@@ -10,32 +10,39 @@
 # --- tablas y textos del menu ------------------------------------------------
 # La matriz de teclas del ZX SPECTRUM en el orden de sus puertos (BHY65TGV = el
 # bit 4 de cada fila...): la conversion imita el teclado del ZX por debajo.
-D 0x5FB8 0x5FF0 nombres de tecla en el orden de la matriz del Spectrum, con codigos >=0x80 para las teclas especiales (ld de,0x5FB7 en 0x5EAC, que empieza con inc de; ld hl,0x5FBD en 0x708A)
-D 0x5FF0 0x5FF8 punteros a los cuatro rotulos de "Control Actual" (0x5E31 indexa con (0x96F0)*2)
-D 0x5FF8 0x6008 tabla de la lectura de teclas definidas (ld hl,0x600A en 0x5F36)
-D 0x6008 0x600F las cinco teclas definidas: "1RQAOP" y un byte (ld ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
-D 0x600F 0x62FF textos del menu: rotulos de control, "Las Teclas Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
-D 0x62FF 0x6317 dibujo de 24 bytes de la marca del cursor (ld de,0x62FF en 0x64DC: 8 columnas de 3)
-D 0x6317 0x63FB tabla que leen 0x6593-0x659C (formato pendiente)
-D 0x64DA 0x64DC dos nop tras el ret-interruptor de 0x64D9 (que 0x65FB convierte en ld hl,0x0000)
+D 0x5FB8 0x5FF0 nombres_de_tecla_spectrum Nombres de tecla en el orden de la matriz del Spectrum, con codigos >=0x80 para las teclas especiales (ld de,0x5FB7 en 0x5EAC, que empieza con inc de; ld hl,0x5FBD en 0x708A)
+D 0x5FF0 0x5FF8 punteros_de_control_actual Punteros a los cuatro rotulos de "Control Actual" (0x5E31 indexa con (0x96F0)*2)
+F 0x5FF0 w1
+D 0x5FF8 0x6008 tabla_de_teclas_definidas Tabla de la lectura de teclas definidas (ld hl,0x600A en 0x5F36)
+D 0x6008 0x600F teclas_definidas Las cinco teclas definidas: "1RQAOP" y un byte (ld ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
+D 0x600F 0x62FF textos_del_menu Textos del menu: rotulos de control, "Las Teclas Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
+D 0x62FF 0x6317 dibujo_del_cursor Dibujo de 24 bytes de la marca del cursor (ld de,0x62FF en 0x64DC: 8 columnas de 3)
+F 0x62FF 8
+D 0x6317 0x63FB tabla_6317 Tabla que leen 0x6593-0x659C (formato pendiente)
+D 0x64DA 0x64DC dos_nop_64da Dos nop tras el ret-interruptor de 0x64D9 (que 0x65FB convierte en ld hl,0x0000)
 
 # --- tablas de saltos ------------------------------------------------------
-D 0x7697 0x76B7 tabla de 16 palabras que 0x7687 indexa con A*2 & 0x1E y despacha con push de / ret
-D 0x8030 0x8044 tabla de 10 palabras (indice 1..10) que 0x804D-0x805B indexa con A y salta con jp (hl)
+D 0x7697 0x76B7 tabla_de_16_palabras_7697 Tabla de 16 palabras que 0x7687 indexa con A*2 & 0x1E y despacha con push de / ret
+F 0x7697 w1
+D 0x8030 0x8044 tabla_de_10_palabras_8030 Tabla de 10 palabras (indice 1..10) que 0x804D-0x805B indexa con A y salta con jp (hl)
+F 0x8030 w1
 
 # --- textos y datos del juego -------------------------------------------------
-D 0x6AF5 0x6DE7 textos ("El Anillo se ha perdido.") y tablas (0x6B13, 0x6B34, 0x6B3D, 0x6B46, 0x6BE4 los apuntan; formato pendiente)
-D 0x77A0 0x7E4F textos de batalla ("Comienza la Batalla") y tablas (0x7554, 0x76C1, 0x76DE, 0x7702, 0x76DB, 0x76BE las apuntan; formato pendiente)
-D 0x83F8 0x8572 textos y marcos de los paneles: "Volver/Cargar/Salvar", "Pulsa Fuego", File/Memo/Time, numeros romanos I..VII, "El Anillo corrompe al que lo usa", "Ningun mensaje" (los leen 0x7E81-0x7EA0 y 0x8280)
-D 0x93D9 0x93E5 seis punteros a los mensajes de abajo (0x9180, 0x9189, 0x925B)
-D 0x93E5 0x94B7 mensajes: "La Batalla ha comenzado/finalizado", "Elige el enemigo a atacar", "No puedes atacar a un amigo", "No pertenece a tu Alianza", "Nuevo destino elegido", "Aqui no hay nadie"
-D 0x94B7 0x94BF tabla de 4 palabras del despachador de 0x9163 (la CUARTA, 0x94BD, es una variable: 0x8BA1 mete 0x8BE4 y 0x8C83 devuelve 0x8F19)
-D 0x94BF 0x94C7 tabla de 4 palabras que 0x8A11-0x8A1E indexa con A&3
-D 0x94C7 0x9627 tablas de codigos de caracter/tile y datos (0x95A8 lo apuntan 0x8850, 0x8B3B, 0x8C74, 0x8E42, 0x90B0; formato pendiente)
-D 0x9687 0x96F0 rotulos "Cargando Posiciones" y compania para cargar/salvar la partida en cinta (0x962B, 0x9658, 0x966C)
-D 0x96F0 0x96F1 variable: modo de control (0 joystick, 1 cursores, 3 teclado); la lee 0x5E31 y 0x0698, la escribe 0x5E61
+D 0x6AF5 0x6DE7 textos_y_tablas_del_anillo Textos ("El Anillo se ha perdido.") y tablas (0x6B13, 0x6B34, 0x6B3D, 0x6B46, 0x6BE4 los apuntan; formato pendiente)
+D 0x77A0 0x7E4F textos_y_tablas_de_batalla Textos de batalla ("Comienza la Batalla") y tablas (0x7554, 0x76C1, 0x76DE, 0x7702, 0x76DB, 0x76BE las apuntan; formato pendiente)
+D 0x83F8 0x8572 textos_de_los_paneles Textos y marcos de los paneles: "Volver/Cargar/Salvar", "Pulsa Fuego", File/Memo/Time, numeros romanos I..VII, "El Anillo corrompe al que lo usa", "Ningun mensaje" (los leen 0x7E81-0x7EA0 y 0x8280)
+D 0x93D9 0x93E5 punteros_de_los_mensajes Seis punteros a los mensajes de abajo (0x9180, 0x9189, 0x925B)
+F 0x93D9 w1
+D 0x93E5 0x94B7 mensajes_de_abajo Mensajes: "La Batalla ha comenzado/finalizado", "Elige el enemigo a atacar", "No puedes atacar a un amigo", "No pertenece a tu Alianza", "Nuevo destino elegido", "Aqui no hay nadie"
+D 0x94B7 0x94BF tabla_del_despachador_9163 Tabla de 4 palabras del despachador de 0x9163 (la CUARTA, 0x94BD, es una variable: 0x8BA1 mete 0x8BE4 y 0x8C83 devuelve 0x8F19)
+F 0x94B7 w1
+D 0x94BF 0x94C7 tabla_del_despachador_8A11 Tabla de 4 palabras que 0x8A11-0x8A1E indexa con A&3
+F 0x94BF w1
+D 0x94C7 0x9627 tablas_de_caracteres_y_datos Tablas de codigos de caracter/tile y datos (0x95A8 lo apuntan 0x8850, 0x8B3B, 0x8C74, 0x8E42, 0x90B0; formato pendiente)
+D 0x9687 0x96F0 rotulos_de_cinta Rotulos "Cargando Posiciones" y compania para cargar/salvar la partida en cinta (0x962B, 0x9658, 0x966C)
+D 0x96F0 0x96F1 modo_de_control Variable: modo de control (0 joystick, 1 cursores, 3 teclado); la lee 0x5E31 y 0x0698, la escribe 0x5E61
 
 # --- bytes sueltos ------------------------------------------------------------
-D 0x8A51 0x8A52 un pop hl que el jr de 0x8A4F salta y al que nadie llega (entrada alternativa sin uso)
-D 0x8A68 0x8A6B interruptor por opcode: en la cinta ret / 00 / BE; 0x8BEE escribe 0x21 y 0x8BCC el byte de 0x8A69, y queda ld hl,0xBExx que cae en 0x8A6B
-D 0x6712 0x6714 pop af / ret al que no llega nadie: cola del motor de sonido del Spectrum
+D 0x8A51 0x8A52 pop_hl_sin_uso Un pop hl que el jr de 0x8A4F salta y al que nadie llega (entrada alternativa sin uso)
+D 0x8A68 0x8A6B interruptor_por_opcode Interruptor por opcode: en la cinta ret / 00 / BE; 0x8BEE escribe 0x21 y 0x8BCC el byte de 0x8A69, y queda ld hl,0xBExx que cae en 0x8A6B
+D 0x6712 0x6714 cola_del_motor_de_sonido Pop af / ret al que no llega nadie: cola del motor de sonido del Spectrum

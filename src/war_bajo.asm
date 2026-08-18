@@ -48,49 +48,60 @@ L_01C2:
 	jp 05e00h		;01c2
 
 ; ----------------------------------------------------------------------
-; DATOS restos: sin lector: 58 bytes de la misma basura de memoria del volcado
+; DATOS restos_de_memoria: Restos sin lector: 58 bytes de la misma basura de
+;   memoria del volcado
 ;   0x01c5..0x01ff  (58 bytes)
-; DATOS restos: del codigo fuente ("HEX FF00FF00..."); al arrancar aqui va la tabla atributo ZX -> byte de color MSX (256 B, la rellena 0x5E15 con 0x049F)
-;   0x01ff..0x0300  (257 bytes)
-; DATOS restos: del codigo fuente (sigue el texto HEX); en juego, tabla de 256 B que rellenan 0x908D y 0x9129
-;   0x0300..0x0400  (256 bytes)
-; ----------------------------------------------------------------------
+DATA_restos_de_memoria:
 	defb 000h,084h,001h,000h,000h,082h,080h,000h,080h,080h,080h,02ah,000h,018h,000h,031h	; 01c5  ...........*...1
 	defb 014h,016h,030h,02ch,009h,029h,010h,01dh,045h,094h,050h,080h,0b2h,001h,0e0h,000h	; 01d5  ..0,.)..E.P.....
 	defb 044h,000h,0e5h,000h,08eh,000h,0a2h,000h,0c4h,000h,0ffh,000h,0cdh,048h,06ch,007h	; 01e5  D............Hl.
-	defb 01dh,00ch,03ch,00ch,07dh,005h,015h,01dh,059h,080h,0c0h,046h,046h,030h,030h,046h	; 01f5  ..<.}...Y..FF00F
-	defb 046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h	; 0205  F00FF00FF00FF00F
-	defb 046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h	; 0215  F00FF00FF00FF00F
-	defb 046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,045h,030h,031h,046h	; 0225  F00FF00FF00FE01F
-	defb 046h,030h,030h,00dh,00ah,009h,048h,045h,058h,020h,046h,046h,030h,030h,046h,046h	; 0235  F00...HEX FF00FF
-	defb 030h,030h,046h,045h,030h,031h,046h,046h,030h,030h,046h,046h,030h,030h,046h,043h	; 0245  00FE01FF00FF00FC
-	defb 030h,033h,046h,033h,030h,043h,046h,046h,030h,030h,046h,046h,030h,030h,043h,046h	; 0255  03F30CFF00FF00CF
-	defb 033h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h	; 0265  30FF00FF00FF00FF
-	defb 030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,00dh,00ah,009h,048h,045h,058h	; 0275  00FF00FF00...HEX
-	defb 020h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 0285   FF00FF00FF00FF0
-	defb 030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 0295  0FF00FF00FF00FF0
-	defb 030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 02a5  0FF00FF00FF00FF0
-	defb 030h,046h,030h,030h,046h,046h,046h,030h,030h,037h,046h,038h,030h,046h,030h,030h	; 02b5  0F00FFF007F80F00
-	defb 045h,00dh,00ah,009h,048h,045h,058h,020h,046h,030h,030h,044h,033h,046h,034h,030h	; 02c5  E...HEX F00D3F40
-	defb 031h,046h,041h,030h,046h,030h,030h,039h,046h,030h,030h,038h,031h,046h,041h,030h	; 02d5  1FA0F009F0081FA0
-	defb 031h,046h,038h,030h,046h,030h,030h,044h,045h,030h,031h,046h,031h,046h,043h,030h	; 02e5  1F80F00DE01F1FC0
-	defb 030h,046h,037h,030h,043h,030h,033h,042h,043h,030h,033h,033h,030h,046h,035h,030h	; 02f5  0F70C03BC0330F50
-	defb 030h,046h,035h,030h,038h,030h,036h,046h,00dh,00ah,009h,048h,045h,058h,020h,030h	; 0305  0F50806F...HEX 0
-	defb 030h,046h,033h,030h,046h,035h,030h,030h,046h,044h,030h,037h,030h,038h,038h,042h	; 0315  0F30F500FD07088B
-	defb 030h,034h,039h,030h,046h,031h,030h,030h,046h,037h,030h,046h,030h,030h,046h,046h	; 0325  0490F100F70F00FF
-	defb 030h,030h,045h,031h,046h,036h,030h,031h,046h,032h,030h,046h,030h,030h,042h,046h	; 0335  00E1F601F20F00BF
-	defb 030h,030h,039h,031h,046h,032h,030h,031h,046h,041h,030h,046h,030h,030h,042h,00dh	; 0345  0091F201FA0F00B.
-	defb 00ah,009h,048h,045h,058h,020h,046h,031h,030h,041h,030h,046h,039h,030h,038h,046h	; 0355  ..HEX F10A0F908F
-	defb 035h,030h,046h,031h,030h,041h,046h,031h,030h,045h,043h,046h,033h,030h,043h,037h	; 0365  50F10AF10ECF30C7
-	defb 033h,038h,046h,031h,030h,045h,046h,033h,030h,043h,045h,037h,031h,038h,043h,037h	; 0375  38F10EF30CE718C7
-	defb 033h,038h,046h,033h,030h,043h,046h,033h,030h,043h,043h,046h,033h,030h,046h,046h	; 0385  38F30CF30CCF30FF
-	defb 030h,030h,045h,033h,031h,043h,00dh,00ah,009h,048h,045h,058h,020h,045h,037h,031h	; 0395  00E31C...HEX E71
-	defb 038h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 03a5  8FF00FF00FF00FF0
-	defb 030h,046h,046h,030h,030h,039h,046h,036h,030h,046h,046h,030h,030h,046h,046h,030h	; 03b5  0FF009F60FF00FF0
-	defb 030h,045h,037h,031h,038h,046h,039h,030h,036h,046h,046h,030h,030h,046h,046h,030h	; 03c5  0E718F906FF00FF0
-	defb 030h,046h,045h,030h,031h,046h,046h,030h,030h,046h,046h,030h,030h,00dh,00ah,009h	; 03d5  0FE01FF00FF00...
-	defb 048h,045h,058h,020h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h	; 03e5  HEX FF00FF00FF00
-	defb 046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 03f5  FF00FF00FF0
+	defb 01dh,00ch,03ch,00ch,07dh,005h,015h,01dh,059h,080h	; 01f5  ..<.}...Y.
+
+; ----------------------------------------------------------------------
+; DATOS restos_fuente_y_tabla_de_atributos: Restos del codigo fuente ("HEX
+;   FF00FF00..."); al arrancar aqui va la tabla atributo ZX -> byte de color
+;   MSX (256 B, la rellena 0x5E15 con 0x049F)
+;   0x01ff..0x0300  (257 bytes)
+DATA_restos_fuente_y_tabla_de_atributos:
+	defb 0c0h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 01ff  .FF00FF00FF00FF0
+	defb 030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 020f  0FF00FF00FF00FF0
+	defb 030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 021f  0FF00FF00FF00FF0
+	defb 030h,046h,045h,030h,031h,046h,046h,030h,030h,00dh,00ah,009h,048h,045h,058h,020h	; 022f  0FE01FF00...HEX 
+	defb 046h,046h,030h,030h,046h,046h,030h,030h,046h,045h,030h,031h,046h,046h,030h,030h	; 023f  FF00FF00FE01FF00
+	defb 046h,046h,030h,030h,046h,043h,030h,033h,046h,033h,030h,043h,046h,046h,030h,030h	; 024f  FF00FC03F30CFF00
+	defb 046h,046h,030h,030h,043h,046h,033h,030h,046h,046h,030h,030h,046h,046h,030h,030h	; 025f  FF00CF30FF00FF00
+	defb 046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h	; 026f  FF00FF00FF00FF00
+	defb 00dh,00ah,009h,048h,045h,058h,020h,046h,046h,030h,030h,046h,046h,030h,030h,046h	; 027f  ...HEX FF00FF00F
+	defb 046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h	; 028f  F00FF00FF00FF00F
+	defb 046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h	; 029f  F00FF00FF00FF00F
+	defb 046h,030h,030h,046h,046h,030h,030h,046h,030h,030h,046h,046h,046h,030h,030h,037h	; 02af  F00FF00F00FFF007
+	defb 046h,038h,030h,046h,030h,030h,045h,00dh,00ah,009h,048h,045h,058h,020h,046h,030h	; 02bf  F80F00E...HEX F0
+	defb 030h,044h,033h,046h,034h,030h,031h,046h,041h,030h,046h,030h,030h,039h,046h,030h	; 02cf  0D3F401FA0F009F0
+	defb 030h,038h,031h,046h,041h,030h,031h,046h,038h,030h,046h,030h,030h,044h,045h,030h	; 02df  081FA01F80F00DE0
+	defb 031h,046h,031h,046h,043h,030h,030h,046h,037h,030h,043h,030h,033h,042h,043h,030h	; 02ef  1F1FC00F70C03BC0
+	defb 033h	; 02ff
+
+; ----------------------------------------------------------------------
+; DATOS restos_fuente_y_tabla_908D: Restos del codigo fuente (sigue el texto
+;   HEX); en juego, tabla de 256 B que rellenan 0x908D y 0x9129
+;   0x0300..0x0400  (256 bytes)
+DATA_restos_fuente_y_tabla_908D:
+	defb 033h,030h,046h,035h,030h,030h,046h,035h,030h,038h,030h,036h,046h,00dh,00ah,009h	; 0300  30F500F50806F...
+	defb 048h,045h,058h,020h,030h,030h,046h,033h,030h,046h,035h,030h,030h,046h,044h,030h	; 0310  HEX 00F30F500FD0
+	defb 037h,030h,038h,038h,042h,030h,034h,039h,030h,046h,031h,030h,030h,046h,037h,030h	; 0320  7088B0490F100F70
+	defb 046h,030h,030h,046h,046h,030h,030h,045h,031h,046h,036h,030h,031h,046h,032h,030h	; 0330  F00FF00E1F601F20
+	defb 046h,030h,030h,042h,046h,030h,030h,039h,031h,046h,032h,030h,031h,046h,041h,030h	; 0340  F00BF0091F201FA0
+	defb 046h,030h,030h,042h,00dh,00ah,009h,048h,045h,058h,020h,046h,031h,030h,041h,030h	; 0350  F00B...HEX F10A0
+	defb 046h,039h,030h,038h,046h,035h,030h,046h,031h,030h,041h,046h,031h,030h,045h,043h	; 0360  F908F50F10AF10EC
+	defb 046h,033h,030h,043h,037h,033h,038h,046h,031h,030h,045h,046h,033h,030h,043h,045h	; 0370  F30C738F10EF30CE
+	defb 037h,031h,038h,043h,037h,033h,038h,046h,033h,030h,043h,046h,033h,030h,043h,043h	; 0380  718C738F30CF30CC
+	defb 046h,033h,030h,046h,046h,030h,030h,045h,033h,031h,043h,00dh,00ah,009h,048h,045h	; 0390  F30FF00E31C...HE
+	defb 058h,020h,045h,037h,031h,038h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h	; 03a0  X E718FF00FF00FF
+	defb 030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,039h,046h,036h,030h,046h,046h	; 03b0  00FF00FF009F60FF
+	defb 030h,030h,046h,046h,030h,030h,045h,037h,031h,038h,046h,039h,030h,036h,046h,046h	; 03c0  00FF00E718F906FF
+	defb 030h,030h,046h,046h,030h,030h,046h,045h,030h,031h,046h,046h,030h,030h,046h,046h	; 03d0  00FF00FE01FF00FF
+	defb 030h,030h,00dh,00ah,009h,048h,045h,058h,020h,046h,046h,030h,030h,046h,046h,030h	; 03e0  00...HEX FF00FF0
+	defb 030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h,030h,046h,046h,030h	; 03f0  0FF00FF00FF00FF0
 
 ; ======================================================================
 ; CODIGO 0x0400..0x04ce  (206 bytes)
@@ -259,12 +270,18 @@ L_04AD:
 	ret			;04cd
 
 ; ----------------------------------------------------------------------
-; DATOS colores: MSX de los 8 colores ZX SIN brillo (ld hl,0x04CE en 0x04A3)
+; DATOS colores_zx_sin_brillo: Colores MSX de los 8 colores ZX SIN brillo (ld
+;   hl,0x04CE en 0x04A3)
 ;   0x04ce..0x04d6  (8 bytes)
-; DATOS colores: MSX de los 8 colores ZX CON brillo (ld hl,0x04D6 en 0x04AA)
-;   0x04d6..0x04de  (8 bytes)
+DATA_colores_zx_sin_brillo:
+	defb 001h,004h,006h,00dh,00ch,007h,00ah,00fh	; 04ce  ........
+
 ; ----------------------------------------------------------------------
-	defb 001h,004h,006h,00dh,00ch,007h,00ah,00fh,001h,005h,009h,00dh,003h,007h,00bh,00fh	; 04ce  ................
+; DATOS colores_zx_con_brillo: Colores MSX de los 8 colores ZX CON brillo (ld
+;   hl,0x04D6 en 0x04AA)
+;   0x04d6..0x04de  (8 bytes)
+DATA_colores_zx_con_brillo:
+	defb 001h,005h,009h,00dh,003h,007h,00bh,00fh	; 04d6  ........
 
 ; ======================================================================
 ; CODIGO 0x04de..0x0527  (73 bytes)
@@ -335,20 +352,49 @@ L_051A:
 	ret			;0526
 
 ; ----------------------------------------------------------------------
-; DATOS nombre: ASCII de cada tecla de la matriz del MSX (ld hl,0x0527 en 0x051F)
+; DATOS nombres_de_tecla_msx: Nombre ASCII de cada tecla de la matriz del MSX
+;   (ld hl,0x0527 en 0x051F)
 ;   0x0527..0x056f  (72 bytes)
-; DATOS nombres: de tres letras de las teclas especiales (ld hl,0x056F en 0x0641, de 3 en 3)
-;   0x056f..0x05b7  (72 bytes)
+DATA_nombres_de_tecla_msx:
+	defb 030h,031h,032h,033h,034h,035h,036h,037h	; 0527  01234567
+	defb 038h,039h,02dh,03dh,05ch,07bh,07dh,03bh	; 052f  89-=\{};
+	defb 03ah,020h,02ch,02eh,02fh,05eh,041h,042h	; 0537  : ,./^AB
+	defb 043h,044h,045h,046h,047h,048h,049h,04ah	; 053f  CDEFGHIJ
+	defb 04bh,04ch,04dh,04eh,04fh,050h,051h,052h	; 0547  KLMNOPQR
+	defb 053h,054h,055h,056h,057h,058h,059h,05ah	; 054f  STUVWXYZ
+	defb 001h,002h,003h,004h,005h,006h,007h,008h	; 0557  ........
+	defb 009h,00ah,00bh,00ch,00dh,00eh,00fh,010h	; 055f  ........
+	defb 011h,012h,013h,014h,015h,016h,017h,018h	; 0567  ........
+
 ; ----------------------------------------------------------------------
-	defb 030h,031h,032h,033h,034h,035h,036h,037h,038h,039h,02dh,03dh,05ch,07bh,07dh,03bh	; 0527  0123456789-=\{};
-	defb 03ah,020h,02ch,02eh,02fh,05eh,041h,042h,043h,044h,045h,046h,047h,048h,049h,04ah	; 0537  : ,./^ABCDEFGHIJ
-	defb 04bh,04ch,04dh,04eh,04fh,050h,051h,052h,053h,054h,055h,056h,057h,058h,059h,05ah	; 0547  KLMNOPQRSTUVWXYZ
-	defb 001h,002h,003h,004h,005h,006h,007h,008h,009h,00ah,00bh,00ch,00dh,00eh,00fh,010h	; 0557  ................
-	defb 011h,012h,013h,014h,015h,016h,017h,018h,053h,048h,046h,043h,054h,052h,047h,052h	; 0567  ........SHFCTRGR
-	defb 046h,043h,041h,050h,043h,04fh,044h,046h,031h,020h,046h,032h,020h,046h,033h,020h	; 0577  FCAPCODF1 F2 F3 
-	defb 046h,034h,020h,046h,035h,020h,045h,053h,043h,054h,041h,042h,053h,054h,050h,042h	; 0587  F4 F5 ESCTABSTPB
-	defb 053h,020h,053h,045h,04ch,052h,045h,054h,053h,050h,043h,048h,04fh,04dh,049h,04eh	; 0597  S SELRETSPCHOMIN
-	defb 053h,044h,045h,04ch,04ch,046h,054h,055h,050h,020h,044h,057h,04eh,052h,049h,047h	; 05a7  SDELLFTUP DWNRIG
+; DATOS nombres_de_teclas_especiales: Nombres de tres letras de las teclas
+;   especiales (ld hl,0x056F en 0x0641, de 3 en 3)
+;   0x056f..0x05b7  (72 bytes)
+DATA_nombres_de_teclas_especiales:
+	defb 053h,048h,046h	; 056f
+	defb 043h,054h,052h	; 0572
+	defb 047h,052h,046h	; 0575
+	defb 043h,041h,050h	; 0578
+	defb 043h,04fh,044h	; 057b
+	defb 046h,031h,020h	; 057e
+	defb 046h,032h,020h	; 0581
+	defb 046h,033h,020h	; 0584
+	defb 046h,034h,020h	; 0587
+	defb 046h,035h,020h	; 058a
+	defb 045h,053h,043h	; 058d
+	defb 054h,041h,042h	; 0590
+	defb 053h,054h,050h	; 0593
+	defb 042h,053h,020h	; 0596
+	defb 053h,045h,04ch	; 0599
+	defb 052h,045h,054h	; 059c
+	defb 053h,050h,043h	; 059f
+	defb 048h,04fh,04dh	; 05a2
+	defb 049h,04eh,053h	; 05a5
+	defb 044h,045h,04ch	; 05a8
+	defb 04ch,046h,054h	; 05ab
+	defb 055h,050h,020h	; 05ae
+	defb 044h,057h,04eh	; 05b1
+	defb 052h,049h,047h	; 05b4
 
 ; ======================================================================
 ; CODIGO 0x05b7..0x0656  (159 bytes)
@@ -462,10 +508,11 @@ L_0651:
 	ret			;0655
 
 ; ----------------------------------------------------------------------
-; DATOS buffer: de tres caracteres donde 0x0627 deja el nombre de una tecla ("123" en la cinta)
+; DATOS buffer_del_nombre_de_tecla: Buffer de tres caracteres donde 0x0627
+;   deja el nombre de una tecla ("123" en la cinta)
 ;   0x0656..0x0659  (3 bytes)
-; ----------------------------------------------------------------------
-	defb 031h,032h,033h	; 0656  123
+DATA_buffer_del_nombre_de_tecla:
+	defb 031h,032h,033h	; 0656
 
 ; ======================================================================
 ; CODIGO 0x0659..0x06d0  (119 bytes)
@@ -556,15 +603,24 @@ L_06C8:
 	ret			;06cf
 
 ; ----------------------------------------------------------------------
-; DATOS mascaras: de bit 01 02 04 08 10 (ld de,0x06D0 en 0x06AF)
+; DATOS mascaras_de_bit: Mascaras de bit 01 02 04 08 10 (ld de,0x06D0 en
+;   0x06AF)
 ;   0x06d0..0x06d5  (5 bytes)
-; DATOS tabla: de la lectura de mandos (la usa 0x06A7-0x06BD)
-;   0x06d5..0x06e5  (16 bytes)
-; DATOS tabla: que 0x5ECF pasa en hl al redefinir teclas (ld hl,0x06E5 / push hl)
-;   0x06e5..0x06ef  (10 bytes)
+DATA_mascaras_de_bit:
+	defb 001h,002h,004h,008h,010h	; 06d0
+
 ; ----------------------------------------------------------------------
-	defb 001h,002h,004h,008h,010h,0dbh,006h,000h,000h,0e5h,006h,0f8h,020h,0f8h,040h,0f8h	; 06d0  ............ .@.
-	defb 010h,0f8h,080h,0f8h,001h,0f4h,040h,0f2h,040h,0f4h,010h,0f4h,020h,0f8h,001h	; 06e0  ......@.@... ..
+; DATOS tabla_de_mandos: Tabla de la lectura de mandos (la usa 0x06A7-0x06BD)
+;   0x06d5..0x06e5  (16 bytes)
+DATA_tabla_de_mandos:
+	defb 0dbh,006h,000h,000h,0e5h,006h,0f8h,020h,0f8h,040h,0f8h,010h,0f8h,080h,0f8h,001h	; 06d5  ....... .@......
+
+; ----------------------------------------------------------------------
+; DATOS tabla_de_redefinir_teclas: Tabla que 0x5ECF pasa en hl al redefinir
+;   teclas (ld hl,0x06E5 / push hl)
+;   0x06e5..0x06ef  (10 bytes)
+DATA_tabla_de_redefinir_teclas:
+	defb 0f4h,040h,0f2h,040h,0f4h,010h,0f4h,020h,0f8h,001h	; 06e5  .@.@... ..
 
 ; ======================================================================
 ; CODIGO 0x06ef..0x094f  (608 bytes)
@@ -1014,7 +1070,7 @@ L_0942:
 
 ; ----------------------------------------------------------------------
 ; DATOS sin identificar  0x094f..0x3f4f  (13824 bytes)
-; ----------------------------------------------------------------------
+DATA_094F:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 094f  ................
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 095f  ................
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 096f  ................

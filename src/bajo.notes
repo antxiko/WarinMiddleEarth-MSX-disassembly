@@ -14,25 +14,27 @@
 # tabla atributo->color (con la rutina 0x049F, que la leen 0x0616 y 0x07A7 con
 # H=2), y 0x908D/0x9129 rellenan 0x0300-0x03FF. Los 58 bytes de 0x01C5-0x01FE
 # no los lee nadie (medido con puntos de observacion de lectura, lee2).
-D 0x01C5 0x01FF restos sin lector: 58 bytes de la misma basura de memoria del volcado
-D 0x01FF 0x0300 restos del codigo fuente ("HEX FF00FF00..."); al arrancar aqui va la tabla atributo ZX -> byte de color MSX (256 B, la rellena 0x5E15 con 0x049F)
-D 0x0300 0x0400 restos del codigo fuente (sigue el texto HEX); en juego, tabla de 256 B que rellenan 0x908D y 0x9129
+D 0x01C5 0x01FF restos_de_memoria Restos sin lector: 58 bytes de la misma basura de memoria del volcado
+D 0x01FF 0x0300 restos_fuente_y_tabla_de_atributos Restos del codigo fuente ("HEX FF00FF00..."); al arrancar aqui va la tabla atributo ZX -> byte de color MSX (256 B, la rellena 0x5E15 con 0x049F)
+D 0x0300 0x0400 restos_fuente_y_tabla_908D Restos del codigo fuente (sigue el texto HEX); en juego, tabla de 256 B que rellenan 0x908D y 0x9129
 
 # --- tablas de la capa MSX --------------------------------------------------
 # Las dos tablas de 8 colores que usa 0x049F para traducir un atributo del
 # Spectrum (tinta bits 0-2, papel bits 3-5, brillo bit 6) a un byte de color de
 # SCREEN 2 (tinta<<4 | papel): sin brillo 1,4,6,13,12,7,10,15 y con brillo
 # 1,5,9,13,3,7,11,15 (negro, azul, rojo, magenta, verde, cian, amarillo, blanco).
-D 0x04CE 0x04D6 colores MSX de los 8 colores ZX SIN brillo (ld hl,0x04CE en 0x04A3)
-D 0x04D6 0x04DE colores MSX de los 8 colores ZX CON brillo (ld hl,0x04D6 en 0x04AA)
+D 0x04CE 0x04D6 colores_zx_sin_brillo Colores MSX de los 8 colores ZX SIN brillo (ld hl,0x04CE en 0x04A3)
+D 0x04D6 0x04DE colores_zx_con_brillo Colores MSX de los 8 colores ZX CON brillo (ld hl,0x04D6 en 0x04AA)
 # Nombres de las teclas del MSX por fila y columna de la matriz, para la pantalla
 # de "Define Teclas": las filas de 8 ("0123456789-=" ... "ABC..."), y detras
 # los nombres de tres letras de las teclas especiales, que 0x0641 indexa de 3 en
 # 3 (ld hl,0x056F).
-D 0x0527 0x056F nombre ASCII de cada tecla de la matriz del MSX (ld hl,0x0527 en 0x051F)
-D 0x056F 0x05B7 nombres de tres letras de las teclas especiales (ld hl,0x056F en 0x0641, de 3 en 3)
-D 0x0656 0x0659 buffer de tres caracteres donde 0x0627 deja el nombre de una tecla ("123" en la cinta)
+D 0x0527 0x056F nombres_de_tecla_msx Nombre ASCII de cada tecla de la matriz del MSX (ld hl,0x0527 en 0x051F)
+F 0x0527 8
+D 0x056F 0x05B7 nombres_de_teclas_especiales Nombres de tres letras de las teclas especiales (ld hl,0x056F en 0x0641, de 3 en 3)
+F 0x056F 3
+D 0x0656 0x0659 buffer_del_nombre_de_tecla Buffer de tres caracteres donde 0x0627 deja el nombre de una tecla ("123" en la cinta)
 # Mascaras de bit 1,2,4,8,16 y la tabla de la lectura de mandos.
-D 0x06D0 0x06D5 mascaras de bit 01 02 04 08 10 (ld de,0x06D0 en 0x06AF)
-D 0x06D5 0x06E5 tabla de la lectura de mandos (la usa 0x06A7-0x06BD)
-D 0x06E5 0x06EF tabla que 0x5ECF pasa en hl al redefinir teclas (ld hl,0x06E5 / push hl)
+D 0x06D0 0x06D5 mascaras_de_bit Mascaras de bit 01 02 04 08 10 (ld de,0x06D0 en 0x06AF)
+D 0x06D5 0x06E5 tabla_de_mandos Tabla de la lectura de mandos (la usa 0x06A7-0x06BD)
+D 0x06E5 0x06EF tabla_de_redefinir_teclas Tabla que 0x5ECF pasa en hl al redefinir teclas (ld hl,0x06E5 / push hl)

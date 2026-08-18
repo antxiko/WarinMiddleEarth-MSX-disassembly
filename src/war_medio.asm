@@ -283,90 +283,123 @@ L_5FB7:
 	ret			;5fb7
 
 ; ----------------------------------------------------------------------
-; DATOS nombres: de tecla en el orden de la matriz del Spectrum, con codigos >=0x80 para las teclas especiales (ld de,0x5FB7 en 0x5EAC, que empieza con inc de; ld hl,0x5FBD en 0x708A)
+; DATOS nombres_de_tecla_spectrum: Nombres de tecla en el orden de la matriz
+;   del Spectrum, con codigos >=0x80 para las teclas especiales (ld de,0x5FB7
+;   en 0x5EAC, que empieza con inc de; ld hl,0x5FBD en 0x708A)
 ;   0x5fb8..0x5ff0  (56 bytes)
-; DATOS punteros: a los cuatro rotulos de "Control Actual" (0x5E31 indexa con (0x96F0)*2)
-;   0x5ff0..0x5ff8  (8 bytes)
-; DATOS tabla: de la lectura de teclas definidas (ld hl,0x600A en 0x5F36)
-;   0x5ff8..0x6008  (16 bytes)
-; DATOS las: cinco teclas definidas: "1RQAOP" y un byte (ld ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
-;   0x6008..0x600f  (7 bytes)
-; DATOS textos: del menu: rotulos de control, "Las Teclas Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
-;   0x600f..0x62ff  (752 bytes)
-; DATOS dibujo: de 24 bytes de la marca del cursor (ld de,0x62FF en 0x64DC: 8 columnas de 3)
-;   0x62ff..0x6317  (24 bytes)
-; DATOS tabla: que leen 0x6593-0x659C (formato pendiente)
-;   0x6317..0x63fb  (228 bytes)
-; ----------------------------------------------------------------------
+DATA_nombres_de_tecla_spectrum:
 	defb 042h,048h,059h,036h,035h,054h,047h,056h,04eh,04ah,055h,037h,034h,052h,046h,043h	; 5fb8  BHY65TGVNJU74RFC
 	defb 04dh,04bh,049h,038h,033h,045h,044h,058h,0d3h,0d9h,04dh,04ch,04fh,039h,032h,057h	; 5fc8  MKI83EDX..MLO92W
 	defb 053h,05ah,0d3h,0d0h,043h,0c5h,0ceh,054h,050h,030h,031h,051h,041h,0c3h,0c1h,050h	; 5fd8  SZ..C..TP01QA..P
-	defb 0f8h,05fh,0fah,05fh,001h,060h,008h,060h,00fh,060h,025h,060h,03bh,060h,051h,060h	; 5fe8  ._._.`.`.`%`;`Q`
+	defb 0f8h,05fh,0fah,05fh,001h,060h,008h,060h	; 5fe8  ._._.`.`
+
+; ----------------------------------------------------------------------
+; DATOS punteros_de_control_actual: Punteros a los cuatro rotulos de "Control
+;   Actual" (0x5E31 indexa con (0x96F0)*2)
+;   0x5ff0..0x5ff8  (8 bytes)
+DATA_punteros_de_control_actual:
+	defw 0600fh	; 5ff0  -> DATA_textos_del_menu
+	defw 06025h	; 5ff2
+	defw 0603bh	; 5ff4
+	defw 06051h	; 5ff6
+
+; ----------------------------------------------------------------------
+; DATOS tabla_de_teclas_definidas: Tabla de la lectura de teclas definidas (ld
+;   hl,0x600A en 0x5F36)
+;   0x5ff8..0x6008  (16 bytes)
+DATA_tabla_de_teclas_definidas:
 	defb 031h,052h,031h,052h,018h,015h,016h,017h,011h,00eh,025h,01ch,014h,004h,00ch,024h	; 5ff8  1R1R......%....$
-	defb 031h,052h,051h,041h,04fh,050h,011h,021h,020h,04ah,06fh,079h,073h,074h,069h,063h	; 6008  1RQAOP.! Joystic
-	defb 06bh,020h,053h,074h,061h,06eh,064h,061h,072h,064h,020h,021h,000h,021h,020h,054h	; 6018  k Standard !.! T
-	defb 065h,063h,06ch,061h,073h,020h,044h,065h,06ch,020h,043h,075h,072h,073h,06fh,072h	; 6028  eclas Del Cursor
-	defb 020h,021h,000h,021h,020h,020h,020h,049h,06eh,074h,065h,072h,066h,061h,063h,065h	; 6038   !.!   Interface
-	defb 020h,054h,077h,06fh,020h,020h,020h,021h,000h,021h,020h,054h,065h,063h,06ch,061h	; 6048   Two   !.! Tecla
-	defb 064h,06fh,020h,044h,065h,066h,069h,06eh,069h,064h,06fh,020h,020h,021h,000h,0d0h	; 6058  do Definido  !..
-	defb 060h,023h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 6068  `#""""""""""""""
-	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 6078  """"""""""""""""
-	defb 023h,0b7h,021h,020h,020h,020h,04ch,061h,073h,020h,054h,065h,063h,06ch,061h,073h	; 6088  #.!   Las Teclas
-	defb 020h,041h,063h,074h,075h,061h,06ch,065h,073h,020h,053h,06fh,06eh,03ah,020h,020h	; 6098   Actuales Son:  
-	defb 020h,021h,0b7h,021h,02dh,041h,052h,052h,049h,02dh,020h,041h,042h,041h,04ah,02dh	; 60a8   !.!-ARRI- ABAJ-
-	defb 020h,049h,05ah,044h,041h,02dh,020h,044h,043h,048h,041h,02dh,046h,055h,045h,047h	; 60b8   IZDA- DCHA-FUEG
-	defb 04fh,02dh,021h,0b7h,021h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 60c8  O-!.!           
-	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 60d8                  
-	defb 020h,020h,020h,021h,0b7h,023h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 60e8     !.#""""""""""
-	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 60f8  """"""""""""""""
-	defb 022h,022h,022h,022h,023h,000h,0c0h,005h,023h,022h,022h,022h,022h,022h,022h,022h	; 6108  """"#...#"""""""
-	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,023h,0b7h,021h,057h	; 6118  """"""""""""#.!W
-	defb 061h,072h,020h,049h,06eh,020h,04dh,069h,064h,064h,06ch,065h,020h,045h,061h,072h	; 6128  ar In Middle Ear
-	defb 074h,068h,021h,0b7h,023h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 6138  th!.#"""""""""""
-	defb 022h,022h,022h,022h,022h,022h,022h,022h,023h,0b7h,021h,031h,02eh,020h,055h,073h	; 6148  """"""""#.!1. Us
-	defb 061h,020h,04ah,06fh,079h,073h,074h,069h,063h,06bh,020h,020h,020h,020h,021h,0b7h	; 6158  a Joystick    !.
-	defb 021h,032h,02eh,020h,055h,073h,061h,020h,043h,075h,072h,073h,06fh,072h,065h,073h	; 6168  !2. Usa Cursores
-	defb 020h,020h,020h,020h,021h,0b7h,021h,033h,02eh,020h,055h,073h,061h,020h,054h,065h	; 6178      !.!3. Usa Te
-	defb 063h,06ch,061h,064h,06fh,020h,020h,020h,020h,020h,021h,0b7h,021h,020h,020h,020h	; 6188  clado     !.!   
-	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 6198                  
-	defb 021h,0b7h,021h,035h,02eh,020h,044h,065h,066h,069h,06eh,065h,020h,054h,065h,063h	; 61a8  !.!5. Define Tec
-	defb 06ch,061h,073h,020h,020h,020h,021h,0b7h,021h,036h,02eh,020h,04eh,069h,076h,065h	; 61b8  las   !.!6. Nive
-	defb 06ch,020h,030h,030h,031h,020h,020h,020h,020h,020h,020h,020h,021h,0b7h,021h,030h	; 61c8  l 001       !.!0
-	defb 02eh,020h,045h,06dh,070h,069h,065h,07ah,061h,020h,04ah,075h,065h,067h,06fh,020h	; 61d8  . Empieza Juego 
-	defb 020h,020h,021h,0b7h,021h,020h,043h,06fh,06eh,074h,072h,06fh,06ch,020h,041h,063h	; 61e8    !.! Control Ac
-	defb 074h,075h,061h,06ch,03ah,020h,020h,020h,021h,0b7h,0b7h,023h,022h,022h,022h,022h	; 61f8  tual:   !..#""""
-	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,023h	; 6208  """""""""""""""#
-	defb 0b7h,021h,050h,061h,075h,073h,061h,02fh,041h,062h,061h,06eh,064h,06fh,06eh,061h	; 6218  .!Pausa/Abandona
-	defb 02dh,020h,020h,031h,020h,021h,0b7h,021h,04dh,065h,06eh,075h,020h,020h,020h,020h	; 6228  -  1 !.!Menu    
-	defb 020h,020h,020h,020h,020h,020h,02dh,020h,020h,052h,020h,021h,0b7h,023h,022h,022h	; 6238        -  R !.#""
-	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 6248  """"""""""""""""
-	defb 022h,023h,000h,050h,072h,06fh,067h,072h,061h,06dh,061h,064h,06fh,020h,070h,06fh	; 6258  "#.Programado po
-	defb 072h,020h,043h,02eh,04ah,02eh,050h,069h,06eh,06bh,02eh,020h,020h,020h,020h,020h	; 6268  r C.J.Pink.     
-	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,043h,06fh,06eh,076h,065h	; 6278             Conve
-	defb 072h,073h,069h,06fh,06eh,020h,070h,06fh,072h,020h,041h,04eh,049h,04dh,041h,047h	; 6288  rsion por ANIMAG
-	defb 049h,043h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 6298  IC              
-	defb 020h,020h,020h,059h,06fh,075h,072h,020h,06fh,06eh,06ch,079h,020h,061h,073h,020h	; 62a8     Your only as 
-	defb 067h,06fh,06fh,064h,020h,061h,073h,020h,074h,068h,065h,020h,06ch,061h,073h,074h	; 62b8  good as the last
-	defb 020h,067h,072h,065h,061h,074h,020h,074h,068h,069h,06eh,067h,020h,079h,06fh,075h	; 62c8   great thing you
-	defb 020h,064h,069h,064h,02ch,020h,077h,068h,065h,072h,065h,020h,068h,061h,076h,065h	; 62d8   did, where have
-	defb 020h,079h,06fh,075h,020h,062h,065h,065h,06eh,020h,073h,069h,06eh,063h,065h,020h	; 62e8   you been since 
-	defb 074h,068h,065h,06eh,000h,000h,000h,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 62f8  then............
-	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 6308  ................
-	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 6318  ................
-	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,02dh,000h,000h,008h,004h	; 6328  ...........-....
-	defb 00ch,002h,00ah,006h,00eh,001h,009h,005h,00dh,003h,00bh,007h,00fh,03ch,070h,043h	; 6338  .............<pC
-	defb 09eh,060h,051h,0e0h,07eh,0c0h,090h,0c7h,060h,099h,0c0h,0e0h,000h,0c3h,08fh,080h	; 6348  .`Q.~...`.......
-	defb 001h,080h,000h,000h,001h,000h,00fh,000h,01fh,006h,03fh,01fh,0ffh,06fh,063h,084h	; 6358  ..........?..oc.
-	defb 063h,099h,063h,0aeh,063h,0c3h,063h,02dh,000h,005h,000h,002h,000h,001h,000h,001h	; 6368  c.c.c.c-........
-	defb 000h,001h,000h,001h,000h,001h,000h,001h,000h,001h,000h,001h,00ch,000h,003h,000h	; 6378  ................
-	defb 00ch,000h,000h,000h,002h,000h,000h,000h,000h,000h,00ch,000h,038h,000h,022h,000h	; 6388  ............8.".
-	defb 064h,028h,000h,021h,000h,003h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 6398  d(.!............
-	defb 000h,000h,000h,000h,000h,005h,046h,000h,02dh,000h,001h,000h,003h,000h,003h,000h	; 63a8  ......F.-.......
-	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,00fh,064h,000h,002h,000h,003h	; 63b8  ...........d....
-	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,028h	; 63c8  ...............(
-	defb 0d0h,0e0h,020h,045h,06ch,065h,067h,069h,072h,03ah,020h,041h,072h,072h,069h,062h	; 63d8  .. Elegir: Arrib
-	defb 061h,02ch,020h,041h,062h,061h,06ah,06fh,020h,079h,020h,046h,075h,065h,067h,06fh	; 63e8  a, Abajo y Fuego
-	defb 02eh,020h,000h	; 63f8  . .
+
+; ----------------------------------------------------------------------
+; DATOS teclas_definidas: Las cinco teclas definidas: "1RQAOP" y un byte (ld
+;   ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
+;   0x6008..0x600f  (7 bytes)
+DATA_teclas_definidas:
+	defb 031h,052h,051h,041h,04fh,050h,011h	; 6008
+
+; ----------------------------------------------------------------------
+; DATOS textos_del_menu: Textos del menu: rotulos de control, "Las Teclas
+;   Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza
+;   Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por
+;   C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
+;   0x600f..0x62ff  (752 bytes)
+DATA_textos_del_menu:
+	defb 021h,020h,04ah,06fh,079h,073h,074h,069h,063h,06bh,020h,053h,074h,061h,06eh,064h	; 600f  ! Joystick Stand
+	defb 061h,072h,064h,020h,021h,000h,021h,020h,054h,065h,063h,06ch,061h,073h,020h,044h	; 601f  ard !.! Teclas D
+	defb 065h,06ch,020h,043h,075h,072h,073h,06fh,072h,020h,021h,000h,021h,020h,020h,020h	; 602f  el Cursor !.!   
+	defb 049h,06eh,074h,065h,072h,066h,061h,063h,065h,020h,054h,077h,06fh,020h,020h,020h	; 603f  Interface Two   
+	defb 021h,000h,021h,020h,054h,065h,063h,06ch,061h,064h,06fh,020h,044h,065h,066h,069h	; 604f  !.! Teclado Defi
+	defb 06eh,069h,064h,06fh,020h,020h,021h,000h,0d0h,060h,023h,022h,022h,022h,022h,022h	; 605f  nido  !..`#"""""
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 606f  """"""""""""""""
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,023h,0b7h,021h,020h,020h,020h,04ch	; 607f  """""""""#.!   L
+	defb 061h,073h,020h,054h,065h,063h,06ch,061h,073h,020h,041h,063h,074h,075h,061h,06ch	; 608f  as Teclas Actual
+	defb 065h,073h,020h,053h,06fh,06eh,03ah,020h,020h,020h,021h,0b7h,021h,02dh,041h,052h	; 609f  es Son:   !.!-AR
+	defb 052h,049h,02dh,020h,041h,042h,041h,04ah,02dh,020h,049h,05ah,044h,041h,02dh,020h	; 60af  RI- ABAJ- IZDA- 
+	defb 044h,043h,048h,041h,02dh,046h,055h,045h,047h,04fh,02dh,021h,0b7h,021h,020h,020h	; 60bf  DCHA-FUEGO-!.!  
+	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 60cf                  
+	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,021h,0b7h,023h,022h	; 60df              !.#"
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 60ef  """"""""""""""""
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,023h,000h,0c0h	; 60ff  """""""""""""#..
+	defb 005h,023h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 610f  .#""""""""""""""
+	defb 022h,022h,022h,022h,022h,023h,0b7h,021h,057h,061h,072h,020h,049h,06eh,020h,04dh	; 611f  """""#.!War In M
+	defb 069h,064h,064h,06ch,065h,020h,045h,061h,072h,074h,068h,021h,0b7h,023h,022h,022h	; 612f  iddle Earth!.#""
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 613f  """"""""""""""""
+	defb 022h,023h,0b7h,021h,031h,02eh,020h,055h,073h,061h,020h,04ah,06fh,079h,073h,074h	; 614f  "#.!1. Usa Joyst
+	defb 069h,063h,06bh,020h,020h,020h,020h,021h,0b7h,021h,032h,02eh,020h,055h,073h,061h	; 615f  ick    !.!2. Usa
+	defb 020h,043h,075h,072h,073h,06fh,072h,065h,073h,020h,020h,020h,020h,021h,0b7h,021h	; 616f   Cursores    !.!
+	defb 033h,02eh,020h,055h,073h,061h,020h,054h,065h,063h,06ch,061h,064h,06fh,020h,020h	; 617f  3. Usa Teclado  
+	defb 020h,020h,020h,021h,0b7h,021h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 618f     !.!          
+	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,021h,0b7h,021h,035h,02eh,020h,044h	; 619f           !.!5. D
+	defb 065h,066h,069h,06eh,065h,020h,054h,065h,063h,06ch,061h,073h,020h,020h,020h,021h	; 61af  efine Teclas   !
+	defb 0b7h,021h,036h,02eh,020h,04eh,069h,076h,065h,06ch,020h,030h,030h,031h,020h,020h	; 61bf  .!6. Nivel 001  
+	defb 020h,020h,020h,020h,020h,021h,0b7h,021h,030h,02eh,020h,045h,06dh,070h,069h,065h	; 61cf       !.!0. Empie
+	defb 07ah,061h,020h,04ah,075h,065h,067h,06fh,020h,020h,020h,021h,0b7h,021h,020h,043h	; 61df  za Juego   !.! C
+	defb 06fh,06eh,074h,072h,06fh,06ch,020h,041h,063h,074h,075h,061h,06ch,03ah,020h,020h	; 61ef  ontrol Actual:  
+	defb 020h,021h,0b7h,0b7h,023h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 61ff   !..#"""""""""""
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,023h,0b7h,021h,050h,061h,075h,073h,061h	; 620f  """"""""#.!Pausa
+	defb 02fh,041h,062h,061h,06eh,064h,06fh,06eh,061h,02dh,020h,020h,031h,020h,021h,0b7h	; 621f  /Abandona-  1 !.
+	defb 021h,04dh,065h,06eh,075h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,02dh	; 622f  !Menu          -
+	defb 020h,020h,052h,020h,021h,0b7h,023h,022h,022h,022h,022h,022h,022h,022h,022h,022h	; 623f    R !.#"""""""""
+	defb 022h,022h,022h,022h,022h,022h,022h,022h,022h,022h,023h,000h,050h,072h,06fh,067h	; 624f  """"""""""#.Prog
+	defb 072h,061h,06dh,061h,064h,06fh,020h,070h,06fh,072h,020h,043h,02eh,04ah,02eh,050h	; 625f  ramado por C.J.P
+	defb 069h,06eh,06bh,02eh,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 626f  ink.            
+	defb 020h,020h,020h,020h,043h,06fh,06eh,076h,065h,072h,073h,069h,06fh,06eh,020h,070h	; 627f      Conversion p
+	defb 06fh,072h,020h,041h,04eh,049h,04dh,041h,047h,049h,043h,020h,020h,020h,020h,020h	; 628f  or ANIMAGIC     
+	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,059h,06fh,075h,072h	; 629f              Your
+	defb 020h,06fh,06eh,06ch,079h,020h,061h,073h,020h,067h,06fh,06fh,064h,020h,061h,073h	; 62af   only as good as
+	defb 020h,074h,068h,065h,020h,06ch,061h,073h,074h,020h,067h,072h,065h,061h,074h,020h	; 62bf   the last great 
+	defb 074h,068h,069h,06eh,067h,020h,079h,06fh,075h,020h,064h,069h,064h,02ch,020h,077h	; 62cf  thing you did, w
+	defb 068h,065h,072h,065h,020h,068h,061h,076h,065h,020h,079h,06fh,075h,020h,062h,065h	; 62df  here have you be
+	defb 065h,06eh,020h,073h,069h,06eh,063h,065h,020h,074h,068h,065h,06eh,000h,000h,000h	; 62ef  en since then...
+
+; ----------------------------------------------------------------------
+; DATOS dibujo_del_cursor: Dibujo de 24 bytes de la marca del cursor (ld
+;   de,0x62FF en 0x64DC: 8 columnas de 3)
+;   0x62ff..0x6317  (24 bytes)
+DATA_dibujo_del_cursor:
+	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 62ff  ........
+	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 6307  ........
+	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 630f  ........
+
+; ----------------------------------------------------------------------
+; DATOS tabla_6317: Tabla que leen 0x6593-0x659C (formato pendiente)
+;   0x6317..0x63fb  (228 bytes)
+DATA_tabla_6317:
+	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 6317  ................
+	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh,02dh,000h,000h,008h	; 6327  ............-...
+	defb 004h,00ch,002h,00ah,006h,00eh,001h,009h,005h,00dh,003h,00bh,007h,00fh,03ch,070h	; 6337  ..............<p
+	defb 043h,09eh,060h,051h,0e0h,07eh,0c0h,090h,0c7h,060h,099h,0c0h,0e0h,000h,0c3h,08fh	; 6347  C.`Q.~...`......
+	defb 080h,001h,080h,000h,000h,001h,000h,00fh,000h,01fh,006h,03fh,01fh,0ffh,06fh,063h	; 6357  ...........?..oc
+	defb 084h,063h,099h,063h,0aeh,063h,0c3h,063h,02dh,000h,005h,000h,002h,000h,001h,000h	; 6367  .c.c.c.c-.......
+	defb 001h,000h,001h,000h,001h,000h,001h,000h,001h,000h,001h,000h,001h,00ch,000h,003h	; 6377  ................
+	defb 000h,00ch,000h,000h,000h,002h,000h,000h,000h,000h,000h,00ch,000h,038h,000h,022h	; 6387  .............8."
+	defb 000h,064h,028h,000h,021h,000h,003h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 6397  .d(.!...........
+	defb 000h,000h,000h,000h,000h,000h,005h,046h,000h,02dh,000h,001h,000h,003h,000h,003h	; 63a7  .......F.-......
+	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,00fh,064h,000h,002h,000h	; 63b7  ............d...
+	defb 003h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 63c7  ................
+	defb 028h,0d0h,0e0h,020h,045h,06ch,065h,067h,069h,072h,03ah,020h,041h,072h,072h,069h	; 63d7  (.. Elegir: Arri
+	defb 062h,061h,02ch,020h,041h,062h,061h,06ah,06fh,020h,079h,020h,046h,075h,065h,067h	; 63e7  ba, Abajo y Fueg
+	defb 06fh,02eh,020h,000h	; 63f7
 
 ; ======================================================================
 ; CODIGO 0x63fb..0x64da  (223 bytes)
@@ -512,10 +545,11 @@ L_64D9:
 	ret			;64d9
 
 ; ----------------------------------------------------------------------
-; DATOS dos: nop tras el ret-interruptor de 0x64D9 (que 0x65FB convierte en ld hl,0x0000)
+; DATOS dos_nop_64da: Dos nop tras el ret-interruptor de 0x64D9 (que 0x65FB
+;   convierte en ld hl,0x0000)
 ;   0x64da..0x64dc  (2 bytes)
-; ----------------------------------------------------------------------
-	defb 000h,000h	; 64da  ..
+DATA_dos_nop_64da:
+	defb 000h,000h	; 64da
 
 ; ======================================================================
 ; CODIGO 0x64dc..0x6712  (566 bytes)
@@ -856,10 +890,11 @@ L_6705:
 	jp L_66CE		;670f
 
 ; ----------------------------------------------------------------------
-; DATOS pop: af / ret al que no llega nadie: cola del motor de sonido del Spectrum
+; DATOS cola_del_motor_de_sonido: Pop af / ret al que no llega nadie: cola del
+;   motor de sonido del Spectrum
 ;   0x6712..0x6714  (2 bytes)
-; ----------------------------------------------------------------------
-	defb 0f1h,0c9h	; 6712  ..
+DATA_cola_del_motor_de_sonido:
+	defb 0f1h,0c9h	; 6712
 
 ; ======================================================================
 ; CODIGO 0x6714..0x6af5  (993 bytes)
@@ -1539,9 +1574,11 @@ L_6AE3:
 	ret			;6af4
 
 ; ----------------------------------------------------------------------
-; DATOS textos: ("El Anillo se ha perdido.") y tablas (0x6B13, 0x6B34, 0x6B3D, 0x6B46, 0x6BE4 los apuntan; formato pendiente)
+; DATOS textos_y_tablas_del_anillo: Textos ("El Anillo se ha perdido.") y
+;   tablas (0x6B13, 0x6B34, 0x6B3D, 0x6B46, 0x6BE4 los apuntan; formato
+;   pendiente)
 ;   0x6af5..0x6de7  (754 bytes)
-; ----------------------------------------------------------------------
+DATA_textos_y_tablas_del_anillo:
 	defb 045h,06ch,020h,041h,06eh,069h,06ch,06ch,06fh,020h,073h,065h,020h,068h,061h,020h	; 6af5  El Anillo se ha 
 	defb 070h,065h,072h,064h,069h,064h,06fh,02eh,020h,020h,020h,020h,020h,000h,0ffh,000h	; 6b05  perdido.     ...
 	defb 0ffh,001h,000h,001h,001h,001h,001h,000h,001h,0ffh,000h,0ffh,0ffh,0ffh,000h,001h	; 6b15  ................
@@ -1589,7 +1626,7 @@ L_6AE3:
 	defb 00fh,003h,003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h	; 6db5  ................
 	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6dc5  ................
 	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6dd5  ................
-	defb 00fh,003h	; 6de5  ..
+	defb 00fh,003h	; 6de5
 
 ; ======================================================================
 ; CODIGO 0x6de7..0x7697  (2224 bytes)
@@ -3070,11 +3107,26 @@ L_7696:
 	ret			;7696
 
 ; ----------------------------------------------------------------------
-; DATOS tabla: de 16 palabras que 0x7687 indexa con A*2 & 0x1E y despacha con push de / ret
+; DATOS tabla_de_16_palabras_7697: Tabla de 16 palabras que 0x7687 indexa con
+;   A*2 & 0x1E y despacha con push de / ret
 ;   0x7697..0x76b7  (32 bytes)
-; ----------------------------------------------------------------------
-	defb 096h,076h,0b7h,076h,096h,076h,0c7h,076h,0e4h,076h,096h,076h,0f0h,076h,096h,076h	; 7697  .v.v.v.v.v.v.v.v
-	defb 096h,076h,096h,076h,096h,076h,096h,076h,096h,076h,096h,076h,096h,076h,096h,076h	; 76a7  .v.v.v.v.v.v.v.v
+DATA_tabla_de_16_palabras_7697:
+	defw 07696h	; 7697  -> L_7696
+	defw 076b7h	; 7699  -> L_76B7
+	defw 07696h	; 769b  -> L_7696
+	defw 076c7h	; 769d  -> L_76C7
+	defw 076e4h	; 769f  -> L_76E4
+	defw 07696h	; 76a1  -> L_7696
+	defw 076f0h	; 76a3  -> L_76F0
+	defw 07696h	; 76a5  -> L_7696
+	defw 07696h	; 76a7  -> L_7696
+	defw 07696h	; 76a9  -> L_7696
+	defw 07696h	; 76ab  -> L_7696
+	defw 07696h	; 76ad  -> L_7696
+	defw 07696h	; 76af  -> L_7696
+	defw 07696h	; 76b1  -> L_7696
+	defw 07696h	; 76b3  -> L_7696
+	defw 07696h	; 76b5  -> L_7696
 
 ; ======================================================================
 ; CODIGO 0x76b7..0x77a0  (233 bytes)
@@ -3208,9 +3260,11 @@ L_7785:
 	jr L_7758		;779e
 
 ; ----------------------------------------------------------------------
-; DATOS textos: de batalla ("Comienza la Batalla") y tablas (0x7554, 0x76C1, 0x76DE, 0x7702, 0x76DB, 0x76BE las apuntan; formato pendiente)
+; DATOS textos_y_tablas_de_batalla: Textos de batalla ("Comienza la Batalla")
+;   y tablas (0x7554, 0x76C1, 0x76DE, 0x7702, 0x76DB, 0x76BE las apuntan;
+;   formato pendiente)
 ;   0x77a0..0x7e4f  (1711 bytes)
-; ----------------------------------------------------------------------
+DATA_textos_y_tablas_de_batalla:
 	defb 043h,06fh,06dh,069h,065h,06eh,07ah,061h,020h,06ch,061h,020h,042h,061h,074h,061h	; 77a0  Comienza la Bata
 	defb 06ch,06ch,061h,02eh,02eh,000h,000h,000h,000h,000h,000h,000h,000h,081h,081h,081h	; 77b0  lla.............
 	defb 081h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 77c0  ................
@@ -3638,11 +3692,20 @@ L_8024:
 	jp L_7F54		;802d
 
 ; ----------------------------------------------------------------------
-; DATOS tabla: de 10 palabras (indice 1..10) que 0x804D-0x805B indexa con A y salta con jp (hl)
+; DATOS tabla_de_10_palabras_8030: Tabla de 10 palabras (indice 1..10) que
+;   0x804D-0x805B indexa con A y salta con jp (hl)
 ;   0x8030..0x8044  (20 bytes)
-; ----------------------------------------------------------------------
-	defb 071h,080h,062h,080h,068h,080h,068h,080h,05ch,080h,0aeh,080h,0adh,080h,0adh,080h	; 8030  q.b.h.h.\.......
-	defb 0adh,080h,0adh,080h	; 8040  ....
+DATA_tabla_de_10_palabras_8030:
+	defw 08071h	; 8030  -> L_8071
+	defw 08062h	; 8032  -> L_8062
+	defw 08068h	; 8034  -> L_8068
+	defw 08068h	; 8036  -> L_8068
+	defw 0805ch	; 8038  -> L_805C
+	defw 080aeh	; 803a  -> L_80AE
+	defw 080adh	; 803c  -> L_80AD
+	defw 080adh	; 803e  -> L_80AD
+	defw 080adh	; 8040  -> L_80AD
+	defw 080adh	; 8042  -> L_80AD
 
 ; ======================================================================
 ; CODIGO 0x8044..0x83f8  (948 bytes)
@@ -4208,9 +4271,12 @@ L_83F6:
 	jr L_83F6		;83f6
 
 ; ----------------------------------------------------------------------
-; DATOS textos: y marcos de los paneles: "Volver/Cargar/Salvar", "Pulsa Fuego", File/Memo/Time, numeros romanos I..VII, "El Anillo corrompe al que lo usa", "Ningun mensaje" (los leen 0x7E81-0x7EA0 y 0x8280)
+; DATOS textos_de_los_paneles: Textos y marcos de los paneles:
+;   "Volver/Cargar/Salvar", "Pulsa Fuego", File/Memo/Time, numeros romanos
+;   I..VII, "El Anillo corrompe al que lo usa", "Ningun mensaje" (los leen
+;   0x7E81-0x7EA0 y 0x8280)
 ;   0x83f8..0x8572  (378 bytes)
-; ----------------------------------------------------------------------
+DATA_textos_de_los_paneles:
 	defb 000h,0ffh,0aah,055h,003h,00ch,030h,0c0h,003h,00bh,056h,06fh,06ch,076h,065h,072h	; 83f8  ...U..0...Volver
 	defb 0b7h,0b7h,043h,061h,072h,067h,061h,072h,020h,020h,020h,0b7h,0b7h,053h,061h,06ch	; 8408  ..Cargar   ..Sal
 	defb 076h,061h,072h,020h,020h,020h,0b7h,0b7h,056h,06fh,06ch,076h,065h,072h,000h,0c0h	; 8418  var   ..Volver..
@@ -5080,10 +5146,11 @@ L_8A30:
 	jr $+3		;8a4f
 
 ; ----------------------------------------------------------------------
-; DATOS un: pop hl que el jr de 0x8A4F salta y al que nadie llega (entrada alternativa sin uso)
+; DATOS pop_hl_sin_uso: Un pop hl que el jr de 0x8A4F salta y al que nadie
+;   llega (entrada alternativa sin uso)
 ;   0x8a51..0x8a52  (1 bytes)
-; ----------------------------------------------------------------------
-	defb 0e1h	; 8a51  .
+DATA_pop_hl_sin_uso:
+	defb 0e1h	; 8a51
 
 ; ======================================================================
 ; CODIGO 0x8a52..0x8a68  (22 bytes)
@@ -5107,10 +5174,12 @@ L_8A61:
 	ret			;8a67
 
 ; ----------------------------------------------------------------------
-; DATOS interruptor: por opcode: en la cinta ret / 00 / BE; 0x8BEE escribe 0x21 y 0x8BCC el byte de 0x8A69, y queda ld hl,0xBExx que cae en 0x8A6B
+; DATOS interruptor_por_opcode: Interruptor por opcode: en la cinta ret / 00 /
+;   BE; 0x8BEE escribe 0x21 y 0x8BCC el byte de 0x8A69, y queda ld hl,0xBExx
+;   que cae en 0x8A6B
 ;   0x8a68..0x8a6b  (3 bytes)
-; ----------------------------------------------------------------------
-	defb 0c9h,000h,0beh	; 8a68  ...
+DATA_interruptor_por_opcode:
+	defb 0c9h,000h,0beh	; 8a68
 
 ; ======================================================================
 ; CODIGO 0x8a6b..0x93d9  (2414 bytes)
@@ -6636,54 +6705,87 @@ L_93D2:
 	ret			;93d8
 
 ; ----------------------------------------------------------------------
-; DATOS seis: punteros a los mensajes de abajo (0x9180, 0x9189, 0x925B)
+; DATOS punteros_de_los_mensajes: Seis punteros a los mensajes de abajo
+;   (0x9180, 0x9189, 0x925B)
 ;   0x93d9..0x93e5  (12 bytes)
-; DATOS mensajes:: "La Batalla ha comenzado/finalizado", "Elige el enemigo a atacar", "No puedes atacar a un amigo", "No pertenece a tu Alianza", "Nuevo destino elegido", "Aqui no hay nadie"
-;   0x93e5..0x94b7  (210 bytes)
-; DATOS tabla: de 4 palabras del despachador de 0x9163 (la CUARTA, 0x94BD, es una variable: 0x8BA1 mete 0x8BE4 y 0x8C83 devuelve 0x8F19)
-;   0x94b7..0x94bf  (8 bytes)
-; DATOS tabla: de 4 palabras que 0x8A11-0x8A1E indexa con A&3
-;   0x94bf..0x94c7  (8 bytes)
-; DATOS tablas: de codigos de caracter/tile y datos (0x95A8 lo apuntan 0x8850, 0x8B3B, 0x8C74, 0x8E42, 0x90B0; formato pendiente)
-;   0x94c7..0x9627  (352 bytes)
+DATA_punteros_de_los_mensajes:
+	defw 093e5h	; 93d9  -> DATA_mensajes_de_abajo
+	defw 09421h	; 93db
+	defw 0943fh	; 93dd
+	defw 0945dh	; 93df
+	defw 0947bh	; 93e1
+	defw 09499h	; 93e3
+
 ; ----------------------------------------------------------------------
-	defb 0e5h,093h,021h,094h,03fh,094h,05dh,094h,07bh,094h,099h,094h,04ch,061h,020h,042h	; 93d9  ..!.?.].{...La B
-	defb 061h,074h,061h,06ch,06ch,061h,020h,068h,061h,020h,063h,06fh,06dh,065h,06eh,07ah	; 93e9  atalla ha comenz
-	defb 061h,064h,06fh,02eh,020h,020h,020h,020h,020h,000h,04ch,061h,020h,042h,061h,074h	; 93f9  ado.     .La Bat
-	defb 061h,06ch,06ch,061h,020h,068h,061h,020h,066h,069h,06eh,061h,06ch,069h,07ah,061h	; 9409  alla ha finaliza
-	defb 064h,06fh,02eh,020h,020h,020h,020h,000h,045h,06ch,069h,067h,065h,020h,065h,06ch	; 9419  do.    .Elige el
-	defb 020h,065h,06eh,065h,06dh,069h,067h,06fh,020h,061h,020h,061h,074h,061h,063h,061h	; 9429   enemigo a ataca
-	defb 072h,02eh,020h,020h,020h,000h,04eh,06fh,020h,070h,075h,065h,064h,065h,073h,020h	; 9439  r.   .No puedes 
-	defb 061h,074h,061h,063h,061h,072h,020h,061h,020h,075h,06eh,020h,061h,06dh,069h,067h	; 9449  atacar a un amig
-	defb 06fh,02eh,020h,000h,04eh,06fh,020h,070h,065h,072h,074h,065h,06eh,065h,063h,065h	; 9459  o. .No pertenece
-	defb 020h,061h,020h,074h,075h,020h,041h,06ch,069h,061h,06eh,07ah,061h,02eh,020h,020h	; 9469   a tu Alianza.  
-	defb 020h,000h,04eh,075h,065h,076h,06fh,020h,064h,065h,073h,074h,069h,06eh,06fh,020h	; 9479   .Nuevo destino 
-	defb 065h,06ch,065h,067h,069h,064h,06fh,02eh,020h,020h,020h,020h,020h,020h,020h,000h	; 9489  elegido.       .
-	defb 041h,071h,075h,069h,020h,06eh,06fh,020h,068h,061h,079h,020h,06eh,061h,064h,069h	; 9499  Aqui no hay nadi
-	defb 065h,02eh,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,000h,095h,08eh	; 94a9  e.           ...
-	defb 019h,08fh,07dh,089h,019h,08fh,04dh,089h,05ch,089h,06bh,089h,03eh,089h,02fh,02eh	; 94b9  ..}...M.\.k.>./.
-	defb 02dh,02ch,033h,032h,031h,030h,027h,026h,025h,024h,02bh,02ah,029h,028h,04fh,04eh	; 94c9  -,3210'&%$+*)(ON
-	defb 04dh,04ch,053h,052h,051h,050h,047h,046h,045h,044h,04bh,04ah,049h,048h,03fh,03eh	; 94d9  MLSRQPGFEDKJIH?>
-	defb 03dh,03ch,043h,042h,041h,040h,037h,036h,035h,034h,03bh,03ah,039h,038h,01fh,01eh	; 94e9  =<CBA@7654;:98..
-	defb 01dh,01ch,023h,022h,021h,020h,017h,016h,015h,014h,01bh,01ah,019h,018h,05ch,05bh	; 94f9  ..#"! ........\[
-	defb 05ah,000h,05fh,05eh,05dh,000h,056h,055h,054h,000h,059h,058h,057h,000h,00fh,00eh	; 9509  Z._^].VUT.YXW...
-	defb 00dh,00ch,013h,012h,011h,010h,007h,006h,005h,004h,00bh,00ah,009h,008h,068h,067h	; 9519  ..............hg
-	defb 066h,000h,06bh,06ah,069h,000h,062h,061h,060h,000h,065h,064h,063h,000h,000h,000h	; 9529  f.kji.ba`.edc...
-	defb 08bh,08ah,08fh,08eh,08dh,08ch,000h,085h,084h,000h,089h,088h,087h,086h,000h,000h	; 9539  ................
-	defb 09fh,000h,0a3h,0a2h,0a1h,0a0h,000h,000h,09ah,000h,09eh,09dh,09ch,09bh,000h,000h	; 9549  ................
-	defb 095h,000h,099h,098h,097h,096h,000h,000h,090h,000h,094h,093h,092h,091h,000h,000h	; 9559  ................
-	defb 07fh,000h,083h,082h,081h,080h,000h,07ah,079h,000h,07eh,07dh,07ch,07bh,000h,000h	; 9569  .......zy.~}|{..
-	defb 000h,000h,0ach,0abh,0aah,000h,000h,0a6h,0a5h,0a4h,0a9h,0a8h,0a7h,000h,000h,000h	; 9579  ................
-	defb 074h,073h,078h,077h,076h,075h,000h,06eh,06dh,06ch,072h,071h,070h,06fh,000h,000h	; 9589  tsxwvu.nmlrqpo..
-	defb 000h,000h,0b3h,0b2h,0b1h,000h,000h,000h,0adh,000h,0b0h,0afh,0aeh,000h,0e0h,01fh	; 9599  ................
-	defb 007h,0f8h,0f9h,006h,09fh,060h,07fh,080h,0feh,001h,0feh,001h,07fh,080h,07fh,080h	; 95a9  .....`..........
-	defb 0feh,001h,0feh,001h,07fh,080h,09fh,060h,0f9h,006h,007h,0f8h,0e0h,01fh,003h,0fch	; 95b9  .......`........
-	defb 0c0h,03fh,0f1h,00eh,08fh,070h,0d3h,02ch,0cbh,034h,03fh,0c0h,0fch,003h,0fch,003h	; 95c9  .?...p.,.4?.....
-	defb 03fh,0c0h,0cbh,034h,0d3h,02ch,08fh,070h,0f1h,00eh,0c0h,03fh,003h,0fch,0e0h,01fh	; 95d9  ?..4.,.p...?....
-	defb 007h,0f8h,051h,0aeh,095h,06ah,02ah,0d5h,0aah,055h,054h,0abh,055h,0aah,02ah,0d5h	; 95e9  ..Q..j*..UT.U.*.
-	defb 0aah,055h,054h,0abh,055h,0aah,08ah,075h,0a9h,056h,007h,0f8h,0e0h,01fh,0ffh,000h	; 95f9  .UT.U..u.V......
-	defb 0ffh,000h,0ffh,000h,0ffh,000h,0bfh,040h,0ffh,000h,0ffh,000h,05bh,0a4h,0d5h,02ah	; 9609  .......@....[..*
-	defb 0cfh,030h,0b7h,048h,0feh,001h,0f8h,007h,07fh,080h,0ffh,000h,0f6h,009h	; 9619  .0.H..........
+; DATOS mensajes_de_abajo: Mensajes: "La Batalla ha comenzado/finalizado",
+;   "Elige el enemigo a atacar", "No puedes atacar a un amigo", "No pertenece
+;   a tu Alianza", "Nuevo destino elegido", "Aqui no hay nadie"
+;   0x93e5..0x94b7  (210 bytes)
+DATA_mensajes_de_abajo:
+	defb 04ch,061h,020h,042h,061h,074h,061h,06ch,06ch,061h,020h,068h,061h,020h,063h,06fh	; 93e5  La Batalla ha co
+	defb 06dh,065h,06eh,07ah,061h,064h,06fh,02eh,020h,020h,020h,020h,020h,000h,04ch,061h	; 93f5  menzado.     .La
+	defb 020h,042h,061h,074h,061h,06ch,06ch,061h,020h,068h,061h,020h,066h,069h,06eh,061h	; 9405   Batalla ha fina
+	defb 06ch,069h,07ah,061h,064h,06fh,02eh,020h,020h,020h,020h,000h,045h,06ch,069h,067h	; 9415  lizado.    .Elig
+	defb 065h,020h,065h,06ch,020h,065h,06eh,065h,06dh,069h,067h,06fh,020h,061h,020h,061h	; 9425  e el enemigo a a
+	defb 074h,061h,063h,061h,072h,02eh,020h,020h,020h,000h,04eh,06fh,020h,070h,075h,065h	; 9435  tacar.   .No pue
+	defb 064h,065h,073h,020h,061h,074h,061h,063h,061h,072h,020h,061h,020h,075h,06eh,020h	; 9445  des atacar a un 
+	defb 061h,06dh,069h,067h,06fh,02eh,020h,000h,04eh,06fh,020h,070h,065h,072h,074h,065h	; 9455  amigo. .No perte
+	defb 06eh,065h,063h,065h,020h,061h,020h,074h,075h,020h,041h,06ch,069h,061h,06eh,07ah	; 9465  nece a tu Alianz
+	defb 061h,02eh,020h,020h,020h,000h,04eh,075h,065h,076h,06fh,020h,064h,065h,073h,074h	; 9475  a.   .Nuevo dest
+	defb 069h,06eh,06fh,020h,065h,06ch,065h,067h,069h,064h,06fh,02eh,020h,020h,020h,020h	; 9485  ino elegido.    
+	defb 020h,020h,020h,000h,041h,071h,075h,069h,020h,06eh,06fh,020h,068h,061h,079h,020h	; 9495     .Aqui no hay 
+	defb 06eh,061h,064h,069h,065h,02eh,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 94a5  nadie.          
+	defb 020h,000h	; 94b5
+
+; ----------------------------------------------------------------------
+; DATOS tabla_del_despachador_9163: Tabla de 4 palabras del despachador de
+;   0x9163 (la CUARTA, 0x94BD, es una variable: 0x8BA1 mete 0x8BE4 y 0x8C83
+;   devuelve 0x8F19)
+;   0x94b7..0x94bf  (8 bytes)
+DATA_tabla_del_despachador_9163:
+	defw 08e95h	; 94b7  -> L_8E95
+	defw 08f19h	; 94b9  -> L_8F19
+	defw 0897dh	; 94bb  -> L_897D
+	defw 08f19h	; 94bd  -> L_8F19
+
+; ----------------------------------------------------------------------
+; DATOS tabla_del_despachador_8A11: Tabla de 4 palabras que 0x8A11-0x8A1E
+;   indexa con A&3
+;   0x94bf..0x94c7  (8 bytes)
+DATA_tabla_del_despachador_8A11:
+	defw 0894dh	; 94bf  -> L_894D
+	defw 0895ch	; 94c1  -> L_895C
+	defw 0896bh	; 94c3  -> L_896B
+	defw 0893eh	; 94c5  -> L_893E
+
+; ----------------------------------------------------------------------
+; DATOS tablas_de_caracteres_y_datos: Tablas de codigos de caracter/tile y
+;   datos (0x95A8 lo apuntan 0x8850, 0x8B3B, 0x8C74, 0x8E42, 0x90B0; formato
+;   pendiente)
+;   0x94c7..0x9627  (352 bytes)
+DATA_tablas_de_caracteres_y_datos:
+	defb 02fh,02eh,02dh,02ch,033h,032h,031h,030h,027h,026h,025h,024h,02bh,02ah,029h,028h	; 94c7  /.-,3210'&%$+*)(
+	defb 04fh,04eh,04dh,04ch,053h,052h,051h,050h,047h,046h,045h,044h,04bh,04ah,049h,048h	; 94d7  ONMLSRQPGFEDKJIH
+	defb 03fh,03eh,03dh,03ch,043h,042h,041h,040h,037h,036h,035h,034h,03bh,03ah,039h,038h	; 94e7  ?>=<CBA@7654;:98
+	defb 01fh,01eh,01dh,01ch,023h,022h,021h,020h,017h,016h,015h,014h,01bh,01ah,019h,018h	; 94f7  ....#"! ........
+	defb 05ch,05bh,05ah,000h,05fh,05eh,05dh,000h,056h,055h,054h,000h,059h,058h,057h,000h	; 9507  \[Z._^].VUT.YXW.
+	defb 00fh,00eh,00dh,00ch,013h,012h,011h,010h,007h,006h,005h,004h,00bh,00ah,009h,008h	; 9517  ................
+	defb 068h,067h,066h,000h,06bh,06ah,069h,000h,062h,061h,060h,000h,065h,064h,063h,000h	; 9527  hgf.kji.ba`.edc.
+	defb 000h,000h,08bh,08ah,08fh,08eh,08dh,08ch,000h,085h,084h,000h,089h,088h,087h,086h	; 9537  ................
+	defb 000h,000h,09fh,000h,0a3h,0a2h,0a1h,0a0h,000h,000h,09ah,000h,09eh,09dh,09ch,09bh	; 9547  ................
+	defb 000h,000h,095h,000h,099h,098h,097h,096h,000h,000h,090h,000h,094h,093h,092h,091h	; 9557  ................
+	defb 000h,000h,07fh,000h,083h,082h,081h,080h,000h,07ah,079h,000h,07eh,07dh,07ch,07bh	; 9567  .........zy.~}|{
+	defb 000h,000h,000h,000h,0ach,0abh,0aah,000h,000h,0a6h,0a5h,0a4h,0a9h,0a8h,0a7h,000h	; 9577  ................
+	defb 000h,000h,074h,073h,078h,077h,076h,075h,000h,06eh,06dh,06ch,072h,071h,070h,06fh	; 9587  ..tsxwvu.nmlrqpo
+	defb 000h,000h,000h,000h,0b3h,0b2h,0b1h,000h,000h,000h,0adh,000h,0b0h,0afh,0aeh,000h	; 9597  ................
+	defb 0e0h,01fh,007h,0f8h,0f9h,006h,09fh,060h,07fh,080h,0feh,001h,0feh,001h,07fh,080h	; 95a7  .......`........
+	defb 07fh,080h,0feh,001h,0feh,001h,07fh,080h,09fh,060h,0f9h,006h,007h,0f8h,0e0h,01fh	; 95b7  .........`......
+	defb 003h,0fch,0c0h,03fh,0f1h,00eh,08fh,070h,0d3h,02ch,0cbh,034h,03fh,0c0h,0fch,003h	; 95c7  ...?...p.,.4?...
+	defb 0fch,003h,03fh,0c0h,0cbh,034h,0d3h,02ch,08fh,070h,0f1h,00eh,0c0h,03fh,003h,0fch	; 95d7  ..?..4.,.p...?..
+	defb 0e0h,01fh,007h,0f8h,051h,0aeh,095h,06ah,02ah,0d5h,0aah,055h,054h,0abh,055h,0aah	; 95e7  ....Q..j*..UT.U.
+	defb 02ah,0d5h,0aah,055h,054h,0abh,055h,0aah,08ah,075h,0a9h,056h,007h,0f8h,0e0h,01fh	; 95f7  *..UT.U..u.V....
+	defb 0ffh,000h,0ffh,000h,0ffh,000h,0ffh,000h,0bfh,040h,0ffh,000h,0ffh,000h,05bh,0a4h	; 9607  .........@....[.
+	defb 0d5h,02ah,0cfh,030h,0b7h,048h,0feh,001h,0f8h,007h,07fh,080h,0ffh,000h,0f6h,009h	; 9617  .*.0.H..........
 
 ; ======================================================================
 ; CODIGO 0x9627..0x9687  (96 bytes)
@@ -6746,15 +6848,21 @@ L_9685:
 	ret			;9686
 
 ; ----------------------------------------------------------------------
-; DATOS rotulos: "Cargando Posiciones" y compania para cargar/salvar la partida en cinta (0x962B, 0x9658, 0x966C)
+; DATOS rotulos_de_cinta: Rotulos "Cargando Posiciones" y compania para
+;   cargar/salvar la partida en cinta (0x962B, 0x9658, 0x966C)
 ;   0x9687..0x96f0  (105 bytes)
-; DATOS variable:: modo de control (0 joystick, 1 cursores, 3 teclado); la lee 0x5E31 y 0x0698, la escribe 0x5E61
-;   0x96f0..0x96f1  (1 bytes)
-; ----------------------------------------------------------------------
+DATA_rotulos_de_cinta:
 	defb 0d0h,0e0h,020h,020h,020h,020h,020h,020h,020h,043h,061h,072h,067h,061h,06eh,064h	; 9687  ..       Cargand
 	defb 06fh,020h,050h,06fh,073h,069h,063h,069h,06fh,06eh,065h,073h,020h,020h,020h,020h	; 9697  o Posiciones    
 	defb 020h,020h,000h,0d0h,0e0h,020h,020h,053h,061h,06ch,076h,061h,06eh,064h,06fh,020h	; 96a7    ...  Salvando 
 	defb 050h,06fh,073h,069h,063h,069h,06fh,06eh,065h,073h,020h,064h,065h,06ch,020h,06ah	; 96b7  Posiciones del j
 	defb 075h,065h,067h,06fh,020h,000h,0d0h,0e0h,020h,020h,050h,06fh,06eh,020h,065h,06ch	; 96c7  uego ...  Pon el
 	defb 020h,063h,061h,073h,073h,065h,074h,074h,065h,020h,079h,020h,070h,075h,06ch,073h	; 96d7   cassette y puls
-	defb 061h,020h,046h,075h,065h,067h,06fh,020h,000h,000h	; 96e7  a Fuego ..
+	defb 061h,020h,046h,075h,065h,067h,06fh,020h,000h	; 96e7  a Fuego .
+
+; ----------------------------------------------------------------------
+; DATOS modo_de_control: Variable: modo de control (0 joystick, 1 cursores, 3
+;   teclado); la lee 0x5E31 y 0x0698, la escribe 0x5E61
+;   0x96f0..0x96f1  (1 bytes)
+DATA_modo_de_control:
+	defb 000h	; 96f0

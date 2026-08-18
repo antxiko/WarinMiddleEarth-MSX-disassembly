@@ -6,12 +6,14 @@
 #     ld hl,0xA11C / ld de,0x2000 / ld bc,0x1800 / call 0xD748   -> colores
 # y las cuentas cierran: 0x88B8 + 100 = 0x891C, + 6144 = 0xA11C, + 6144 = 0xB91C,
 # que es el final exacto del bloque.
-D 0x891C 0xA11C patrones de la pantalla de carga: 6144 bytes a la VRAM 0x0000
-D 0xA11C 0xB91C colores de la pantalla de carga: 6144 bytes a la VRAM 0x2000
+D 0x891C 0xA11C patrones_de_la_carga Patrones de la pantalla de carga: 6144 bytes a la VRAM 0x0000
+F 0x891C 8
+D 0xA11C 0xB91C colores_de_la_carga Colores de la pantalla de carga: 6144 bytes a la VRAM 0x2000
+F 0xA11C 8
 # Y entre la rutina y los patrones quedan 66 bytes que nadie ejecuta: un ret
 # suelto, 18 bytes de otro programa (guardan SP en 0x0190, ponen la pila bajo
 # 0xFC00 y escriben 0xFF en 0xFFFF: un arranque de otro cargador, cortado) y
 # relleno con 0xFF hasta 0x891C. Se declaran como datos porque no se ejecutan;
 # los 34 bytes de arriba tampoco en esta cinta (ver src/pantalla.entries).
-D 0x88DA 0x88ED restos: un ret y 18 bytes de otro arranque, cortado (nadie los ejecuta)
-D 0x88ED 0x891C relleno con 0xFF hasta el principio de los patrones
+D 0x88DA 0x88ED restos_de_otro_arranque Restos: un ret y 18 bytes de otro arranque, cortado (nadie los ejecuta)
+D 0x88ED 0x891C relleno_88ed Relleno con 0xFF hasta el principio de los patrones

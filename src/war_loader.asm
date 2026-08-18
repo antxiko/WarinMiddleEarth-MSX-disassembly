@@ -58,10 +58,12 @@ L_D6D8:
 	jp 00190h		;d741
 
 ; ----------------------------------------------------------------------
-; DATOS los: slots: A8 y (0xFFFF) originales (0xD744-45) y los que tienen RAM en las tres paginas (0xD746-47)
+; DATOS slots_originales_y_de_ram: Los slots: A8 y (0xFFFF) originales
+;   (0xD744-45) y los que tienen RAM en las tres paginas (0xD746-47)
 ;   0xd744..0xd748  (4 bytes)
-; ----------------------------------------------------------------------
-	defb 000h,000h,000h,000h	; d744  ....
+DATA_slots_originales_y_de_ram:
+	defb 000h,000h	; d744
+	defb 000h,000h	; d746
 
 ; ======================================================================
 ; CODIGO 0xd748..0xd8be  (374 bytes)
@@ -324,10 +326,11 @@ L_D8A2:
 	ret			;d8bd
 
 ; ----------------------------------------------------------------------
-; DATOS dos: bytes 0xFF de relleno entre la rutina recolocable y la de carga
+; DATOS relleno_d8be: Dos bytes 0xFF de relleno entre la rutina recolocable y
+;   la de carga
 ;   0xd8be..0xd8c0  (2 bytes)
-; ----------------------------------------------------------------------
-	defb 0ffh,0ffh	; d8be  ..
+DATA_relleno_d8be:
+	defb 0ffh,0ffh	; d8be
 
 ; ======================================================================
 ; CODIGO 0xd8c0..0xd981  (193 bytes)

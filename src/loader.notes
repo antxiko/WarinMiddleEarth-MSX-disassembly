@@ -6,5 +6,6 @@
 # arranque; en una maquina real ahi hay RAM sin inicializar), carga la pantalla
 # y la vuelca a VRAM, y carga los tres bloques del juego con una
 # reimplementacion de LD-BYTES leyendo el puerto 0xA2 (bit 7 = casete).
-D 0xD744 0xD748 los slots: A8 y (0xFFFF) originales (0xD744-45) y los que tienen RAM en las tres paginas (0xD746-47)
-D 0xD8BE 0xD8C0 dos bytes 0xFF de relleno entre la rutina recolocable y la de carga
+D 0xD744 0xD748 slots_originales_y_de_ram Los slots: A8 y (0xFFFF) originales (0xD744-45) y los que tienen RAM en las tres paginas (0xD746-47)
+F 0xD744 2
+D 0xD8BE 0xD8C0 relleno_d8be Dos bytes 0xFF de relleno entre la rutina recolocable y la de carga

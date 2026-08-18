@@ -4,12 +4,14 @@
 # las tablas del juego. Cada zona esta identificada por la RUTINA QUE LA LEE,
 # medida con puntos de observacion de lectura en openMSX (tools/omsx_quien_lee.tcl,
 # volcados lee1/lee2 en work/omsx), y en los graficos ademas dibujandola.
-D 0x9E00 0xA280 tiles del mapa: hasta 128 de 9 bytes (8 lineas + 1 atributo ZX); los lee 0x75C7-0x75EB cuando el codigo de la rejilla lleva el bit 7 (dibujados en work/omsx/tiles9_9e00.png)
-D 0xA280 0xB8E8 graficos sin lector visto todavia (perfil: dibujo; nadie los leyo en 3,5 min de mapa)
-D 0xB8E8 0xBE00 tablas de estado del juego (0xB900 la apuntan 0x6AC2, 0x6EAC, 0x8F7A...; las lee 0x92E4 en bloque; formato pendiente)
-D 0xBE00 0xC000 ceros: RAM de trabajo que viene cargada (0xBE00/0xBF00 las escriben 0x8BC3, 0x914E...)
-D 0xC000 0xC600 tablas de estado (0xC1xx las toca el menu en 0x5E8D-0x5E9E: nivel; formato pendiente)
-D 0xC600 0xC800 ceros: RAM de trabajo que viene cargada (0x7F43 y 0x9239 la limpian con ld hl,0xC600 / ld de,0xC601)
-D 0xC800 0xCC00 la FUENTE: 128 caracteres de 8 bytes (texturas del terreno en los codigos bajos, marcos, flechas, digitos y letras); la leen 0x7620-0x763C y el volcado a VRAM de 0x043F (dibujada en work/omsx/tiles8_c800.png)
-D 0xCC00 0xE400 el mapa (lo leen 0x7FF0, 0x81A9, 0x8189, 0x80A4 y el iterador de 0x7656, 13 filas x 16 con paso 0x66; formato pendiente)
-D 0xE400 0xE678 tablas finales (las leen 0x81A9, 0x8189, 0x7FF0; formato pendiente)
+D 0x9E00 0xA280 tiles_del_mapa Tiles del mapa: hasta 128 de 9 bytes (8 lineas + 1 atributo ZX); los lee 0x75C7-0x75EB cuando el codigo de la rejilla lleva el bit 7 (dibujados en work/omsx/tiles9_9e00.png)
+F 0x9E00 9
+D 0xA280 0xB8E8 graficos_sin_lector Graficos sin lector visto todavia (perfil: dibujo; nadie los leyo en 3,5 min de mapa)
+D 0xB8E8 0xBE00 tablas_de_estado_b900 Tablas de estado del juego (0xB900 la apuntan 0x6AC2, 0x6EAC, 0x8F7A...; las lee 0x92E4 en bloque; formato pendiente)
+D 0xBE00 0xC000 ram_de_trabajo_be00 Ceros: RAM de trabajo que viene cargada (0xBE00/0xBF00 las escriben 0x8BC3, 0x914E...)
+D 0xC000 0xC600 tablas_de_estado_c100 Tablas de estado (0xC1xx las toca el menu en 0x5E8D-0x5E9E: nivel; formato pendiente)
+D 0xC600 0xC800 ram_de_trabajo_c600 Ceros: RAM de trabajo que viene cargada (0x7F43 y 0x9239 la limpian con ld hl,0xC600 / ld de,0xC601)
+D 0xC800 0xCC00 fuente La FUENTE: 128 caracteres de 8 bytes (texturas del terreno en los codigos bajos, marcos, flechas, digitos y letras); la leen 0x7620-0x763C y el volcado a VRAM de 0x043F (dibujada en work/omsx/tiles8_c800.png)
+F 0xC800 8
+D 0xCC00 0xE400 mapa El mapa (lo leen 0x7FF0, 0x81A9, 0x8189, 0x80A4 y el iterador de 0x7656, 13 filas x 16 con paso 0x66; formato pendiente)
+D 0xE400 0xE678 tablas_finales Tablas finales (las leen 0x81A9, 0x8189, 0x7FF0; formato pendiente)
