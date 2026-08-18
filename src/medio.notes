@@ -17,7 +17,7 @@ D 0x5FF8 0x6008 tabla_de_teclas_definidas Tabla de la lectura de teclas definida
 D 0x6008 0x600F teclas_definidas Las cinco teclas definidas: "1RQAOP" y un byte (ld ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
 D 0x600F 0x62FF textos_del_menu Textos del menu: rotulos de control, "Las Teclas Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
 D 0x62FF 0x6317 dibujo_del_cursor Dibujo de 24 bytes de la marca del cursor (ld de,0x62FF en 0x64DC: 8 columnas de 3)
-F 0x62FF 8
+F 0x62FF 3
 D 0x6317 0x63FB tabla_6317 Tabla que leen 0x6593-0x659C (formato pendiente)
 D 0x64DA 0x64DC dos_nop_64da Dos nop tras el ret-interruptor de 0x64D9 (que 0x65FB convierte en ld hl,0x0000)
 

@@ -377,9 +377,14 @@ DATA_textos_del_menu:
 ;   de,0x62FF en 0x64DC: 8 columnas de 3)
 ;   0x62ff..0x6317  (24 bytes)
 DATA_dibujo_del_cursor:
-	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 62ff  ........
-	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 6307  ........
-	defb 0adh,0adh,0adh,0adh,0adh,0adh,0adh,0adh	; 630f  ........
+	defb 0adh,0adh,0adh	; 62ff
+	defb 0adh,0adh,0adh	; 6302
+	defb 0adh,0adh,0adh	; 6305
+	defb 0adh,0adh,0adh	; 6308
+	defb 0adh,0adh,0adh	; 630b
+	defb 0adh,0adh,0adh	; 630e
+	defb 0adh,0adh,0adh	; 6311
+	defb 0adh,0adh,0adh	; 6314
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_6317: Tabla que leen 0x6593-0x659C (formato pendiente)
