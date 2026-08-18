@@ -1,0 +1,66 @@
+# El juego, trazado sobre la imagen de 64K (work/juego64.bin) tal y como queda
+# al arrancar. Tres bloques disjuntos: 0x0190-0x3F4E, 0x5E00-0x96F0, 0x9E00-0xE677.
+0x0190  arranque       el cargador salta aqui (jp 0x0190 en 0xD741): recoloca y salta al juego
+0x5E00  juego          jp 0x5E00 en 0x01C2, tras recolocar
+0x0400  interrupcion   0x5E00 escribe JP 0x0400 en 0x0038 (ld a,0xC3 / ld (0x0038),a / ld hl,0x0400 / ld (0x0039),hl)
+0x7F43  partida        0x5E24 hace ld hl,0x7F43 / push hl antes del menu; el ret de 0x5EA0 (opcion 0) vuelve aqui
+0x7FAC  vuelta_7fac    0x9220 hace ld hl,0x7FAC / push hl / ld bc,(0x8F78) / ret: retorno puesto a mano
+# Operandos de CALL/JP que el propio codigo escribe (automodificacion):
+0x0428  int_gancho     0x5E12 escribe 0x0428 en 0x0415, operando del call de 0x0414 (dentro de la interrupcion)
+0x9627  op_menu_1      0x8024-0x802B: ld (0x802B),hl con hl=0x9627 (0x8015), operando del call de 0x802A
+0x9654  op_menu_2      idem con hl=0x9654 (0x801B)
+0x8274  cb_7f65_a      0x81E1/0x81E4 escriben 0x8274 en los operandos de los call de 0x7F65 y 0x7F6B
+0x6719  cb_7f65_b      0x81F7 escribe 0x6719 en el operando del call de 0x7F65
+0x831B  cb_7f6b_b      0x81FD escribe 0x831B en el operando del call de 0x7F6B
+0x8F1A  cb_91ed        0x91D1/0x91D4 escriben 0x8F1A en los operandos de los call de 0x91ED y 0x91F2
+0x6F08  cb_7793_a      0x7742 escribe 0x6F08 en el operando del call c de 0x7793
+0x6F0B  cb_7793_b      0x774C escribe 0x6F0B en el operando del call c de 0x7793
+0x7708  cb_766c        0x7653 pone hl=0x7708 y 0x765E lo escribe en el operando del call de 0x766C
+# Tabla de saltos de 0x94B7 (4 palabras): 0x9163-0x9177 la indexa con un contador 0..3 y escribe el destino en el call de 0x917A
+0x8E95  t94b7_0        tabla 0x94B7, entrada 0
+0x8F19  t94b7_1        tabla 0x94B7, entradas 1 y 3
+0x897D  t94b7_2        tabla 0x94B7, entrada 2
+# Tabla de saltos de 0x8030 (10 palabras, indice 1..10): 0x804D-0x805B la indexa con A y hace jp (hl)
+0x8071  t8030_1        tabla 0x8030, entrada 1
+0x8062  t8030_2        tabla 0x8030, entrada 2
+0x8068  t8030_3        tabla 0x8030, entradas 3 y 4
+0x805C  t8030_5        tabla 0x8030, entrada 5
+0x80AE  t8030_6        tabla 0x8030, entrada 6
+0x80AD  t8030_7        tabla 0x8030, entradas 7 a 10 (un ret)
+# Vistos ejecutarse en el emulador (tools/omsx_conduce.tcl, muestreo c1) y sin
+# camino estatico: el mecanismo que los alcanza se apunta al lado cuando se sabe.
+0x64DC  dibuja_marca   0x65FB escribe 0x21 (ld hl,nn) sobre el ret de 0x64D9, que pasa a ser ld hl,0x0000 y CAE aqui; 0x6509 vuelve a poner el ret (interruptor por opcode)
+0x7366  visto_7366     visto correr (c1); lo llaman los manejadores de la tabla 0x7697 (call 0x7366 en 0x76B9)
+0x73CA  visto_73ca     visto correr (c1); jp 0x73CA en 0x76C4
+0x7687  despacho_7697  0x7647 lo pasa en hl a 0x7656, que lo escribe en el call de 0x766C; A*2 & 0x1E indexa la tabla de 16 palabras de 0x7697 y hace push de / ret
+0x7696  t7697_0       tabla 0x7697, entradas 0, 2, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15
+0x76B7  t7697_1       tabla 0x7697, entrada 1
+0x76C7  t7697_3       tabla 0x7697, entrada 3
+0x76E4  t7697_4       tabla 0x7697, entrada 4
+0x76F0  t7697_6       tabla 0x7697, entrada 6
+0x7714  cb_766c_b      0x764D pone hl=0x7714 y 0x7656 lo escribe en el call de 0x766C
+0x8925  cb_8a06_a      0x89B9/0x89C1 escriben 0x8925 en el operando del call de 0x8A06
+0x8908  cb_8a06_b      0x89BE/0x89C1 escriben 0x8908 en el operando del call de 0x8A06
+# Tabla de saltos de 0x94BF (4 palabras): 0x8A11-0x8A1E la indexa con A&3 y escribe el destino en el call de 0x8A26
+0x894D  t94bf_0        tabla 0x94BF, entrada 0
+0x895C  t94bf_1        tabla 0x94BF, entrada 1
+0x896B  t94bf_2        tabla 0x94BF, entrada 2
+0x893E  t94bf_3        tabla 0x94BF, entrada 3
+# La CUARTA entrada de la tabla 0x94B7 (en 0x94BD) es una variable: la cinta trae
+# 0x8F19, 0x8BA1 escribe 0x8BE4 (ld de,0x8BE4 / ld (0x94BD),de) y 0x8C83 vuelve a
+# poner 0x8F19. El despachador de 0x9163 la llama como a las otras tres.
+0x8BE4  modo_8be4      0x8B9E/0x8BA1 lo instalan en la cuarta entrada de la tabla 0x94B7
+0x8A6B  tras_8a68      0x8BEE escribe 0x21 (ld hl,nn) sobre el ret de 0x8A68 y 0x8BCC pone el byte de 0x8A69: queda ld hl,0xBExx y CAE aqui (interruptor por opcode)
+# Codigo al que no llega nadie: se lista como codigo (como las tres rutinas
+# "restaura" del cargador) porque lo es, y la web lo cuenta aparte como muerto.
+# Buscado: ningun call/jp/jr ni palabra cruda apunta a ellos, y en 25 min de
+# juego en openMSX ningun PC muestreado cayo dentro (work/omsx/c1-c3).
+0x045A  vdp_dir_muerta   sin llamadas: pone la direccion de VRAM en el VDP (gemela de 0x044B pero sin ei)
+0x04F2  psg_muerta       sin llamadas: escribe un registro del PSG (A=registro, E=valor)
+0x5EAC  busca_nombre     sin llamadas: recorre la tabla de nombres de tecla de 0x5FB7 hasta el C-esimo
+0x5F25  resto_5f25       sin llamadas: fragmento del menu de teclas
+0x5F75  zx_espera_soltar sin llamadas: RESTO DEL SPECTRUM, espera a que no haya tecla con in a,(0xFE)
+0x5F7E  zx_lee_tecla     sin llamadas: RESTO DEL SPECTRUM, lee una tecla por la matriz del ZX (0x5F98, ld bc,0xFEFE / in a,(c))
+0x6600  zx_beeper        sin llamadas: RESTO DEL SPECTRUM, motor de sonido por el altavoz (out (0xFE) con bit 4), tabla de sonidos en 0x6365
+0x7EE7  resto_7ee7       sin llamadas: un call 0x7E86 suelto entre dos rutinas
+0x7EFA  resto_7efa       sin llamadas: calculo de direccion (0x65CB apunta a 0x7EFD como DATO: ld bc,0x7EFD)

@@ -1,0 +1,10 @@
+# Anotaciones del cargador (cinta [07], BIN en 0xD6D8, 681 bytes).
+#
+# Cargador estilo Spectrum: busca RAM en las paginas 1, 2 y 0 -para la 0 se
+# copia una rutina de 122 bytes a 0xAFC8, porque con la BIOS quitada no puede
+# llamar a ENASLT-, copia 100 bytes de 0xDAC0 a 0x012C (el buzon de POKEs del
+# arranque; en una maquina real ahi hay RAM sin inicializar), carga la pantalla
+# y la vuelca a VRAM, y carga los tres bloques del juego con una
+# reimplementacion de LD-BYTES leyendo el puerto 0xA2 (bit 7 = casete).
+D 0xD744 0xD748 los slots: A8 y (0xFFFF) originales (0xD744-45) y los que tienen RAM en las tres paginas (0xD746-47)
+D 0xD8BE 0xD8C0 dos bytes 0xFF de relleno entre la rutina recolocable y la de carga

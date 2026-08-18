@@ -1,0 +1,5 @@
+# La pantalla de carga (org 0x88B8, 12388 bytes). Los primeros 100 bytes son
+# codigo que la vuelca a VRAM con la BIOS, pero el cargador de esta cinta NO lo
+# llama: la vuelca el mismo con su rutina de 0xD748. Se lista para que no quede
+# ni un byte sin explicar.
+0x88B8  vuelca_bios    sin llamadas en esta cinta: la BIOS ya no esta mapeada cuando llega este bloque

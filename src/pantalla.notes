@@ -1,0 +1,17 @@
+# Anotaciones de la pantalla de carga (bloque [08], org 0x88B8, 12388 bytes).
+#
+# El grueso del bloque es una pantalla de SCREEN 2 completa: 6144 bytes de
+# patrones y 6144 de colores. Lo dice el cargador (0xD702-0xD719):
+#     ld hl,0x891C / ld de,0x0000 / ld bc,0x1800 / call 0xD748   -> patrones
+#     ld hl,0xA11C / ld de,0x2000 / ld bc,0x1800 / call 0xD748   -> colores
+# y las cuentas cierran: 0x88B8 + 100 = 0x891C, + 6144 = 0xA11C, + 6144 = 0xB91C,
+# que es el final exacto del bloque.
+D 0x891C 0xA11C patrones de la pantalla de carga: 6144 bytes a la VRAM 0x0000
+D 0xA11C 0xB91C colores de la pantalla de carga: 6144 bytes a la VRAM 0x2000
+# Y entre la rutina y los patrones quedan 66 bytes que nadie ejecuta: un ret
+# suelto, 18 bytes de otro programa (guardan SP en 0x0190, ponen la pila bajo
+# 0xFC00 y escriben 0xFF en 0xFFFF: un arranque de otro cargador, cortado) y
+# relleno con 0xFF hasta 0x891C. Se declaran como datos porque no se ejecutan;
+# los 34 bytes de arriba tampoco en esta cinta (ver src/pantalla.entries).
+D 0x88DA 0x88ED restos: un ret y 18 bytes de otro arranque, cortado (nadie los ejecuta)
+D 0x88ED 0x891C relleno con 0xFF hasta el principio de los patrones

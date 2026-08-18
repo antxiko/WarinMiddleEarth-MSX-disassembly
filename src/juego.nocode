@@ -1,0 +1,7 @@
+# Zonas de la imagen de 64K que NO son el juego: los huecos entre bloques. En
+# work/juego64.bin estan a cero, o sea NOPs, y una llamada perdida ahi haria
+# que el trazador se los tragara como codigo hasta topar con algo.
+0x0000 0x018F   pagina 0 por debajo del arranque: RAM de trabajo (vector 0x0038, tabla de 0x0200 la rellena el juego)
+0x3F4F 0x5DFF   hueco entre bajo y medio: RAM de trabajo (SP=0x5BFF)
+0x96F1 0x9DFF   hueco entre medio y alto
+0xE678 0xFFFF   por encima del ultimo bloque

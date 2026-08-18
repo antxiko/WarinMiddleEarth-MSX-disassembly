@@ -1,0 +1,4 @@
+# La pantalla de carga: tras los 100 bytes de codigo, todo son los dos bloques
+# de 6144 bytes que van a la VRAM (patrones y colores). El propio cargador lo
+# dice: ld hl,0x891C / ld de,0x0000 / ld bc,0x1800 y ld hl,0xA11C / ld de,0x2000.
+0x891C 0xB91B   patrones (0x1800) y colores (0x1800) de la pantalla de carga

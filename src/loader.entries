@@ -1,0 +1,17 @@
+# El cargador (org 0xD6D8, 681 bytes). Lo arranca el BASIC con BLOAD"cas:",R.
+0xD6D8  arranque       la cabecera BIN dice exec=0xD6D8
+0xD972  vuelta_carga   direccion de retorno que la rutina de carga apila en 0xD8C1 (push hl)
+# La rutina que busca RAM en la pagina 0 se COPIA a 0xAFC8 (122 bytes desde
+# 0xD846) y corre alli; sus saltos absolutos apuntan a la copia. Aqui van los
+# destinos traducidos al sitio de la cinta (0xD846 + destino - 0xAFC8).
+0xD846  busca_ram_p0   se ejecuta recolocada en 0xAFC8; la llama 0xD81B via CALL 0x0024 con la tabla en 0xD827
+0xD853  reloc_afd5     jp m,0xAFD5 en 0xD849
+0xD866  reloc_afe8     call 0xAFE8 en 0xD846
+0xD86F  reloc_aff1     jp p,0xAFF1 en 0xD872
+0xD88A  reloc_b00c     call 0xB00C en 0xD854
+0xD8A2  reloc_b024     jp p,0xB024 en 0xD8A5
+# Tres rutinas que restauran los slots ORIGINALES de las paginas 0, 1 y 2. No
+# las llama nadie en esta cinta: el cargador es generico y aqui no vuelve atras.
+0xD77E  restaura_p0    sin llamadas (codigo muerto del cargador generico)
+0xD783  restaura_p1    sin llamadas
+0xD788  restaura_p2    sin llamadas
