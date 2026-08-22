@@ -86,8 +86,8 @@ def enlinea(t):
 
 # La web se sirve desde docs/, asi que lo que este fuera de esa carpeta no
 # existe para el navegador: esos enlaces se mandan al repositorio.
-REPO = os.environ.get("STARDUST_REPO",
-                      "https://github.com/antxiko/Stardust-MSX-disassembly")
+REPO = os.environ.get("WARMIDDLEEARTH_REPO",
+                      "https://github.com/antxiko/WarinMiddleEarth-MSX-disassembly")
 
 
 def ruta(href):
