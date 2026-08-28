@@ -32,7 +32,9 @@ import sys
 
 
 def main(entrada, cinta, salida):
-    cinta = os.path.abspath(cinta)
+    cinta = os.path.abspath(cinta).replace("\\", "/")   # openMSX quiere C:/...
+    # dentro del XML la ruta va escapada: openMSX escribe la comilla como &apos;
+    cinta_xml = cinta.replace("&", "&amp;").replace("<", "&lt;").replace("'", "&apos;")
     if not os.path.exists(cinta):
         print("no existe la cinta: %s" % cinta)
         return 2
@@ -51,7 +53,7 @@ def main(entrada, cinta, salida):
         n = xml.count(r)
         total += n
         print("  %s\n    -> %s   (%d referencias)" % (r, cinta, n))
-        xml = xml.replace(r, cinta)
+        xml = xml.replace(r, cinta_xml)
 
     with gzip.open(salida, "wb") as f:
         f.write(xml.encode("utf-8"))

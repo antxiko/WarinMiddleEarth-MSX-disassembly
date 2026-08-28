@@ -16,7 +16,7 @@
 # no los lee nadie (medido con puntos de observacion de lectura, lee2).
 D 0x01C5 0x01FF restos_de_memoria Restos sin lector: 58 bytes de la misma basura de memoria del volcado
 D 0x01FF 0x0300 restos_fuente_y_tabla_de_atributos Restos del codigo fuente ("HEX FF00FF00..."); al arrancar aqui va la tabla atributo ZX -> byte de color MSX (256 B, la rellena 0x5E15 con 0x049F)
-D 0x0300 0x0400 restos_fuente_y_tabla_908D Restos del codigo fuente (sigue el texto HEX); en juego, tabla de 256 B que rellenan 0x908D y 0x9129
+D 0x0300 0x0400 restos_fuente_y_tabla_de_bits_invertidos Restos del codigo fuente (sigue el texto HEX); en juego, tabla de 256 B: 0x9129 la construye al empezar la batalla con el byte de bits invertidos de cada indice (rlca / rr b) y con ella 0x88B9 y 0x88DA reflejan los sprites; 0x908D la rellena con tramos decrecientes 0x1F..0x1C. Medido en la partida: en el mapa aun trae el texto, en batalla es la tabla invertida
 
 # --- tablas de la capa MSX --------------------------------------------------
 # Las dos tablas de 8 colores que usa 0x049F para traducir un atributo del
@@ -38,3 +38,17 @@ D 0x0656 0x0659 buffer_del_nombre_de_tecla Buffer de tres caracteres donde 0x062
 D 0x06D0 0x06D5 mascaras_de_bit Mascaras de bit 01 02 04 08 10 (ld de,0x06D0 en 0x06AF)
 D 0x06D5 0x06E5 tabla_de_mandos Tabla de la lectura de mandos (la usa 0x06A7-0x06BD)
 D 0x06E5 0x06EF tabla_de_redefinir_teclas Tabla que 0x5ECF pasa en hl al redefinir teclas (ld hl,0x06E5 / push hl)
+
+# --- los graficos: las DOS PANTALLAS FINALES ----------------------------------
+# 0x094F-0x3F4F son 13824 bytes = 2 x 6912 = dos pantallas completas del
+# Spectrum (bitmap de 6144 + atributos de 768), tal cual se copian a 0x4000:
+# 0x83DC hace ld hl,0x094F y 0x83E4 ld hl,0x244F, y las dos caen en 0x83E7
+# (ld de,0x4000 / ld bc,0x1B00 / ldir en 0x83ED), pasan la pantalla al VDP
+# (call 0x05BD, call 0x0604) y se quedan en di / jr $: son el final del juego.
+# Dibujadas con tools/replay_linea.py (work/replay/final_094f.png y
+# final_244f.png): la primera es Gandalf con "THE FORCES OF EVIL HAVE BEEN
+# DESTROYED" (victoria) y la segunda Sauron con "May the Forces of Evil Never
+# be Defeated" (derrota). Llegan a 0x83D9 (victoria) el jp z de 0x7F7D, y a
+# 0x83E1 (derrota) los jp z de 0x6A73 y 0x8338 y el jp de 0x9229.
+D 0x094F 0x244F pantalla_final_victoria Pantalla ZX completa (6912 B: bitmap + atributos) de la VICTORIA, Gandalf y "THE FORCES OF EVIL HAVE BEEN DESTROYED"; la copia a 0x4000 el ldir de 0x83ED con hl=0x094F puesto en 0x83DC (jp z de 0x7F7D)
+D 0x244F 0x3F4F pantalla_final_derrota Pantalla ZX completa (6912 B: bitmap + atributos) de la DERROTA, Sauron y "May the Forces of Evil Never be Defeated"; la copia a 0x4000 el ldir de 0x83ED con hl=0x244F puesto en 0x83E4 (jp z de 0x6A73 y 0x8338, jp de 0x9229)

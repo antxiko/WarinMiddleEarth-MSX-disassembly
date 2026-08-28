@@ -4139,27 +4139,27 @@ L_8305:
 	ld d,c			;8319
 	ret			;831a
 L_831B:
-	ld a,0ffh		;831b
+	ld a,0ffh		;831b   ; Reloj: el operando de 0x831C es el TIC (0..255); lo llama el bucle de partida a cada vuelta (0x7F6B) y solo sigue una de cada 256
 	inc a			;831d
 	ld (L_831B+1),a		;831e
 	ret nz			;8321
 	ld hl,084f6h		;8322
-	ld a,000h		;8325
+	ld a,000h		;8325   ; Reloj: el operando de 0x8326 es el DIA (1..60); se reescribe en 0x8367
 	inc a			;8327
 	ld c,a			;8328
-	cp 03dh		;8329
+	cp 03dh		;8329   ; Dia 61: vuelve al 1 y pasa al mes siguiente
 	jr nz,L_8360		;832b
 	sub 03ch		;832d
 	ld c,a			;832f
 	push af			;8330
 	push hl			;8331
-	ld a,000h		;8332
+	ld a,000h		;8332   ; Reloj: el operando de 0x8333 es la CUENTA ATRAS de meses (0x7F4F la pone a 255); a cero, derrota (0x83E1)
 	dec a			;8334
 	ld (08333h),a		;8335
 	jp z,L_83E1		;8338
 	ld a,004h		;833b
 	call L_65FF		;833d
-	ld hl,0853ah		;8340
+	ld hl,0853ah		;8340   ; Cada mes: mensaje "El Anillo corrompe al que lo usa." y +1 a los 256 contadores de 0xC300 (saturando en 255)
 	ld (08242h),hl		;8343
 	ld l,000h		;8346
 	ld h,0c3h		;8348
@@ -4172,7 +4172,7 @@ L_834F:
 	jr nz,L_834A		;8350
 	pop hl			;8352
 	pop af			;8353
-	ld a,001h		;8354
+	ld a,001h		;8354   ; Reloj: el operando de 0x8355 es el MES (1..12); se reescribe en 0x835D
 	inc a			;8356
 	cp 00dh		;8357
 	jr nz,L_835D		;8359
@@ -4180,7 +4180,7 @@ L_834F:
 L_835D:
 	ld (08355h),a		;835d
 L_8360:
-	ld a,(08355h)		;8360
+	ld a,(08355h)		;8360   ; Panel Time: escribe "mes dia" en romanos en 0x84F6 y lo pinta con 0x8280 (0x84F5 en 0x50C1)
 	call L_8383		;8363
 	ld a,c			;8366
 	ld (08326h),a		;8367
@@ -4199,7 +4199,7 @@ L_837A:
 	ld de,050c1h		;837d
 	jp L_8280		;8380
 L_8383:
-	ld de,08538h		;8383
+	ld de,08538h		;8383   ; Numero A en romanos en (hl): L si A >= 50, una X por decena, y las unidades de la tabla de 0x8517 (4 bytes por entrada, la ultima letra con el bit 7)
 	cp 031h		;8386
 	jr z,L_83B1		;8388
 	cp 032h		;838a

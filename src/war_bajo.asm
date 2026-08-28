@@ -82,10 +82,14 @@ DATA_restos_fuente_y_tabla_de_atributos:
 	defb 033h	; 02ff
 
 ; ----------------------------------------------------------------------
-; DATOS restos_fuente_y_tabla_908D: Restos del codigo fuente (sigue el texto
-;   HEX); en juego, tabla de 256 B que rellenan 0x908D y 0x9129
+; DATOS restos_fuente_y_tabla_de_bits_invertidos: Restos del codigo fuente
+;   (sigue el texto HEX); en juego, tabla de 256 B: 0x9129 la construye al
+;   empezar la batalla con el byte de bits invertidos de cada indice (rlca /
+;   rr b) y con ella 0x88B9 y 0x88DA reflejan los sprites; 0x908D la rellena
+;   con tramos decrecientes 0x1F..0x1C. Medido en la partida: en el mapa aun
+;   trae el texto, en batalla es la tabla invertida
 ;   0x0300..0x0400  (256 bytes)
-DATA_restos_fuente_y_tabla_908D:
+DATA_restos_fuente_y_tabla_de_bits_invertidos:
 	defb 033h,030h,046h,035h,030h,030h,046h,035h,030h,038h,030h,036h,046h,00dh,00ah,009h	; 0300  30F500F50806F...
 	defb 048h,045h,058h,020h,030h,030h,046h,033h,030h,046h,035h,030h,030h,046h,044h,030h	; 0310  HEX 00F30F500FD0
 	defb 037h,030h,038h,038h,042h,030h,034h,039h,030h,046h,031h,030h,030h,046h,037h,030h	; 0320  7088B0490F100F70
@@ -1069,8 +1073,12 @@ L_0942:
 	ret			;094e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x094f..0x3f4f  (13824 bytes)
-DATA_094F:
+; DATOS pantalla_final_victoria: Pantalla ZX completa (6912 B: bitmap +
+;   atributos) de la VICTORIA, Gandalf y "THE FORCES OF EVIL HAVE BEEN
+;   DESTROYED"; la copia a 0x4000 el ldir de 0x83ED con hl=0x094F puesto en
+;   0x83DC (jp z de 0x7F7D)
+;   0x094f..0x244f  (6912 bytes)
+DATA_pantalla_final_victoria:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 094f  ................
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 095f  ................
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 096f  ................
@@ -1503,6 +1511,14 @@ DATA_094F:
 	defb 020h,020h,030h,030h,030h,030h,030h,030h,030h,030h,030h,018h,020h,020h,020h,020h	; 241f    000000000.    
 	defb 020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h,020h	; 242f                  
 	defb 020h,018h,018h,030h,030h,030h,030h,030h,030h,030h,030h,030h,018h,020h,020h,020h	; 243f   ..000000000.   
+
+; ----------------------------------------------------------------------
+; DATOS pantalla_final_derrota: Pantalla ZX completa (6912 B: bitmap +
+;   atributos) de la DERROTA, Sauron y "May the Forces of Evil Never be
+;   Defeated"; la copia a 0x4000 el ldir de 0x83ED con hl=0x244F puesto en
+;   0x83E4 (jp z de 0x6A73 y 0x8338, jp de 0x9229)
+;   0x244f..0x3f4f  (6912 bytes)
+DATA_pantalla_final_derrota:
 	defb 00fh,0bfh,0c3h,0ffh,0e1h,0fdh,0ffh,007h,0ffh,01fh,0fch,0ffh,0ffh,03dh,01fh,0ffh	; 244f  .............=..
 	defb 0ffh,087h,0efh,0ffh,0ffh,0ffh,0f0h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0e0h,000h	; 245f  ................
 	defb 08fh,07fh,0ffh,0ffh,0f0h,0ffh,0ffh,007h,0efh,0ffh,0ffh,0ffh,0ffh,08fh,00fh,0ffh	; 246f  ................

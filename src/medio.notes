@@ -1,27 +1,27 @@
-# Anotaciones del bloque medio (cinta [10], corre en 0x5E00-0x96F0, 14577 bytes).
-#
-# El juego. Empieza por el arranque y el menu (0x5E00-0x5F74), cuyo codigo se
-# RECICLA despues como buffer: 0x75A5 lee en 0x5E00 una rejilla de 24 filas de 34
-# bytes (32 codigos + 2) y monta con ella la pantalla del mapa.
 
-# --- restos del Spectrum y rutinas sin llamadas ------------------------------
-# (ver src/juego.entries: se listan como codigo con "sin llamadas")
-
-# --- tablas y textos del menu ------------------------------------------------
-# La matriz de teclas del ZX SPECTRUM en el orden de sus puertos (BHY65TGV = el
-# bit 4 de cada fila...): la conversion imita el teclado del ZX por debajo.
-D 0x5FB8 0x5FF0 nombres_de_tecla_spectrum Nombres de tecla en el orden de la matriz del Spectrum, con codigos >=0x80 para las teclas especiales (ld de,0x5FB7 en 0x5EAC, que empieza con inc de; ld hl,0x5FBD en 0x708A)
-D 0x5FF0 0x5FF8 punteros_de_control_actual Punteros a los cuatro rotulos de "Control Actual" (0x5E31 indexa con (0x96F0)*2)
-F 0x5FF0 w1
-D 0x5FF8 0x6008 tabla_de_teclas_definidas Tabla de la lectura de teclas definidas (ld hl,0x600A en 0x5F36)
-D 0x6008 0x600F teclas_definidas Las cinco teclas definidas: "1RQAOP" y un byte (ld ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
-D 0x600F 0x62FF textos_del_menu Textos del menu: rotulos de control, "Las Teclas Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
-D 0x62FF 0x6317 dibujo_del_cursor Dibujo de 24 bytes de la marca del cursor (ld de,0x62FF en 0x64DC: 8 columnas de 3)
-F 0x62FF 3
-D 0x6317 0x63FB tabla_6317 Tabla que leen 0x6593-0x659C (formato pendiente)
-D 0x64DA 0x64DC dos_nop_64da Dos nop tras el ret-interruptor de 0x64D9 (que 0x65FB convierte en ld hl,0x0000)
-
-# --- tablas de saltos ------------------------------------------------------
+# --- el reloj del juego (medido en la partida completa, work/replay/pasada1) ---
+# Las variables van en los OPERANDOS de cuatro ld a,nn (automodificacion, como
+# en el resto del juego): 0x831C tic, 0x8326 dia, 0x8355 mes y 0x8333 cuenta
+# atras. El bucle de partida (0x7F6B) llama a 0x831B a cada vuelta; a la vuelta
+# 256 avanza un dia; al dia 61 vuelve al 1, resta uno a la cuenta atras (255 al
+# empezar: 0x7F4F), y si llega a cero salta a la DERROTA (0x83E1); si no, suma
+# uno a los 256 contadores de 0xC300 (saturando en 255), deja el mensaje "El
+# Anillo corrompe al que lo usa." (0x853A en 0x8242) y pasa al mes siguiente
+# (1..12). El panel Time lo pinta 0x8360-0x8380 en romanos: mes y dia, con
+# 0x8383 (L = 50, X por decenas, y las unidades de la tabla de 0x8517).
+# Comprobado: en los volcados de la partida el dia va 0, 9, 11, 15 ... 58 y a
+# las 6,7 h pasa a mes 2 dia 1 con la cuenta en 254; el panel decia "I XXXVI"
+# a las 4,2 h (volcados vecinos: dia 34 y 39) y "I XXXXVIII" a las 5,0 h (47 y
+# 49). En batalla el reloj NO corre: el bucle de 0x7F57 no gira.
+C 0x831B Reloj: el operando de 0x831C es el TIC (0..255); lo llama el bucle de partida a cada vuelta (0x7F6B) y solo sigue una de cada 256
+C 0x8325 Reloj: el operando de 0x8326 es el DIA (1..60); se reescribe en 0x8367
+C 0x8329 Dia 61: vuelve al 1 y pasa al mes siguiente
+C 0x8332 Reloj: el operando de 0x8333 es la CUENTA ATRAS de meses (0x7F4F la pone a 255); a cero, derrota (0x83E1)
+C 0x8340 Cada mes: mensaje "El Anillo corrompe al que lo usa." y +1 a los 256 contadores de 0xC300 (saturando en 255)
+C 0x8354 Reloj: el operando de 0x8355 es el MES (1..12); se reescribe en 0x835D
+C 0x8360 Panel Time: escribe "mes dia" en romanos en 0x84F6 y lo pinta con 0x8280 (0x84F5 en 0x50C1)
+C 0x8383 Numero A en romanos en (hl): L si A >= 50, una X por decena, y las unidades de la tabla de 0x8517 (4 bytes por entrada, la ultima letra con el bit 7)
+# -----------------------------------------------
 D 0x7697 0x76B7 tabla_de_16_palabras_7697 Tabla de 16 palabras que 0x7687 indexa con A*2 & 0x1E y despacha con push de / ret
 F 0x7697 w1
 D 0x8030 0x8044 tabla_de_10_palabras_8030 Tabla de 10 palabras (indice 1..10) que 0x804D-0x805B indexa con A y salta con jp (hl)
@@ -46,3 +46,18 @@ D 0x96F0 0x96F1 modo_de_control Variable: modo de control (0 joystick, 1 cursore
 D 0x8A51 0x8A52 pop_hl_sin_uso Un pop hl que el jr de 0x8A4F salta y al que nadie llega (entrada alternativa sin uso)
 D 0x8A68 0x8A6B interruptor_por_opcode Interruptor por opcode: en la cinta ret / 00 / BE; 0x8BEE escribe 0x21 y 0x8BCC el byte de 0x8A69, y queda ld hl,0xBExx que cae en 0x8A6B
 D 0x6712 0x6714 cola_del_motor_de_sonido Pop af / ret al que no llega nadie: cola del motor de sonido del Spectrum
+
+# --- tablas y textos del menu (restaurado el 2026-08-28: el agente las borro
+# sin querer al escribir las notas del reloj; son las mismas de antes) ---
+# La matriz de teclas del ZX SPECTRUM en el orden de sus puertos (BHY65TGV = el
+# bit 4 de cada fila...): la conversion imita el teclado del ZX por debajo.
+D 0x5FB8 0x5FF0 nombres_de_tecla_spectrum Nombres de tecla en el orden de la matriz del Spectrum, con codigos >=0x80 para las teclas especiales (ld de,0x5FB7 en 0x5EAC, que empieza con inc de; ld hl,0x5FBD en 0x708A)
+D 0x5FF0 0x5FF8 punteros_de_control_actual Punteros a los cuatro rotulos de "Control Actual" (0x5E31 indexa con (0x96F0)*2)
+F 0x5FF0 w1
+D 0x5FF8 0x6008 tabla_de_teclas_definidas Tabla de la lectura de teclas definidas (ld hl,0x600A en 0x5F36)
+D 0x6008 0x600F teclas_definidas Las cinco teclas definidas: "1RQAOP" y un byte (ld ix,0x6008 en 0x5EDC; ld hl,0x6010 en 0x9144)
+D 0x600F 0x62FF textos_del_menu Textos del menu: rotulos de control, "Las Teclas Actuales Son", "War In Middle Earth / 1. Usa Joystick ... 0. Empieza Juego", "Pausa/Abandona - 1 / Menu - R", creditos "Programado por C.J.Pink. Conversion por ANIMAGIC" y la frase en ingles
+D 0x62FF 0x6317 dibujo_del_cursor Dibujo de 24 bytes de la marca del cursor (ld de,0x62FF en 0x64DC: 8 columnas de 3)
+F 0x62FF 3
+D 0x6317 0x63FB tabla_6317 Tabla que leen 0x6593-0x659C (formato pendiente)
+D 0x64DA 0x64DC dos_nop_64da Dos nop tras el ret-interruptor de 0x64D9 (que 0x65FB convierte en ld hl,0x0000)

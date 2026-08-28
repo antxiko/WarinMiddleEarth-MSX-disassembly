@@ -6,7 +6,21 @@
 # volcados lee1/lee2 en work/omsx), y en los graficos ademas dibujandola.
 D 0x9E00 0xA280 tiles_del_mapa Tiles del mapa: hasta 128 de 9 bytes (8 lineas + 1 atributo ZX); los lee 0x75C7-0x75EB cuando el codigo de la rejilla lleva el bit 7 (dibujados en work/omsx/tiles9_9e00.png)
 F 0x9E00 9
-D 0xA280 0xB8E8 graficos_sin_lector Graficos sin lector visto todavia (perfil: dibujo; nadie los leyo en 3,5 min de mapa)
+# 0xA280-0xB8E8 son los SPRITES DE LA BATALLA: 104 ceros y luego 176 piezas de
+# 16x8 con mascara, 32 bytes cada una (4 parejas de filas x 8 bytes: mascara y
+# dibujo de la columna 0, mascara y dibujo de la columna 1, y la fila siguiente
+# en orden inverso, que es como las recorre 0x887B-0x8897 con inc e / inc d /
+# dec e). Lo dice el codigo que las pinta y lo confirma la partida completa
+# (work/replay/pasada1, puntos de observacion de lectura; solo se leen en las
+# ventanas de batalla): la casilla (codigo, tipo) de la rejilla de 16x16 de
+# 0xE800 con tipo >= 4 se dibuja desde 0xA2E8 + (tipo-4)*32 (0x87B4-0x87C4 y
+# 0x87E9-0x87FB); las leen 0x880B-0x8824 y 0x887C-0x8895 (and mascara / or
+# dibujo sobre la pantalla), 0x88B9-0x88C6 y 0x88DA-0x88EE (la version reflejada
+# de derecha a izquierda, pasando cada byte por la tabla de bits invertidos de
+# 0x0300) y 0x88F3-0x8903 (copia directa). Dibujadas en work/replay/sprites_a2e8.png.
+D 0xA280 0xA2E8 ceros_antes_de_los_sprites 104 ceros delante de los sprites de batalla (sin lector en la partida completa)
+D 0xA2E8 0xB8E8 sprites_de_batalla 176 sprites de batalla de 16x8 con mascara, 32 B cada uno (0xA2E8 + (tipo-4)*32 en 0x87B4-0x87C4 y 0x87E9-0x87FB); los leen 0x880B-0x8824, 0x887C-0x8895, 0x88B9-0x88C6, 0x88DA-0x88EE y 0x88F3-0x8903 durante la batalla
+F 0xA2E8 32
 D 0xB8E8 0xBE00 tablas_de_estado_b900 Tablas de estado del juego (0xB900 la apuntan 0x6AC2, 0x6EAC, 0x8F7A...; las lee 0x92E4 en bloque; formato pendiente)
 D 0xBE00 0xC000 ram_de_trabajo_be00 Ceros: RAM de trabajo que viene cargada (0xBE00/0xBF00 las escriben 0x8BC3, 0x914E...)
 D 0xC000 0xC600 tablas_de_estado_c100 Tablas de estado (0xC1xx las toca el menu en 0x5E8D-0x5E9E: nivel; formato pendiente)
