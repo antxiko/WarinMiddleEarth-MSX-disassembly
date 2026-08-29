@@ -14,21 +14,25 @@
 ; ======================================================================
 
 
-L_88B8:
+
+; ----------------------------------------------------------------------
+; La pantalla a la VRAM usando la BIOS. Sin llamadas en esta cinta
+; ----------------------------------------------------------------------
+VUELCA_CON_LA_BIOS:		; Sube los dos bloques de 6144 bytes a la VRAM con LDIRVM
 	call 00041h		;88b8   ; BIOS DISSCR - Inhibits the screen display
-	di			;88bb
-	ld hl,0891ch		;88bc
-	ld de,00000h		;88bf
+	di			;88bb   ; Y ademas cierra las interrupciones a mano
+	ld hl,0891ch		;88bc   ; 0x88B8 + 100: justo detras de este trozo empiezan los patrones
+	ld de,00000h		;88bf   ; A la VRAM 0x0000, la tabla de patrones
 	ld bc,01800h		;88c2
 	call 0005ch		;88c5   ; BIOS LDIRVM - Block transfers to VRAM from memory
 	di			;88c8
-	ld hl,0a11ch		;88c9
-	ld de,02000h		;88cc
+	ld hl,0a11ch		;88c9   ; Los otros 6144, los de color
+	ld de,02000h		;88cc   ; A la VRAM 0x2000, la tabla de color
 	ld bc,01800h		;88cf
 	call 0005ch		;88d2   ; BIOS LDIRVM - Block transfers to VRAM from memory
 	call 00044h		;88d5   ; BIOS ENASCR - Displays the screen
 	ei			;88d8
-	ret			;88d9
+	ret			;88d9   ; Un `ret`: esto estaba pensado para llamarlo, no para saltar a el
 
 ; ----------------------------------------------------------------------
 ; DATOS restos_de_otro_arranque: Restos: un ret y 18 bytes de otro arranque,

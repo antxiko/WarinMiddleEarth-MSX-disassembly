@@ -6,6 +6,264 @@
 # arranque; en una maquina real ahi hay RAM sin inicializar), carga la pantalla
 # y la vuelca a VRAM, y carga los tres bloques del juego con una
 # reimplementacion de LD-BYTES leyendo el puerto 0xA2 (bit 7 = casete).
+#
+# LOS CUATRO BLOQUES QUE CARGA, con la cuenta que los cuadra (0xD6F6-0xD741):
+#     0x88B8  0x3064 = 12388 B  pantalla de carga  (= work/pantalla.raw)
+#     0x0190  0x3DBF = 15807 B  bloque bajo        (= work/bajo.raw, y ahi se queda)
+#     0x3F4F  0x38F1 = 14577 B  bloque medio       (= work/medio.raw, luego sube a 0x5E00)
+#     0x88B8  0x4878 = 18552 B  bloque alto        (= work/alto.raw, luego sube a 0x9E00)
+# Los dos ultimos se cargan uno pegado al otro (0x0190+0x3DBF = 0x3F4F) y el
+# alto encima de la pantalla de carga, que para entonces ya esta en la VRAM.
+# Quien los sube a su sitio definitivo es 0x0190, con dos lddr.
+#
+# LA RUTINA DE CARGA (0xD8C0) ES LD-BYTES CON EL CAMINO DE VERIFICAR CORTADO:
+# donde el original decide entre grabar en memoria y comparar, aqui solo queda
+# el `ld (ix+0),l` de 0xD91B. Y no hay tecla de parada: los cuatro `jr nc` que
+# en el original van a la salida por BREAK (0xD8E2, 0xD8F1, 0xD8F8, 0xD907)
+# vuelven aqui a 0xD8DF, o sea a buscar la cabecera de tono otra vez. El unico
+# modo de que devuelva error es el desbordamiento de B en 0xD957.
+#
+# EL BORDE QUE PARPADEA es 0xD966-0xD96F: en cada flanco detectado escribe en
+# el registro 7 del VDP los cuatro bits bajos del registro de refresco R, o sea
+# un color casi al azar. La copia de esta misma rutina que lleva el bloque bajo
+# (0x08A9) hace lo mismo pero subiendo el color de uno en uno.
+
 D 0xD744 0xD748 slots_originales_y_de_ram Los slots: A8 y (0xFFFF) originales (0xD744-45) y los que tienen RAM en las tres paginas (0xD746-47)
 F 0xD744 2
 D 0xD8BE 0xD8C0 relleno_d8be Dos bytes 0xFF de relleno entre la rutina recolocable y la de carga
+
+# ---------------------------------------------------------------------------
+# El arranque
+# ---------------------------------------------------------------------------
+B 0xD6D8 Lo que llama el BLOAD"cas:",R: monta la RAM y carga los cuatro bloques
+L 0xD6D8 ARRANQUE          Deja las cuatro paginas en RAM, carga la pantalla y los tres bloques del juego
+C 0xD6D9 La pila en 0xFDE8; el arranque del bloque bajo la vuelve a poner justo ahi (0x0191)
+C 0xD6DC Busca en que slot hay RAM en las paginas 0, 1 y 2, y lo anota en 0xD746-47
+C 0xD6DF Pagina 0 a RAM: a partir de aqui la BIOS ya no esta debajo
+C 0xD6E2 Pagina 1 a RAM
+C 0xD6E5 Pagina 2 a RAM; la 3 ya lo era. El juego corre sin ROM ninguna
+C 0xD6E8 0xDAC0 esta FUERA del bloque cargado (681 bytes acaban en 0xD981): copia RAM tal como estaba
+C 0xD6EB A 0x012C-0x018F, los 100 bytes justo debajo de donde cae el bloque bajo
+C 0xD6F3 Pantalla apagada mientras se vuelca la imagen de carga a la VRAM
+C 0xD6F6 Primer bloque: la pantalla de carga, a 0x88B8
+C 0xD6FA 0x3064 = 12388 bytes, el tamano exacto del bloque [08] de la cinta
+C 0xD6FD A = el byte de bandera que tiene que traer el bloque: 0
+C 0xD6FE Acarreo puesto: en LD-BYTES es "cargar" y no "verificar"
+C 0xD702 0x88B8 + 100 de cabecera: los 6144 bytes de patrones
+C 0xD708 0x1800 = 6144 bytes a la VRAM 0x0000
+C 0xD70E Y los otros 6144, los de color, a la VRAM 0x2000
+C 0xD71A Enciende la pantalla: ya se ve el dibujo mientras carga el resto
+C 0xD71D Bloque bajo, a 0x0190, que es donde se ejecuta: no lo mueve nadie
+C 0xD721 0x3DBF = 15807 bytes
+C 0xD729 Bloque medio, a 0x3F4F, pegado al anterior; el arranque lo subira a 0x5E00
+C 0xD72D 0x38F1 = 14577 bytes
+C 0xD735 Bloque alto, encima de la pantalla de carga, que ya esta en la VRAM
+C 0xD739 0x4878 = 18552 bytes; el arranque lo subira a 0x9E00
+C 0xD741 Y al bloque bajo, que recoloca los otros dos y salta al juego
+
+# ---------------------------------------------------------------------------
+# La VRAM
+# ---------------------------------------------------------------------------
+B 0xD748 Volcar RAM a VRAM
+L 0xD748 VUELCA_A_VRAM     BC bytes desde HL a la VRAM DE
+C 0xD749 La direccion de VRAM viene en DE y la de RAM en HL; se cruzan
+C 0xD74F Puerto 0x98: el dato. La direccion se autoincrementa sola en el VDP
+C 0xD755 Ni ei al acabar: todo el cargador corre con las interrupciones cerradas
+L 0xD74E BUCLE_A_VRAM      Un byte por vuelta al puerto 0x98
+L 0xD759 VRAM_A_ESCRIBIR   Pone HL como direccion de ESCRITURA de la VRAM
+C 0xD75A Primero el byte bajo de la direccion, por el puerto 0x99
+C 0xD75D El VDP solo mira 14 bits de direccion
+C 0xD75F Bit 6 a 1: lo que viene detras son escrituras
+C 0xD763 Dos `ex (sp),hl` seguidos: el retardo que necesita el VDP, sin tocar nada
+
+L 0xD766 PANTALLA_APAGADA  Registro 1 del VDP con el bit de pantalla a 0
+C 0xD767 Leer el estado deja el puerto 0x99 esperando una direccion, no medio dato
+C 0xD769 Registro 1 = 0xA0: bit 6 (pantalla) a 0, bit 5 (interrupcion) a 1
+C 0xD76B 0x81 = escribir en el registro 1
+L 0xD772 PANTALLA_ENCENDIDA  Registro 1 del VDP con el bit de pantalla a 1
+C 0xD775 Registro 1 = 0xE0: lo mismo de arriba con el bit 6 puesto
+C 0xD777 0x81 = escribir en el registro 1
+
+# ---------------------------------------------------------------------------
+# Los slots
+# ---------------------------------------------------------------------------
+B 0xD77E Conmutar una pagina entre su slot original y el slot con RAM
+L 0xD77E RESTAURA_P0       Pagina 0 a su slot original. NADIE la llama en esta cinta
+C 0xD77E 0xD745 es la pareja de slots de cuando arranco la maquina
+L 0xD783 RESTAURA_P1       Pagina 1 a su slot original. Sin llamadas
+C 0xD783 Mismo par de bytes; solo cambia la mascara de la pagina
+L 0xD788 RESTAURA_P2       Pagina 2 a su slot original. Sin llamadas
+C 0xD788 Las tres son codigo muerto: este cargador no devuelve la BIOS nunca
+L 0xD78D RAM_EN_P0         Pagina 0 al slot con RAM
+C 0xD78D 0xD747 es la pareja de slots que dejo anotada 0xD7C4: los que tienen RAM
+L 0xD792 RAM_EN_P1         Pagina 1 al slot con RAM
+L 0xD797 RAM_EN_P2         Pagina 2 al slot con RAM
+L 0xD79C MASCARA_P0        D = los bits de la pagina 0 en los registros de slot, E = su contrario
+C 0xD79C Bits 0-1: la pagina 0
+L 0xD7A2 MASCARA_P1        D/E para la pagina 1
+C 0xD7A2 Bits 2-3: la pagina 1
+L 0xD7A8 MASCARA_P2        D/E para la pagina 2
+C 0xD7A8 Bits 4-5: la pagina 2. Los 6-7, la pagina 3, no se tocan jamas
+L 0xD7AC CAMBIA_SLOT       Mete en 0xFFFF y en el puerto 0xA8 los dos bits de una pagina
+C 0xD7AD El byte de arriba de la pareja: el registro de slots secundarios
+C 0xD7AE Solo los dos bits de esta pagina; el resto se deja como esta
+C 0xD7B0 0xFFFF se lee INVERTIDO, y el cpl deshace la inversion
+C 0xD7B4 Las otras tres paginas se conservan
+C 0xD7B6 Y se escribe el registro secundario entero
+C 0xD7B9 Ahora el byte de abajo: el registro de slots primarios
+C 0xD7BD El puerto 0xA8 lleva los slots primarios de las cuatro paginas
+C 0xD7C1 Aqui es donde desaparece la BIOS, cuando la pagina es la 0
+
+B 0xD7C4 Buscar RAM probando slot a slot en las paginas 1, 2 y 0
+L 0xD7C4 BUSCA_RAM         Deja las tres paginas en un slot con RAM y anota la pareja en 0xD746-47
+C 0xD7C5 La prueba escribe en 0x0000, 0x4000 y 0x8000; de los tres solo se salva este
+C 0xD7C9 Anota en 0xD744-45 los slots tal como estaban al entrar
+C 0xD7CC 0xD827 es el OPERANDO del `call` de 0xD826: se le pone el ENASLT de la BIOS
+C 0xD7D2 Probar la pagina 1...
+C 0xD7D8 ...y la pagina 2, que ya se pueden probar con la BIOS puesta
+C 0xD7DE 122 bytes de ENASLT recolocado, con los saltos ya escritos para 0xAFC8
+C 0xD7E9 Y ahora el `call` de 0xD826 va a la copia: la pagina 0 se cambia sin BIOS
+C 0xD7EF Probar la pagina 0
+C 0xD7F5 Anota en 0xD746-47 los slots que han quedado, los que tienen RAM
+C 0xD7FB Se devuelven los slots de antes: el juego todavia no ha empezado
+C 0xD804 Y el byte de 0x8000 que se piso al probar
+L 0xD809 APUNTA_ORIGINALES  Guarda los slots de ahora en 0xD744-45
+C 0xD809 0xD744: la pareja "como estaba la maquina"
+L 0xD80E APUNTA_LOS_DE_RAM  Guarda los slots de ahora en 0xD746-47
+C 0xD80E 0xD746: la pareja "donde hay RAM"
+L 0xD811 APUNTA_SLOTS      Mete en (HL) el puerto 0xA8 y en (HL+1) el registro 0xFFFF
+C 0xD811 Byte de abajo: los slots primarios del puerto 0xA8
+C 0xD815 Byte de arriba: el registro de slots secundarios, que se lee invertido
+C 0xD818 Se guarda ya sin invertir, listo para volver a escribirlo
+L 0xD81B RECORRE_SLOTS     Prueba los 16 slots hasta que en HL se pueda escribir y releer
+C 0xD81B Bit 7 puesto: a ENASLT se le da siempre la forma de slot expandido
+C 0xD81D Cuatro slots primarios
+L 0xD81F SIGUIENTE_PRIMARIO  Empieza un slot primario, con el secundario otra vez a cero
+C 0xD81F Se limpian los bits 2-3 al pasar al siguiente primario
+C 0xD821 Y cuatro secundarios dentro de cada uno
+L 0xD823 PRUEBA_UN_SLOT    Conecta un slot y escribe dos valores en HL para ver si es RAM
+C 0xD826 ENASLT, o su copia de 0xAFC8: el operando lo pone 0xD7CC o 0xD7EC
+C 0xD82A Escribe 0x20 en la direccion de prueba...
+C 0xD82C ...y lo relee: si no vuelve igual, ahi no hay RAM
+C 0xD831 Segundo valor, 0xFA, por si lo que se leyo era un eco del bus
+L 0xD838 SLOT_SIN_RAM      Sigue con el siguiente slot
+C 0xD83A +4: el siguiente slot secundario (bits 2-3)
+C 0xD83E +1: el siguiente primario (bits 0-1)
+L 0xD843 SLOT_CON_RAM      Sale dejando conectado el slot que ha valido
+C 0xD843 Se sale con ese slot ya conectado y su identificador en A
+
+# ---------------------------------------------------------------------------
+# Los 122 bytes que se copian a 0xAFC8: ENASLT recolocado
+#
+# Este trozo NO puede ejecutarse donde esta. Todas sus direcciones internas ya
+# estan escritas para la copia: el `jp m,0xAFD5` de 0xD849 apunta a 0xD853+
+# (0xAFC8-0xD846), y lo mismo el resto. Ver src/loader.entries.
+# ---------------------------------------------------------------------------
+L 0xD846 ENASLT_COPIA      Conmuta la pagina de HL al slot A. Corre recolocado en 0xAFC8
+C 0xD846 0xAFE8 es este mismo trozo copiado: le saca en B y C la mascara de la pagina
+C 0xD849 Bit 7 del identificador: es un slot expandido y hay que tocar tambien 0xFFFF
+C 0xD84C Cambia en el puerto 0xA8 solo los dos bits de esa pagina
+L 0xD853 ENASLT_EXPANDIDO  La parte de los slots expandidos
+C 0xD854 0xB00C: escribe el registro secundario del primario que toca
+C 0xD85D 0xFCC5 es SLTTBL, la copia que la BIOS guarda de los cuatro registros secundarios
+C 0xD864 Y a rematar por el camino del slot no expandido, el del puerto 0xA8
+L 0xD866 MASCARAS_DE_SLOT  B = los bits que hay que meter, C = la mascara de lo que se conserva
+C 0xD867 Los dos bits altos de H: la pagina, 0 a 3
+C 0xD86D 0xC0 rotado dos veces por pagina: sale 0x03, 0x0C, 0x30 o 0xC0
+L 0xD86F ROTA_LA_MASCARA   Dos rotaciones por pagina
+C 0xD876 C se queda con la mascara al reves, la de los bits que NO se tocan
+C 0xD87A Los dos bits bajos del identificador: el slot primario
+C 0xD87E 0xAB mas 0x55 por vuelta: 0x00, 0x55, 0xAA o 0xFF, el numero repetido cuatro veces
+L 0xD880 REPITE_EL_SLOT    0xAB + 0x55 por cada vuelta
+C 0xD885 Y se recorta a la pagina que toca
+C 0xD888 Deja el signo del identificador, que es el bit de "expandido"
+L 0xD88A ESCRIBE_SECUNDARIO  Mete el slot secundario en 0xFFFF, conmutando antes la pagina 3
+C 0xD88B Los dos bits altos del patron que armo 0xD866
+C 0xD892 Se apunta el puerto 0xA8 para dejarlo luego como estaba
+C 0xD895 La pagina 3 se lleva al primario que se va a tocar...
+C 0xD898 ...porque 0xFFFF es el registro secundario DE ESE primario, no uno global
+C 0xD89B Bits 2-3 del identificador: el slot secundario
+C 0xD8A0 Otra vez 0xAB + 0x55 por vuelta
+L 0xD8A2 REPITE_SECUNDARIO  El mismo truco del 0x55 para el slot secundario
+C 0xD8AD Se lee 0xFFFF invertido y se le cambian solo los dos bits de la pagina
+C 0xD8B7 Y la pagina 3 vuelve a su slot de antes
+C 0xD8BB Devuelve el slot primario, 0 a 3
+
+# ---------------------------------------------------------------------------
+# La carga de cinta
+#
+# El bloque que se lee lleva [bandera][datos][paridad], y la paridad es el XOR
+# de todo lo anterior. Entra con IX = donde dejarlo, DE = cuantos bytes de
+# datos y A = la bandera que se espera. Sale con el ACARREO PUESTO si todo ha
+# ido bien (0xD948 compara la paridad acumulada contra 1 estando a 0).
+# ---------------------------------------------------------------------------
+B 0xD8C0 Leer un bloque de la cinta: IX destino, DE longitud, A bandera
+L 0xD8C0 CARGA_BLOQUE      Lee de la cinta DE bytes a IX. Acarreo puesto al salir = bien
+C 0xD8C1 Se apila 0xD972 como retorno: acabe como acabe, el motor se para ahi
+C 0xD8C6 Registro 7 del PSG
+C 0xD8CA 0x3F: los tres tonos y los tres ruidos, callados
+C 0xD8CE Puerto 0xAB en modo poner/quitar bit: bit 4 del puerto C a 0, motor EN MARCHA
+C 0xD8D2 Y deja el PSG apuntando al registro 14, por donde el MSX oye la cinta
+C 0xD8D7 inc d / ex af,af' / dec d: mete un NO CERO en AF', la marca de "el proximo byte es la bandera"
+C 0xD8DB C lleva el estado del ultimo flanco visto
+C 0xD8DE cp a: pone el cero y borra el acarreo sin tocar A
+L 0xD8DF BUSCA_CABECERA    Vuelve aqui cada vez que se pierde la senal
+C 0xD8DF Primer flanco de la cabecera de tono
+C 0xD8E2 Aqui el original del Spectrum abandonaba: esta version vuelve a intentarlo
+C 0xD8E4 0x0415 vueltas de 256: hay que oir silencio antes de dar la cabecera por buena
+L 0xD8E7 ESPERA_SILENCIO   Un rato largo sin mirar la cinta
+L 0xD8F3 MIDE_CABECERA     Cuenta ciclos enteros de la cabecera de tono
+C 0xD8F3 B arranca en 0x9C: lo que sube durante el ciclo es la medida del tiempo
+C 0xD8FA Un ciclo mas corto de 0xC6-0x9C no vale como cabecera
+C 0xD8FF Hacen falta 256 ciclos buenos seguidos (H da la vuelta)
+L 0xD902 BUSCA_SINCRONISMO  El medio ciclo corto que separa la cabecera de los datos
+C 0xD90A Mientras el medio ciclo sea largo (0xD4 o mas), sigue siendo cabecera
+C 0xD90E El otro medio del bit de sincronismo; detras vienen ya los datos
+C 0xD912 H acumula la paridad: el XOR de bandera, datos y byte final
+C 0xD914 0xB0 es el punto de partida del cronometro de cada medio bit
+L 0xD918 GUARDA_O_COMPRUEBA  Primer byte: la bandera; los demas, a memoria
+C 0xD918 Recupera la marca de AF': cero quiere decir "ya son datos"
+C 0xD91B A memoria. Aqui el original tenia ademas el camino de VERIFICAR, que aqui no esta
+L 0xD920 MIRA_LA_BANDERA   Compara el primer byte con la bandera que pidio el llamador
+C 0xD922 L trae la bandera leida; A, la que se esperaba
+C 0xD923 No es el bloque que se buscaba: se sale sin acarreo
+C 0xD924 rr c / rla es solo para no perder el acarreo en medio del xor
+C 0xD927 inc de y dec de: la bandera no cuenta en la longitud
+L 0xD92A SIGUIENTE_BYTE    Avanza el destino
+L 0xD92C DESCUENTA         Un byte menos, y a por los ocho bits del siguiente
+C 0xD92E 0xB2 y 0xB0: los dos puntos de partida del cronometro segun el medio bit
+L 0xD930 OCHO_BITS         L = 1; cuando ese 1 sale por arriba, el byte esta completo
+L 0xD932 UN_BIT            Dos flancos por bit; el tiempo entre ellos dice si es 0 o 1
+C 0xD936 0xCB es el umbral: por debajo el bit es 0, por encima 1
+C 0xD939 El bit entra por la derecha de L y empuja al 1 de arriba
+C 0xD940 Cada byte completo entra en la paridad
+C 0xD943 Y asi hasta que DE llega a cero
+C 0xD948 La paridad de todo tiene que dar 0: entonces el cp deja el acarreo, que es la senal de bien
+L 0xD94B DOS_FLANCOS       Un ciclo entero: dos cambios de nivel seguidos
+C 0xD94B Si el primero falla, ni se busca el segundo
+L 0xD94F UN_FLANCO         Espera a que cambie el nivel de la cinta; B mide cuanto tarda
+C 0xD94F Retardo de entrada fijo antes de empezar a mirar
+L 0xD951 RETARDO_FLANCO    Cuenta atras sin hacer nada
+L 0xD955 MUESTREA          Lee la cinta hasta que el nivel cambie
+C 0xD955 B es el cronometro; si da la vuelta a cero, se acabo la paciencia
+C 0xD958 Ese 0 no sirve para nada: el `in` de abajo pisa A inmediatamente
+C 0xD95A El PSG quedo en el registro 14: el bit 7 es la entrada del casete
+C 0xD95C En el MSX la senal llega al reves que en la maquina original
+C 0xD95D Contra el ultimo nivel: mientras no cambie, se sigue contando
+C 0xD963 Cambio: se apunta el nivel nuevo
+C 0xD966 Los cuatro bits bajos del registro de refresco: un color practicamente al azar
+C 0xD96A Registro 7 del VDP; por eso el borde parpadea mientras carga
+C 0xD970 Acarreo puesto = flanco encontrado
+L 0xD972 FIN_DE_CARGA      El retorno que apila 0xD8C1: para el motor y apaga el parpadeo
+C 0xD972 E no lo mira nadie despues; esta instruccion sobra
+C 0xD976 Bit 4 del puerto C del PPI a 1: motor del casete PARADO
+C 0xD978 Registro 7 del VDP a 1: se acaba el parpadeo y el borde queda negro
+C 0xD980 Y de aqui se vuelve al que llamo a 0xD8C0, con su acarreo intacto
+
+# --- remate: los trozos cortos que se quedaban sin una sola linea ------------
+C 0xD792 La misma pareja de 0xD747, con la mascara de la pagina 1
+C 0xD797 Y con la de la pagina 2
+C 0xD8E7 Bucle de dos pisos: B por dentro y HL por fuera
+C 0xD92A IX pasa al siguiente hueco de memoria
+C 0xD930 L arranca con un 1 que hace de cuentabits
+C 0xD951 Retardo puro: A vueltas sin mirar la cinta

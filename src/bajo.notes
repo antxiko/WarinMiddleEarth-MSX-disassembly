@@ -1,10 +1,32 @@
 # Anotaciones del bloque bajo (cinta [09], org 0x0190, 15807 bytes).
 #
-# Es la capa MSX de la conversion mas los graficos: unos 2 KB de rutinas que
-# hablan con el VDP, el PSG y el teclado, y desde 0x0986 dibujos. El juego
+# Es la capa MSX de la conversion mas los graficos: 1218 bytes de rutinas que
+# hablan con el VDP, el PSG y el teclado, y desde 0x094F dibujos. El juego
 # propiamente dicho esta en el bloque medio y dibuja en una pantalla de ZX
 # Spectrum emulada en RAM (0x4000-0x57FF el bitmap, 0x5800-0x5AFF los
 # atributos); lo que hay aqui la pasa al VDP.
+#
+# LAS DOS GEOMETRIAS. En la pantalla del Spectrum las ocho lineas de pixeles de
+# una celda estan a 256 bytes una de otra, y en el SCREEN 2 del MSX estan
+# seguidas. Por eso todas las rutinas que suben el dibujo (0x05D6, 0x0722,
+# 0x076D) leen ocho veces con `inc h` y luego suman 0xF901 (= -0x06FF), que es
+# +0x800-0x06FF = avanzar UNA celda. Y por eso la direccion de VRAM de la celda
+# (fila, columna) es fila*0x100 + columna*8: los `inc h` del listado.
+#
+# LA INTERRUPCION NO HACE NADA. 0x0400 es lo que cuelga 0x5E09 del vector de
+# 0x0038, y su unico trabajo util es leer el estado del VDP (0x0401) para bajar
+# la peticion. El gancho por fotograma es el OPERANDO del `call` de 0x0414, y
+# en los tres listados solo hay una instruccion que lo escriba -0x5E12-, que le
+# mete 0x0428, o sea un `ret`. El juego no corre dentro de la interrupcion.
+#
+# HAY UNA SEGUNDA COPIA DEL CARGADOR DE CINTA AQUI DENTRO, mas la de grabar:
+# 0x07F9 lee y 0x08B2 graba, y son las que usa el guardar/cargar partida
+# (0x963F y 0x9667 del bloque medio, 0x1000 bytes desde 0xB900 con bandera
+# 0xFC). La de leer es la misma rutina que el cargador de la cinta con dos
+# diferencias medibles: aqui SI hay salida por fallo (el `ret nz` de 0x0819) y
+# el borde sube de color de uno en uno (0x08A9-0x08AE) en vez de ir al azar.
+# En la de grabar quedo sin convertir la comprobacion de la tecla de parada:
+# 0x0930 hace `in a,(0feh)`, el puerto del Spectrum, que en un MSX no es eso.
 
 # --- lo que se queda en la pagina 0 y el juego machaca al arrancar ------------
 # 0x01FF-0x03FF trae RESTOS DEL CODIGO FUENTE: lineas de texto "HEX FF00FF00FE01
@@ -39,6 +61,16 @@ D 0x06D0 0x06D5 mascaras_de_bit Mascaras de bit 01 02 04 08 10 (ld de,0x06D0 en 
 D 0x06D5 0x06E5 tabla_de_mandos Tabla de la lectura de mandos (la usa 0x06A7-0x06BD)
 D 0x06E5 0x06EF tabla_de_redefinir_teclas Tabla que 0x5ECF pasa en hl al redefinir teclas (ld hl,0x06E5 / push hl)
 
+# La tabla de 0x06D5 son tres punteros de dos bytes (0x06DB, 0x0000 y 0x06E5) y
+# detras, pegada, la primera de las listas. Cada lista son cinco parejas
+# [fila de la matriz][mascara del bit], y 0x06B2 las recorre para armar el mismo
+# byte que da el joystick. La de 0x06DB sale 0xF8/0x20, 0xF8/0x40, 0xF8/0x10,
+# 0xF8/0x80 y 0xF8/0x01: fila 8 bits 5, 6, 4, 7 y 0, o sea ARRIBA, ABAJO,
+# IZQUIERDA, DERECHA y ESPACIO, las flechas del MSX. La de 0x06E5 sale
+# 0xF4/0x40, 0xF2/0x40, 0xF4/0x10, 0xF4/0x20 y 0xF8/0x01, que con la tabla de
+# nombres de 0x0527 son Q, A, O, P y ESPACIO. La entrada del medio, el 0x0000,
+# no apunta a ningun sitio.
+
 # --- los graficos: las DOS PANTALLAS FINALES ----------------------------------
 # 0x094F-0x3F4F son 13824 bytes = 2 x 6912 = dos pantallas completas del
 # Spectrum (bitmap de 6144 + atributos de 768), tal cual se copian a 0x4000:
@@ -52,3 +84,370 @@ D 0x06E5 0x06EF tabla_de_redefinir_teclas Tabla que 0x5ECF pasa en hl al redefin
 # 0x83E1 (derrota) los jp z de 0x6A73 y 0x8338 y el jp de 0x9229.
 D 0x094F 0x244F pantalla_final_victoria Pantalla ZX completa (6912 B: bitmap + atributos) de la VICTORIA, Gandalf y "THE FORCES OF EVIL HAVE BEEN DESTROYED"; la copia a 0x4000 el ldir de 0x83ED con hl=0x094F puesto en 0x83DC (jp z de 0x7F7D)
 D 0x244F 0x3F4F pantalla_final_derrota Pantalla ZX completa (6912 B: bitmap + atributos) de la DERROTA, Sauron y "May the Forces of Evil Never be Defeated"; la copia a 0x4000 el ldir de 0x83ED con hl=0x244F puesto en 0x83E4 (jp z de 0x6A73 y 0x8338, jp de 0x9229)
+
+# ===========================================================================
+# El arranque: recolocar los otros dos bloques y aplicar los POKEs
+# ===========================================================================
+B 0x0190 Adonde salta el cargador (0xD741). Sube los bloques medio y alto a su sitio
+L 0x0190 ARRANQUE_DEL_JUEGO  Recoloca los bloques medio y alto, aplica el buzon de POKEs y arranca el juego
+C 0x0191 La pila donde ya la puso el cargador
+C 0x0194 0xD12F es el ultimo byte del bloque alto tal como cayo, en 0x88B8
+C 0x0197 0xE677 - 0x4878 + 1 = 0x9E00: ahi es donde se ejecuta
+C 0x019A 0x4878 = 18552 bytes
+C 0x019D De atras adelante porque origen y destino se solapan
+C 0x019F 0x783F es el ultimo byte del bloque medio, cargado en 0x3F4F pegado al bajo
+C 0x01A2 0x96F0 - 0x38F1 + 1 = 0x5E00, su org
+C 0x01A5 0x38F1 = 14577 bytes
+C 0x01AA 0x012C: los 100 bytes que el cargador trajo de 0xDAC0 (0xD6E8)
+C 0x01AD Tres bytes de firma
+L 0x01AF COMPRUEBA_LA_FIRMA  Los tres primeros bytes tienen que ser 0xC9 para que haya POKEs
+C 0x01B0 0xC9 es `ret`; si falta uno, no hay buzon y se arranca sin tocar nada
+C 0x01B7 El cuarto byte dice cuantos POKEs vienen detras
+L 0x01B9 APLICA_UN_POKE      Cada POKE son tres bytes: direccion baja, alta y valor
+C 0x01B9 Direccion, byte bajo primero
+C 0x01BF Y el valor, a esa direccion
+L 0x01C2 AL_JUEGO            Al bloque medio, ya recolocado
+C 0x01C2 Al principio del bloque medio, que ya esta en su sitio
+
+# ===========================================================================
+# La interrupcion y la VRAM
+# ===========================================================================
+B 0x0400 La interrupcion del modo 1: 0x5E09 cuelga esto de 0x0038
+L 0x0400 INTERRUPCION        Reconoce al VDP y llama al gancho de 0x0415. Nada mas
+C 0x0401 Leer el estado del VDP es lo que baja la peticion de interrupcion
+C 0x0404 Sin el bit 7 no era el VDP: no hay nada que hacer
+C 0x0407 Se salvan TODOS los registros, incluidos los alternativos
+C 0x0414 El operando (0x0415) es el gancho por fotograma; 0x5E12 le pone 0x0428, que es un `ret`
+L 0x0424 SALE_DE_LA_INTERRUPCION  Restaura A y vuelve
+L 0x0428 GANCHO_VACIO        Un `ret` suelto: el gancho por fotograma que instala 0x5E12
+C 0x0428 Un `ret` y nada mas: por eso la interrupcion no hace trabajo del juego
+
+B 0x0429 Las tres rutinas de VRAM: llenar, volcar y poner la direccion
+L 0x0429 LLENA_VRAM          Escribe BC veces el byte A en la VRAM desde HL
+C 0x042A La direccion se manda una vez; el VDP la va subiendo sola
+C 0x042E El dato, tantas veces como diga BC
+C 0x0430 `ex af,af'` para poder mirar BC sin perder el byte que se esta escribiendo
+L 0x042E BUCLE_LLENA         Un byte por vuelta
+L 0x0439 VUELCA_A_VRAM       BC bytes desde HL a la VRAM DE
+C 0x043A La direccion de VRAM viene en DE; la rutina de abajo la quiere en HL
+L 0x043F BUCLE_VUELCA        Copia byte a byte
+C 0x0440 Puerto 0x98: los datos
+C 0x0449 Esta si vuelve a abrir las interrupciones al acabar
+L 0x044B VRAM_A_ESCRIBIR     Pone HL como direccion de ESCRITURA de la VRAM
+C 0x044C Byte bajo de la direccion por el puerto 0x99...
+C 0x0450 ...y el alto, del que el VDP solo usa seis bits
+C 0x0452 Bit 6 a 1: lo que venga detras son escrituras
+C 0x0456 Dos `ex (sp),hl`: el retardo que necesita el VDP, sin tocar ningun registro
+L 0x045A VRAM_A_LEER         Igual pero sin el bit 6: direccion de LECTURA. Nadie la llama
+C 0x045A Ni el bloque medio ni el alto la llaman: el juego nunca lee la VRAM
+C 0x045F Sin el `or 0x40` de arriba: eso es lo unico que la distingue
+L 0x0467 COLOR_DEL_BORDE     Mete A en el registro 7 del VDP
+C 0x0469 0x87 = escribir en el registro 7 (tinta arriba, fondo y borde abajo)
+
+# ===========================================================================
+# Mandos y teclado
+# ===========================================================================
+B 0x046E El joystick, por el PSG
+L 0x046E LEE_JOYSTICK        Devuelve en E las direcciones y el disparo, un bit por cosa
+C 0x046E Registro 7 del PSG, el de la direccion de los dos puertos
+C 0x0474 Le pone los bits 6 y 7 y lo devuelve tal cual con el resto intacto
+C 0x047E Registro 14: el puerto por donde entra el joystick
+C 0x0484 E arranca con el bit del disparo puesto y los cuatro de direccion a cero
+C 0x0486 Los bits llegan a cero cuando se pulsa; rra los va sacando de uno en uno
+C 0x0489 Bit 0 de E: ARRIBA
+C 0x048E Bit 1: ABAJO
+C 0x0493 Bit 2: IZQUIERDA
+C 0x0498 Bit 3: DERECHA
+C 0x049A El quinto bit es el disparo
+C 0x049C No pulsado: se le quita el bit 4 que traia de entrada
+
+B 0x049F El color: un atributo del Spectrum se convierte en un byte de SCREEN 2
+L 0x049F ATRIBUTO_A_COLOR    A = atributo ZX de entrada; sale el byte de color del MSX
+C 0x04A3 Tabla de los ocho colores sin brillo
+C 0x04A6 Bit 6 del atributo: el BRIGHT del Spectrum
+C 0x04AA Con brillo, la otra tabla de ocho
+L 0x04AD BUSCA_EN_LA_TABLA   Traduce primero la tinta y luego el papel
+C 0x04AE Bits 0-2: la tinta
+C 0x04B5 Cuatro rrca = subirlo al nibble alto, que es donde va la tinta en el MSX
+C 0x04BC Bits 3-5: el papel
+C 0x04BE Tres desplazamientos para bajarlo a 0-7
+C 0x04C9 Tinta arriba y papel abajo, en un solo byte
+
+B 0x04DE De una direccion de la pantalla ZX a la direccion de VRAM de esa celda
+L 0x04DE CELDA_A_VRAM        DE = direccion de pantalla ZX; sale DE = direccion del patron en la VRAM
+C 0x04DF Bits 3-4 del byte alto: el tercio de pantalla. Los 0-2, la linea de pixel, se tiran
+C 0x04E3 Los tres bits altos de E suben al byte alto...
+C 0x04EA ...y los cinco bajos se multiplican por ocho
+C 0x04ED Sale tercio*0x800 + celda*8, que es donde el SCREEN 2 guarda ese patron
+
+L 0x04F2 ESCRIBE_PSG         Mete E en el registro A del PSG. Nadie la llama
+C 0x04F2 Ni el bloque medio ni el alto la llaman: es codigo muerto
+C 0x04F3 Puerto 0xA0: elige registro
+C 0x04F9 Puerto 0xA1: el dato
+
+B 0x04FE Barrer la matriz del teclado entera y traducir la primera tecla pulsada
+L 0x04FE LEE_TECLADO         Devuelve A = el codigo de la tecla, D = su fila, E = su mascara de bit
+C 0x04FF D empieza en 0xF0 (fila 0) y E cuenta las teclas de 0 a 71
+L 0x0502 SIGUIENTE_FILA      Selecciona una fila y la lee entera
+C 0x0503 Los cuatro bits bajos del puerto C del PPI eligen la fila
+C 0x0505 Puerto 0xA9: los ocho bits de esa fila, a cero los pulsados
+L 0x0509 BUSCA_LA_TECLA      Saca los ocho bits de la fila, uno a uno
+C 0x050A Un bit a cero es una tecla pulsada
+C 0x0510 Nueve filas: de 0xF0 a 0xF8
+C 0x0515 Nada pulsado: sale con A=0 y el cero puesto
+L 0x0518 TECLA_ENCONTRADA    Arma la mascara del bit y busca el nombre de la tecla
+C 0x051A B, que aqui vale 8 menos la columna, se gasta rotando: al salir es 0
+C 0x051D C queda con el numero de tecla, 0 a 71, y B a cero por el bucle de arriba
+C 0x051F La tabla de 0x0527: 72 bytes, uno por posicion de la matriz
+C 0x0524 Deja el cero puesto si en esa posicion no hay tecla
+L 0x051A ARMA_LA_MASCARA     Rota un 1 hasta la columna que toca
+
+L 0x05B7 ESPERA_TECLA        Se queda dando vueltas hasta que hay una tecla con nombre
+C 0x05BA Sale en cuanto 0x04FE devuelve algo que no sea cero
+
+# ===========================================================================
+# Subir la pantalla del Spectrum al VDP
+# ===========================================================================
+B 0x05BD La pantalla entera: los 6144 bytes de bitmap, tercio a tercio
+L 0x05BD PANTALLA_A_VRAM     Vuelca los tres tercios de la pantalla ZX emulada a la VRAM 0x0000
+C 0x05BD La VRAM se apunta una sola vez, al principio: los tres tercios van seguidos
+C 0x05C3 Primer tercio del bitmap emulado
+C 0x05C9 Segundo
+C 0x05CF Tercero. 0x5800 en adelante son los atributos, que van por su cuenta (0x0604)
+L 0x05D6 UN_TERCIO_A_VRAM    2048 bytes: 8 filas x 32 columnas, desenredando el orden del Spectrum
+C 0x05D6 Ocho filas de caracter en un tercio
+C 0x05D8 0xF901 = -0x06FF: tras los siete `inc h`, esto deja HL en la celda siguiente
+L 0x05DB FILA_DE_CELDAS      Treinta y dos columnas
+L 0x05DE UNA_CELDA           Las ocho lineas de una celda, que en el ZX estan a 256 bytes
+C 0x05DE Primera linea de pixeles de la celda
+C 0x05E1 +256: la linea de abajo, que es como el Spectrum las guarda
+C 0x05FA La octava no lleva `inc h`: la cuenta la remata el 0xF901
+
+B 0x0604 Los 768 atributos, cada uno repetido en los ocho bytes de color de su celda
+L 0x0604 ATRIBUTOS_A_VRAM    Traduce los 768 atributos ZX y llena con ellos la tabla de color de la VRAM
+C 0x0605 En el juego alternativo, HL' recorre la tabla de color de la VRAM y DE' vale 8
+C 0x060C 0x5800: los atributos de la pantalla emulada
+C 0x060F 768 = 24 filas x 32 columnas
+L 0x0612 UNA_CELDA_DE_COLOR  Un atributo: se traduce y se escribe ocho veces
+C 0x0614 La tabla de 0x0200, que 0x5E15 relleno con 0x049F: atributo -> byte de color
+C 0x0618 Ocho bytes de color por celda, todos iguales
+C 0x061E HL' a la celda siguiente
+
+# ===========================================================================
+# El nombre de una tecla, para la pantalla de definir teclas
+# ===========================================================================
+B 0x0627 Poner en 0x0656 el nombre de tres letras de la tecla C
+L 0x0627 NOMBRE_DE_TECLA     C = codigo de la tabla de 0x0527; deja el nombre en 0x0656 y DE apuntandolo
+C 0x0628 El buffer de tres caracteres
+C 0x062C Se llena de espacios: los nombres de una sola letra dejan dos en blanco
+C 0x0635 De 0x20 arriba es un caracter imprimible y va tal cual
+C 0x063A Por debajo es un indice: (codigo-1) por tres
+C 0x0641 La tabla de nombres de tres letras: SHF, CTR, GRF, CAP, COD, F1..F5, ESC...
+C 0x0646 Tres letras al buffer
+C 0x064C Se devuelve DE apuntando al buffer
+L 0x0651 TECLA_IMPRIMIBLE    El caracter va solo, con los dos espacios detras
+C 0x0652 El caracter, en el primero de los tres
+
+L 0x0659 COPIA_EL_NOMBRE     Copia los tres bytes de 0x0656 a donde apunte BC
+C 0x065A El destino viene en BC y el ldi lo quiere en DE
+
+L 0x0667 ESPERA_SIN_TECLAS   Lo contrario de 0x05B7: no vuelve hasta que no hay nada pulsado
+C 0x066A Sale cuando 0x04FE devuelve cero, o sea nada pulsado
+
+# ===========================================================================
+# La lectura de mandos que usa el juego
+# ===========================================================================
+B 0x066D Lo que llama el juego quince veces: el mando elegido mas las teclas 1 y R
+L 0x066D LEE_LOS_MANDOS      Devuelve en A el byte de 0x6511: direcciones, disparo, y las teclas 1 y R
+C 0x0670 El mando que este elegido en 0x96F0
+C 0x0673 Y encima de eso, las dos teclas sueltas
+C 0x0676 El resultado se queda tambien en 0x6511, que el juego lee por su cuenta
+L 0x067D LEE_1_Y_R           Anade al byte de 0x6511 el bit 5 (tecla 1) y el bit 6 (tecla R)
+C 0x0680 Fila 0 de la matriz
+C 0x0686 Bit 1 de la fila 0: la tecla 1
+C 0x068A Bit 5 del byte de mandos
+C 0x068C Fila 4 de la matriz
+C 0x0692 Bit 7 de la fila 4: la tecla R
+C 0x0695 Bit 6 del byte de mandos
+L 0x0698 LEE_EL_MANDO_ELEGIDO  0x96F0 dice cual: 0 joystick, 1 flechas, 3 las teclas redefinidas
+C 0x0698 0x96F0 es el ULTIMO byte del bloque medio (0x5E00+0x38F1 = 0x96F1)
+C 0x069B Cero es el joystick, que va por otro camino
+C 0x069F HL = 0x06D5 + (n-1)*2, con el acarreo propagado a mano
+C 0x06A7 De la tabla sale un puntero a una lista de cinco parejas
+C 0x06AB C se va armando bit a bit, como el byte del joystick
+C 0x06AD Cinco: arriba, abajo, izquierda, derecha y disparo
+C 0x06AF Las mascaras 0x01, 0x02, 0x04, 0x08 y 0x10, en ese orden
+L 0x06B2 MIRA_UNA_TECLA      Selecciona la fila de la pareja y prueba su bit
+C 0x06B3 Primer byte de la pareja: la fila de la matriz
+C 0x06B7 Invertido, un 1 es una tecla pulsada
+C 0x06B9 Segundo byte de la pareja: el bit de esa tecla
+C 0x06BD Pulsada: se enciende el bit que le toca en C
+L 0x06C0 SIGUIENTE_DIRECCION  Pasa a la mascara siguiente
+C 0x06C4 Y el byte armado se guarda donde lo espera el juego
+L 0x06C8 MANDO_JOYSTICK      Cuando 0x96F0 es cero, el byte lo da el PSG
+C 0x06CB 0x046E lo deja en E ya con la misma reparticion de bits
+
+# ===========================================================================
+# Dibujar: borrar, subir un recuadro y refrescar alrededor del cursor
+# ===========================================================================
+B 0x06EF Borrar de golpe la pantalla del Spectrum emulada
+L 0x06EF BORRA_LA_PANTALLA_ZX  Pone a cero 0x4000-0x5AFF: bitmap y atributos
+C 0x06FB `ld (hl),l` con L=0 es el cero de arranque del ldir
+C 0x06F8 0x1AFF + 1 = 0x1B00 = 6912 bytes: la pantalla del Spectrum entera
+
+B 0x0702 Subir al VDP un recuadro de la pantalla emulada, sin colores
+L 0x0702 RECUADRO_A_VRAM     D=fila, E=columna, B=filas, C=columnas: sube ese recuadro del bitmap
+C 0x0704 Los tres bits bajos de D: la fila dentro del tercio
+C 0x0706 Suben a la parte alta de la direccion ZX...
+C 0x070E ...y los bits 3-4 con el 0x40 arman el byte alto del bitmap del Spectrum
+C 0x0711 HL se queda con la fila en H y la columna por ocho en L
+C 0x0712 Columna por 8, que es la anchura de una celda en la VRAM
+L 0x0717 FILA_DEL_RECUADRO   Una fila de C celdas
+C 0x0718 H*0x100 + columna*8 ES la direccion de VRAM de esa celda
+C 0x071E 0xF901, otra vez: siete `inc h` y esto dejan HL en la celda de al lado
+C 0x0721 C columnas
+L 0x0722 CELDA_DEL_RECUADRO  Las ocho lineas de una celda, seguidas al puerto 0x98
+C 0x0747 Siguiente fila de la VRAM: +0x100
+C 0x0748 Y la de la pantalla del Spectrum, que no va seguida
+
+B 0x074E Una fila entera, con bitmap Y colores
+L 0x074E FILA_CON_COLOR_A_VRAM  Como 0x0702 pero de una sola fila y ademas subiendo los atributos
+C 0x0765 Igual que 0x0702: patrones primero
+L 0x076D CELDA_CON_COLOR     Las ocho lineas de pixel de una celda
+C 0x0791 Del byte alto del bitmap se saca el tercio...
+C 0x0797 ...y con 0x58 sale la direccion de los ATRIBUTOS de esa misma fila
+C 0x079A La tabla de color de la VRAM esta 0x2000 por encima de la de patrones
+C 0x07A1 Aqui se pisa C: la parte de color hace SIEMPRE 32 celdas, la fila entera
+C 0x07A3 La tabla de traduccion de 0x0200
+L 0x07A5 COLOR_DE_UNA_CELDA  Un atributo, traducido y repetido ocho veces
+C 0x07A7 Atributo -> byte de color
+L 0x07AA OCHO_BYTES_DE_COLOR  Los ocho bytes de color de la celda, todos iguales
+C 0x07AC `inc de` y `dec de` no mueven nada: son el respiro que necesita el VDP
+
+L 0x07B5 SIGUIENTE_FILA_ZX   Avanza DE a la fila de caracteres de abajo, a la manera del Spectrum
+C 0x07BA +32 en el byte bajo: la fila siguiente dentro del tercio
+C 0x07BD Si se paso de 256, hay que cambiar de tercio y el +8 se queda
+C 0x07BE Si no, se deshace: sigue en el mismo tercio
+
+B 0x07C3 Refrescar el trozo de pantalla que hay alrededor de una posicion
+L 0x07C3 REFRESCA_EL_CURSOR  Sube un recuadro de 4x3 celdas alrededor de la celda de (0x6543, 0x6544)
+C 0x07C3 Tres filas por cuatro columnas
+C 0x07C6 0x6544 es la coordenada vertical en pixeles
+C 0x07C9 Entre ocho: la fila de caracteres
+C 0x07D0 Una celda mas arriba, para coger lo que sobresale
+C 0x07D2 De la fila 24 no hay: se da la vuelta a cero
+C 0x07DB En la fila 22 solo caben dos filas de celdas...
+C 0x07E3 ...y en la 23, una
+C 0x07E9 0x6543 es la coordenada horizontal, y se trata igual
+
+# ===========================================================================
+# La cinta otra vez: cargar y grabar la partida
+# ===========================================================================
+B 0x07F9 La misma rutina del cargador, aqui dentro, para recuperar una partida
+L 0x07F9 CARGA_DE_CINTA      Lee de la cinta DE bytes a IX con bandera A. Acarreo al salir = bien
+C 0x07F9 inc d / ex af,af' / dec d: deja en AF' la marca de "aun falta el byte de bandera"
+C 0x07FD Puerto 0xAB, poner/quitar bit: bit 4 del puerto C a 0, motor EN MARCHA
+C 0x0801 El PSG queda apuntando al registro 14, por donde el MSX oye la cinta
+C 0x0806 BC' = 0x0099 y D' = 0x87: el par de `out (c)` de abajo escribe el registro 7 del VDP
+C 0x080B El borde arranca en cero
+C 0x0812 C lleva el nivel del ultimo flanco visto
+C 0x0818 cp a: cero puesto y acarreo limpio sin tocar A
+L 0x0819 CARGA_FALLIDA       Sale sin acarreo. Esto es lo que NO tiene el cargador de la cinta
+C 0x0819 Aqui si se abandona; el cargador de la cinta (0xD8E2) volvia a intentarlo
+L 0x081A BUSCA_CABECERA      Primer flanco de la cabecera de tono
+C 0x081F 0x0415 vueltas de 256: hay que oir silencio antes de dar la cabecera por buena
+L 0x0822 ESPERA_SILENCIO     Un rato largo sin mirar la cinta
+L 0x082E MIDE_CABECERA       Cuenta ciclos enteros de la cabecera
+C 0x0835 Un ciclo mas corto de 0xC6-0x9C no vale
+C 0x083A Hacen falta 256 ciclos seguidos: H da la vuelta
+L 0x083D BUSCA_SINCRONISMO   El medio ciclo corto que separa la cabecera de los datos
+C 0x0845 Mientras el medio ciclo sea de 0xD4 para arriba, sigue siendo cabecera
+C 0x0849 El otro medio del bit de sincronismo
+C 0x0851 H acumula la paridad: el XOR de bandera, datos y byte final
+L 0x0857 GUARDA_O_COMPRUEBA  El primer byte es la bandera; los demas van a memoria
+C 0x0858 La marca de AF': cero quiere decir "ya son datos"
+C 0x085A A memoria, en IX. Aqui tampoco esta el camino de VERIFICAR del original
+L 0x085F MIRA_LA_BANDERA     Compara la bandera leida con la que pidio el llamador
+C 0x0861 L trae lo leido; A, lo que se esperaba
+C 0x0862 No es el bloque que se buscaba
+C 0x0863 rl c / rra es solo para no perder el acarreo en medio del xor
+C 0x0866 inc de y dec de: la bandera no cuenta en la longitud
+L 0x0869 SIGUIENTE_BYTE      Avanza el destino
+L 0x086B DESCUENTA           Un byte menos
+C 0x086D 0xB2 y 0xB0: los dos puntos de partida del cronometro segun el medio bit
+L 0x086F OCHO_BITS           L = 1; cuando ese 1 sale por arriba, el byte esta completo
+L 0x0871 UN_BIT              Dos flancos por bit; el tiempo entre ellos dice si es 0 o 1
+C 0x0875 0xCB es el umbral entre un bit 0 y un bit 1
+C 0x087F Cada byte entra en la paridad
+C 0x0882 Y asi hasta que DE llega a cero
+C 0x0887 Motor PARADO antes de contestar
+C 0x088D La paridad de todo tiene que dar 0: entonces el cp deja el acarreo, que es la senal de bien
+L 0x0890 DOS_FLANCOS         Un ciclo entero de la senal
+L 0x0894 UN_FLANCO           Espera a que cambie el nivel de la cinta; B mide cuanto tarda
+C 0x0894 Retardo fijo antes de empezar a mirar
+L 0x0896 RETARDO_FLANCO      Cuenta atras sin hacer nada
+L 0x089A MUESTREA            Lee la cinta hasta que cambie el nivel
+C 0x089A B es el cronometro; si da la vuelta a cero, se acabo la paciencia
+C 0x089C Ese 0x7F no sirve para nada: el `in` de abajo pisa A
+C 0x089E Registro 14 del PSG: el bit 7 es la entrada del casete
+C 0x08A1 Contra el nivel anterior; el `rra` de arriba lo ha bajado al bit 6
+C 0x08A6 Cambio: se apunta el nivel nuevo
+C 0x08AA Registro 7 del VDP con B, que sube en cada flanco: el borde va cambiando de color
+C 0x08B0 Acarreo puesto = flanco encontrado
+
+B 0x08B2 Grabar en cinta. La usa 0x9667 para salvar la partida
+L 0x08B2 GRABA_EN_CINTA      Saca por el casete DE bytes desde IX con bandera A, mas la paridad
+C 0x08B3 Bit 4 del puerto C del PPI a 0: motor EN MARCHA
+C 0x08B7 Diez vueltas de 65536: el rato que se le da al motor para coger velocidad
+L 0x08B9 ARRANCA_EL_MOTOR    Diez esperas de 65536 para que el motor coja velocidad
+C 0x08C4 0x1F80 ciclos de cabecera de tono si el bit 7 de la bandera esta a 0...
+C 0x08CB ...y solo 0x0C98 si esta a 1. La partida se graba con bandera 0xFC (0x9665)
+C 0x08D3 0x0B en el puerto 0xAB pone a 1 el bit 5 del puerto C, que es la salida al casete
+L 0x08D6 CABECERA_DE_TONO    Cada vuelta saca medio ciclo de la cabecera
+C 0x08DA Se le da la vuelta al bit: asi sale la onda cuadrada
+C 0x08F4 Ya empieza lo que se graba de verdad
+L 0x08FC SIGUIENTE_A_GRABAR  Coge el byte siguiente, o la paridad si ya no quedan
+C 0x08FD Si DE llego a cero, lo que se graba es el byte de paridad
+C 0x0900 Y si no, el byte que toque de la memoria
+L 0x0903 ACUMULA_PARIDAD     El XOR de todo lo que va saliendo
+L 0x090C GRABA_LA_PARIDAD    Detras del ultimo byte va el XOR de todos
+L 0x090F PULSO_DE_BIT        Un bit: dos medios ciclos, y el largo depende de si es 0 o 1
+C 0x0916 El pulso largo: un bit a 1 dura mas que uno a 0
+C 0x091A Y otro cambio de nivel en la salida del casete
+L 0x0924 SIGUIENTE_BIT       Saca el bit siguiente de L
+C 0x0924 Los bits salen por arriba de L; cuando L se queda a cero, el byte esta grabado
+C 0x0930 EL PUERTO 0xFE ES EL DEL SPECTRUM: la comprobacion de la tecla de parada se quedo sin convertir
+C 0x0934 Se sigue hasta que DE pasa de 0 a 0xFFFF: para entonces ya ha salido tambien la paridad
+L 0x093F PARA_EL_MOTOR       Otra espera larga antes de soltar el motor
+C 0x0949 Bit 4 del puerto C a 1: motor PARADO
+
+# --- remate: los trozos cortos que se quedaban sin una sola linea ------------
+C 0x0425 El `reti` no reabre las interrupciones por su cuenta; el `ei` si
+C 0x0518 Un 1 que se rota hasta la columna en que aparecio la tecla
+C 0x05DC Treinta y dos columnas por fila de celdas
+C 0x0723 Las ocho lineas salen seguidas: asi las quiere el SCREEN 2
+C 0x073E La octava, la unica sin `inc h` detras
+C 0x0741 Y el 0xF901 remata la cuenta: HL queda en la celda de la derecha
+C 0x074F Mismo calculo que 0x0702: fila y columna a direccion de pantalla ZX
+C 0x075E Columna por ocho, que es lo que ocupa una celda en la VRAM
+C 0x0763 Se apartan las dos direcciones: luego hacen falta para el color
+C 0x0769 0xF901 otra vez, para pasar de celda a celda
+C 0x076C C columnas
+C 0x07F5 Y a subir el recuadro al VDP
+C 0x0822 Bucle de dos pisos: B por dentro y HL por fuera
+C 0x0869 IX pasa al siguiente hueco de memoria
+C 0x086F L arranca con un 1 que hace de cuentabits
+C 0x0890 Si el primer flanco falla, ni se busca el segundo
+C 0x0896 Retardo puro: A vueltas sin mirar la cinta
+C 0x08BC Cuenta atras de 65536 sin hacer nada
+C 0x08E8 Retardo entre el ultimo pulso de la cabecera y el siguiente
+C 0x0903 H acumula el XOR de todo lo que se ha grabado
+C 0x0905 El acumulador de paridad se queda en H
+C 0x090C L pasa a ser el propio acumulador: eso es lo que se graba detras del ultimo byte
+C 0x090F C guarda uno de los dos valores que se sacan por 0xAB; el otro es el 0x0B de 0x0921
+C 0x0912 Retardo: lo que dura medio pulso
+C 0x0918 El rato de mas que distingue un bit 1 de un bit 0
+C 0x093A Un ultimo respiro antes de soltar el motor
+C 0x0942 Cuenta atras de 65536 sin hacer nada
+C 0x08B9 Diez esperas de 65536 encadenadas
+C 0x093F Otras diez, ahora para dejar acabar la grabacion

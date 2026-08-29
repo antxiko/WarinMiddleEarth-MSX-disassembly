@@ -17,3 +17,20 @@ F 0xA11C 8
 # los 34 bytes de arriba tampoco en esta cinta (ver src/pantalla.entries).
 D 0x88DA 0x88ED restos_de_otro_arranque Restos: un ret y 18 bytes de otro arranque, cortado (nadie los ejecuta)
 D 0x88ED 0x891C relleno_88ed Relleno con 0xFF hasta el principio de los patrones
+
+# ---------------------------------------------------------------------------
+# Los 100 bytes de codigo del principio del bloque
+#
+# Hacen exactamente lo mismo que 0xD702-0xD719 del cargador, pero con la BIOS:
+# DISSCR, dos LDIRVM y ENASCR. En esta cinta no los llama nadie -cuando este
+# bloque llega, la BIOS ya no esta mapeada- y la pantalla la vuelca el propio
+# cargador con su rutina de 0xD748.
+# ---------------------------------------------------------------------------
+B 0x88B8 La pantalla a la VRAM usando la BIOS. Sin llamadas en esta cinta
+L 0x88B8 VUELCA_CON_LA_BIOS  Sube los dos bloques de 6144 bytes a la VRAM con LDIRVM
+C 0x88BB Y ademas cierra las interrupciones a mano
+C 0x88BC 0x88B8 + 100: justo detras de este trozo empiezan los patrones
+C 0x88BF A la VRAM 0x0000, la tabla de patrones
+C 0x88C9 Los otros 6144, los de color
+C 0x88CC A la VRAM 0x2000, la tabla de color
+C 0x88D9 Un `ret`: esto estaba pensado para llamarlo, no para saltar a el
