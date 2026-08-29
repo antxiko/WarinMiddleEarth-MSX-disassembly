@@ -1,0 +1,111 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preguntas abiertas — War in Middle Earth (1989)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="LA-CINTA.html">La cinta</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="PREGUNTAS-ABIERTAS.html" style=color:var(--tinta)>Preguntas abiertas</a><a href="../OPEN-QUESTIONS.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="preguntas-abiertas">Preguntas abiertas</h1>
+<p><a href="EMPEZAR.html">Empezar</a> · <a href="EL-JUEGO.html">El juego</a> · <a href="LA-CINTA.html">La cinta</a> · <a href="EL-CODIGO.html">El codigo</a> · <a href="HALLAZGOS.html">Hallazgos</a></p>
+<p>Lo que queda abierto, separando lo MEDIDO de lo SUPUESTO. Lo medido lleva al lado la medida; lo supuesto va marcado como tal y <b>no se ha escrito en el listado como si fuera un hecho</b>.</p>
+<hr>
+<h2 id="medido-y-cerrado">MEDIDO, y cerrado</h2>
+<ul><li>La cinta entera: <b>62.261 bytes, 62.261 explicados, cero sin explicar</b>.</li><li>Los cinco listados <b>reensamblan byte a byte</b> con pasmo.</li><li><b>52 zonas de datos</b> declaradas, todas cruzadas contra el trazado.</li><li>Comentado al <b>29,7 %</b>, sin una sola rutina por debajo del 10 % de 767.</li><li>El presupuesto se cerró con la <b>partida completa de Araubi</b>: los 13,8 KB que quedaban sin ver eran las dos pantallas finales.</li></ul>
+<hr>
+<h2 id="supuesto-marcado-como-tal">SUPUESTO (marcado como tal)</h2>
+<ul><li><b>Que el bit 4 de <code>0xBD00+n</code> sea «lleva el Anillo».</b> Lo medido es que <code>0x733E</code> busca la primera unidad con ese bit, que el bucle de partida mira si esa unidad está en <code>(0x68, 0x3F)</code>, y que decide la victoria (<code>0x7F7D</code>) y la derrota (<code>0x9218</code>). Todo apunta al mismo sitio, pero el binario no lo dice con esas palabras.</li><li><b>Que las unidades <code>0x16</code> y <code>0x17</code> sean Sauron y Saruman.</b> La cadena es larga: <code>0x72FD</code> guarda el portador y hace <code>inc a</code> para marcar el renglón, y <code>0x7314</code> hace <code>dec a</code> al volver; luego renglón = unidad + 1 y el renglón 0 es «Vuelve», así que unidad <em>n</em> es el nombre <em>n+1</em> de la lista de <code>0x6B46</code>. Contando salen Gollum, Sauron y Saruman. Encaja con que <code>0x6AE3</code> se salte justo esas dos al pintar ejércitos y con que <code>0x7514</code> (elegir enemigo) acepte exactamente <code>{0x16, 0x17, &gt;= 0x78}</code>. Es una deducción, no una lectura directa.</li><li><b>Que las figuras se apilen de dos en dos.</b> Medido: cada sprite son 32 bytes de 16×8. Que las entradas consecutivas encajen en figuras de 16×16 es lo que se ve al dibujarlas, pero <b>no se ha encontrado la rutina que las apile</b>.</li></ul>
+<hr>
+<h2 id="abierto-lo-que-no-se-ha-podido-cerrar">ABIERTO: lo que no se ha podido cerrar</h2>
+<h3 id="1-el-interior-de-las-tablas-de-estado">1. El interior de las tablas de estado</h3>
+<p><code>0xB8E8</code>-<code>0xC600</code> y <code>0xE400</code>-<code>0xE678</code> están acotadas y se sabe quién las lee (<code>0x6AC2</code>, <code>0x6EAC</code>, <code>0x8F7A</code>, <code>0x92E4</code>, <code>0x81A9</code>, <code>0x8189</code>, <code>0x7FF0</code>), pero <b>no se han desmenuzado campo a campo</b>. Se llama X a <code>0xB900</code> y Y a <code>0xBA00</code> porque <code>0x8108</code> multiplica la primera por 102, que es el paso de columna, y <code>0x8166</code> recorre columnas en el bucle exterior; es consistente, no demostrado.</p>
+<h3 id="2-que-anade-la-segunda-pasada-del-mapa">2. Qué añade la segunda pasada del mapa</h3>
+<p>El dibujo del mapa hace tres pasadas. La segunda (<code>0x7714</code>) indexa <code>0x77B5</code> con <b>el mismo nibble bajo</b> que ya usó la pasada de terreno (<code>0x7687</code>), y no se ha podido decir qué aporta.</p>
+<h3 id="3-quien-pone-el-bit-7-de-un-byte-del-mapa">3. Quién pone el bit 7 de un byte del mapa</h3>
+<p>La tercera pasada de <code>0x7708</code> sólo pinta si ese bit está puesto. Se pone desde <code>0x8F70</code>, <code>0x8044</code> y <code>0x80BD</code>, pero no se ha cerrado con qué criterio.</p>
+<h3 id="4-el-trasiego-de-nibbles-con-la-cuenta-atras">4. El trasiego de nibbles con la cuenta atrás</h3>
+<p><code>0x6A76</code>-<code>0x6A94</code> coge el operando de <code>0x8333</code> —que es la cuenta atrás de meses, puesta a 255 en <code>0x7F4F</code>—, lo guarda <b>multiplicado por 16</b> y mete su nibble alto menos uno en el nibble bajo de <code>0xC000+portador</code>. Con 255 dentro, eso deja la cuenta atrás en 240 a la primera y en 0 a la segunda. O es un castigo intencionado, o ese byte tiene un segundo uso que no se ha sabido ver. Está comentado describiendo <b>lo que hace</b>, sin interpretarlo.</p>
+<h3 id="5-0x9144-lee-lo-que-0x904d-acaba-de-borrar">5. <code>0x9144</code> lee lo que <code>0x904D</code> acaba de borrar</h3>
+<p>En la misma rutina, a unas pocas instrucciones: <code>0x904D</code> pone a cero <code>0x5E00</code>+<code>0x4FF</code> —<code>0x6010</code> incluido— y <code>0x9144</code> hace luego <code>ld hl,0x6010 / ld a,(hl) / ld (0x8B19),a</code>. O está pensado para leer el tablero de batalla, o es un resto del Spectrum donde ese byte estaba en otro sitio. Se ha comentado el mecanismo, no la intención.</p>
+<h3 id="6-filas-de-tiles-que-se-calculan-y-no-se-dibujan">6. Filas de tiles que se calculan y no se dibujan</h3>
+<p><code>0x86AF</code> calcula <b>19 filas</b> de tiles (<code>ld c,0x13</code> en <code>0x86CC</code>) pero el bucle que dibuja hace 16×16. Tres filas que se preparan y no se ven.</p>
+<h3 id="7-dos-rangos-que-habria-que-separar">7. Dos rangos que habría que separar</h3>
+<p>Hoy están dentro de <code>textos_de_los_paneles</code> y merecen nombre propio: <code>0x83F8</code>-<code>0x83FB</code>, que son los cuatro rellenos de dos bits (<code>00</code>, <code>FF</code>, <code>AA</code>, <code>55</code>), y <code>0x846F</code>-<code>0x8496</code>, que son las cinco texturas de terreno que escoge <code>0x80BD</code>.</p>
+<footer><p><em>War in Middle Earth</em> lo publicó Melbourne House y lo distribuyó Dro Soft. Su propia pantalla de carga lo firma: <b>MAELSTROM GAMES LTD. PRESENTS</b>, <b>Mike Singleton</b> y <b>CONVERSION by ANIMAGIC sa</b>; el menú añade «Programado por C.J.Pink». Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>

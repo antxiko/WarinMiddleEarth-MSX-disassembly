@@ -1,95 +1,112 @@
 #!/usr/bin/env python3
-"""Dibuja la pantalla que Stardust ensena mientras carga el juego.
+"""Dibuja la pantalla que War in Middle Earth ensena mientras carga.
 
-No es una captura: se monta a partir de los bytes de la cinta siguiendo lo que
-hace el propio bloque [09], que es quien la pinta. Su rutina de 0x9C10 lo dice
-sin ambiguedad:
+No es una captura: se monta con los bytes del bloque [08] de la cinta,
+siguiendo lo que hace el propio cargador. Sus dos volcados (0xD702-0xD719) lo
+dicen sin ambiguedad:
 
-    ld hl,00000h / call 9bffh    -> direcciona la VRAM en 0x0000, los PATRONES
-    ld hl,09c40h / ld bc,01800h  -> 6144 bytes desde 0x9C40
-    ld hl,02000h / call 9bffh    -> direcciona 0x2000, los COLORES
-    ld hl,0b440h / ld bc,01800h  -> 6144 bytes desde 0xB440
+    ld hl,0x891C / ld de,0x0000 / ld bc,0x1800 / call 0xD748   -> los PATRONES
+    ld hl,0xA11C / ld de,0x2000 / ld bc,0x1800 / call 0xD748   -> los COLORES
 
-y las cuentas cierran solas: 0x9C40 + 6144 = 0xB440, y 0xB440 + 6144 = 0xCC40,
-que es el final exacto del bloque. Ademas el registro 0 del VDP se programa a
-0x02, o sea SCREEN 2.
+y las cuentas cierran solas: 0x88B8 + 100 = 0x891C, + 6144 = 0xA11C, + 6144 =
+0xB91C, que es el final exacto del bloque de 12.388 bytes.
 
-OJO CON LA TABLA DE NOMBRES, que es lo que hace que esto no sea un volcado
-directo. La rutina de 0x9BDB no la rellena en orden 0,1,2,3... sino asi:
+Los 100 bytes del principio hacen lo mismo con la BIOS -DISSCR, dos LDIRVM y
+ENASCR- pero en esta cinta no los llama nadie: cuando el bloque llega, la BIOS
+ya no esta mapeada, y la pantalla la vuelca el cargador con su propia rutina.
 
-    9be5: xor a          ; A = 0
-    9be6: out (c),a      ; la escribe
-    9be8: add a,008h     ; y suma OCHO
-    9bea: jr nc,9be6     ; mientras no desborde
-    9bec: inc a / cp 008h ; al desbordar arranca en 1, luego en 2...
+LA UNICA SUPOSICION, y va dicha: que la tabla de nombres sea la identidad, o
+sea 0,1,2...255 en cada tercio, que es lo normal cuando se usa el SCREEN 2 como
+mapa de bits y lo que hace falta para que 6144 bytes seguidos sean una pantalla
+entera. No la pone este bloque. Si estuviera mal, aqui saldria ruido: que salga
+un dibujo coherente ES la comprobacion.
 
-o sea 0, 8, 16 ... 248, 1, 9, 17 ... 249, 2, 10 ... Son los mismos 256 valores
-por tercio, pero INTERCALADOS. Dibujarlo suponiendo orden secuencial da ruido
-convincente, que es la peor clase de error: parece que el reparto esta mal
-cuando lo que esta mal es la lectura.
+En SCREEN 2 cada byte de color vale para una fila de ocho pixeles de una
+casilla: el nibble alto es la tinta -donde el patron tiene un 1- y el bajo, el
+fondo.
 
-Por eso esto vale de comprobacion y no solo de ilustracion: si el reparto
-estuviese mal -si lo que llamamos patrones fuesen en realidad los colores, por
-ejemplo- de aqui saldria ruido en vez de un dibujo.
-
-Uso: render_carga.py <work/pre.raw> <salida.png>
+Uso: render_carga.py <work/pantalla.raw> <salida.png> [escala]
 """
 import os
+import struct
 import sys
+import zlib
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from render_maps import PALETA, png            # noqa: E402
+ORG = 0x88B8
+PATRONES = 0x891C
+COLORES = 0xA11C
+BLOQUE = 0x1800          # 6144 bytes cada tabla
+ANCHO, ALTO = 256, 192
 
-ORG = 0x9B8C
-PATRONES = 0x9C40
-COLORES = 0xB440
+# La paleta del TMS9918, en el orden en que la numera el VDP.
+PAL = [(0, 0, 0), (0, 0, 0), (33, 200, 66), (94, 220, 120), (84, 85, 237),
+       (125, 118, 252), (212, 82, 77), (66, 235, 245), (252, 85, 84),
+       (255, 121, 120), (212, 193, 84), (230, 206, 128), (33, 176, 59),
+       (201, 91, 186), (204, 204, 204), (255, 255, 255)]
+
+
+def png(path, w, h, filas):
+    """Un PNG de color verdadero, sin dependencias."""
+    raw = b"".join(b"\x00" + bytes(v for p in f for v in p) for f in filas)
+
+    def chunk(t, d):
+        return (struct.pack(">I", len(d)) + t + d
+                + struct.pack(">I", zlib.crc32(t + d) & 0xffffffff))
+
+    with open(path, "wb") as f:
+        f.write(b"\x89PNG\r\n\x1a\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(raw, 9))
+                + chunk(b"IEND", b""))
+
+
+def revela(patrones, colores, escala=2):
+    """Revela las dos tablas como lo haria el VDP en SCREEN 2."""
+    lienzo = [[(0, 0, 0)] * (ANCHO * escala) for _ in range(ALTO * escala)]
+    for y in range(ALTO):
+        tercio, fila = divmod(y, 64)
+        fila, linea = divmod(fila, 8)
+        for cx in range(32):
+            # tabla de nombres = identidad: la casilla N del tercio usa el
+            # patron N de ese tercio
+            off = tercio * 2048 + (fila * 32 + cx) * 8 + linea
+            pat, col = patrones[off], colores[off]
+            tinta, fondo = PAL[col >> 4], PAL[col & 0x0F]
+            for bit in range(8):
+                rgb = tinta if pat & (0x80 >> bit) else fondo
+                px, py = (cx * 8 + bit) * escala, y * escala
+                for dy in range(escala):
+                    for dx in range(escala):
+                        lienzo[py + dy][px + dx] = rgb
+    return lienzo
 
 
 def main(argv):
     if len(argv) < 3:
         print(__doc__)
         return 2
-    with open(argv[1], "rb") as f:
-        b = f.read()
-    pat = b[PATRONES - ORG:PATRONES - ORG + 6144]
-    col = b[COLORES - ORG:COLORES - ORG + 6144]
-    if len(pat) != 6144 or len(col) != 6144:
-        print("  el bloque no trae las dos tablas enteras")
+    ruta, salida = argv[1], argv[2]
+    escala = int(argv[3]) if len(argv) > 3 else 2
+    if not os.path.exists(ruta):
+        print("  falta %s: hazlo antes con `make extract`" % ruta)
+        return 2
+    d = open(ruta, "rb").read()
+    fin = COLORES - ORG + BLOQUE
+    if len(d) < fin:
+        print("  el bloque son %d bytes y las dos tablas acaban en %d: no cabe"
+              % (len(d), fin))
         return 1
-
-    # La tabla de nombres, reproduciendo el bucle de 0x9BDB tal cual.
-    nombres = []
-    for _ in range(3):
-        a = 0
-        while True:
-            nombres.append(a)
-            a += 8
-            if a > 255:
-                a = (a & 0xFF) + 1
-                if a == 8:
-                    break
-    if len(nombres) != 768:
-        print("  la tabla de nombres no da 768 entradas sino %d" % len(nombres))
-        return 1
-
-    esc = 2
-    px = [[(0, 0, 0)] * (256 * esc) for _ in range(192 * esc)]
-    for celda in range(768):
-        cx, cy = (celda % 32) * 8, (celda // 32) * 8
-        tercio = celda // 256
-        dibujo = tercio * 256 + nombres[celda]
-        for lin in range(8):
-            p = pat[dibujo * 8 + lin]
-            c = col[dibujo * 8 + lin]
-            tinta, fondo = PALETA[c >> 4], PALETA[c & 15]
-            for bit in range(8):
-                color = tinta if (p >> (7 - bit)) & 1 else fondo
-                for dy in range(esc):
-                    for dx in range(esc):
-                        px[(cy + lin) * esc + dy][(cx + bit) * esc + dx] = color
-    png(argv[2], 256 * esc, 192 * esc, px)
-    print("  %s  (%dx%d, desde los %d bytes de patron y %d de color)"
-          % (argv[2], 256 * esc, 192 * esc, len(pat), len(col)))
+    patrones = d[PATRONES - ORG:PATRONES - ORG + BLOQUE]
+    colores = d[COLORES - ORG:COLORES - ORG + BLOQUE]
+    os.makedirs(os.path.dirname(salida) or ".", exist_ok=True)
+    png(salida, ANCHO * escala, ALTO * escala, revela(patrones, colores, escala))
+    print("  pantalla de carga: patrones 0x%04X, colores 0x%04X -> %s"
+          % (PATRONES, COLORES, salida))
+    # Si el reparto estuviese cambiado, los "colores" tendrian la pinta de un
+    # dibujo y los "patrones" la de una paleta. Se dice cuantos colores
+    # distintos hay en cada tabla, que es la senal mas barata de que van bien.
+    print("  %d bytes distintos en los patrones, %d en los colores"
+          % (len(set(patrones)), len(set(colores))))
     return 0
 
 

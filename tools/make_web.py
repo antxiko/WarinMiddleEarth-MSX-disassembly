@@ -2,256 +2,358 @@
 """Genera la portada de la web, en los dos idiomas.
 
 El diseno es el compartido por la serie (tools/estilo_web.py) y la pagina sale
-autocontenida, con las imagenes embebidas.
+autocontenida, con las imagenes embebidas como data URI.
 
-Una nota sobre las cifras: mientras el trabajo estuvo a medias, la portada
-llevo un aviso antes de ellas. Al cerrarse los siete criterios el usuario lo
-quito (2026-08-12): lo que significa cada cifra —y lo que no— se cuenta en la
-pagina de Preguntas abiertas, no en un cartel.
+NINGUNA IMAGEN ES UNA CAPTURA. Todas las dibujan tools/render_carga.py y
+tools/render_graficos.py con los bytes de la cinta, en los rangos que el
+listado tiene acotados y revelandolos como los revela el juego. Si un rango
+estuviera mal etiquetado, saldria ruido; que salga un dibujo es la
+comprobacion.
 
-Uso: make_web.py <work/juego.raw> <docs/imagenes> <salida.html> <idioma>
+El rotulo de la cabecera es un recorte de la propia pantalla de carga, y por
+eso trae el titulo tal como lo escribio Maelstrom Games.
+
+Uso: make_web.py <docs/imagenes> <salida.html> <idioma>
 """
 import base64
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from estilo_web import ESTILO                      # noqa: E402
+from estilo_web import ESTILO                                   # noqa: E402
 
-TOTAL = 93861
-SIN_IDENTIFICAR = 0
+# Las cifras salen de las herramientas, no de escribirlas aqui a ojo:
+# tools/presupuesto.py (make sanity) da el reparto de la cinta y
+# tools/densidad.py (make densidad) las rutinas y la densidad.
+CINTA = 62261
+CODIGO = 11814
+DATOS = 50191
+LISTADOS = 5
+RUTINAS = 767
+INSTRUCCIONES = 6844
+COMENTARIOS = 2031
+DENSIDAD_ES = "29,7 %"
+DENSIDAD_EN = "29.7%"
+
+
+def mil(n, idioma):
+    return f"{n:,}".replace(",", "." if idioma == "es" else ",")
+
 
 TXT = {
     "es": dict(
-        titulo="Stardust (1987) — desensamblado comentado",
-        claim="Una cinta de cassette de 1987, desmontada bloque a bloque. Y por "
-              "dentro es una conversión del ZX Spectrum que se trajo hasta el "
-              "sistema de grabación, no solo los gráficos.",
-        ficha=["Topo Soft · <b>1987</b>", "Conversión del <b>ZX Spectrum</b>",
-               "Carga de cinta <b>multicarga</b>", "MSX1 · <b>64K</b>"],
+        titulo="War in Middle Earth — desensamblado comentado",
+        aviso="<b>Aquí no hay ni una captura de pantalla.</b> Todas las "
+              "imágenes están <b>dibujadas desde la cinta</b>: se leen los "
+              "bytes en los rangos que el listado tiene acotados y se revelan "
+              "como los revela el juego, con sus máscaras y con el atributo de "
+              "color que cada dibujo lleva pegado. Que salgan dibujos y no "
+              "ruido es la prueba de que los rangos están bien leídos. El "
+              "listado y las cifras salen del binario y se reproducen con "
+              "<code>make</code>.",
+        claim="Una conversión del ZX Spectrum que se trajo el sistema de cinta "
+              "entero, los atributos de color pegados a cada dibujo y hasta el "
+              "motor de sonido del altavoz… que aquí <b>no lo llama nadie</b>. "
+              "Los cuatro sitios que piden un efecto acaban en un "
+              "<code>ret</code> pelado, y del PSG del MSX sólo se tocan los dos "
+              "registros del joystick: <b>este juego es mudo</b>.",
+        ficha=["Melbourne House / Dro Soft · <b>1989</b>",
+               "Cinta, <b>62.261 bytes</b>",
+               "MSX1 · <b>64 KB, sin BIOS</b>",
+               "Conversión de <b>Animagic S.A.</b>"],
         nav=[("#numbers", "Las cifras"), ("#findings", "Hallazgos"),
-             ("#screens", "Los gráficos"), ("#method", "Cómo se hizo")],
+             ("#screens", "Lo que dibuja")],
         docnav=[("EMPEZAR.html", "Empezar"), ("EL-JUEGO.html", "El juego"),
-                ("LA-CINTA.html", "La cinta"), ("EL-CODIGO.html", "El código"),
+                ("LA-CINTA.html", "La cinta"),
+                ("EL-CODIGO.html", "El código"),
                 ("HALLAZGOS.html", "Hallazgos"),
                 ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas")],
         otro=("../", "In English"),
-        h_num="El juego en cifras", h_find="Lo que apareció al desmontarlo",
-        h_scr="Los gráficos", h_met="Cómo se hizo",
-        cifras=[("100%", "del binario con dueño"), ("106", "rutinas identificadas"),
-                ("7+1", "zonas de naves, y una a pie"), ("20.076", "bytes de código"),
-                ("73.785", "bytes de datos"), ("0", "bytes sin identificar")],
-        nota_scr="Nada de lo que ves aquí es una captura de pantalla: está "
-                 "dibujado a partir de los propios datos del binario, con la "
-                 "misma geometría que usa el juego. Y eso lo convierte en una "
-                 "comprobación además de una ilustración, porque si el reparto "
-                 "del bloque estuviera mal, lo que saldría es ruido, no una "
-                 "tilería reconocible.",
-        pie_gracias="Gracias a Araubi. Su grabación de una partida completa en "
-                    "el emulador es lo que ha permitido trazar el código de las "
-                    "pantallas a las que una partida automática no llega nunca, "
-                    "y llegar hasta la segunda parte del juego. Buena parte de "
-                    "lo que cuenta esta página sale de ahí.",
-        pie_leg="Esto es trabajo de documentación y preservación sobre un juego "
-                "de 1987: el código y los gráficos siguen siendo de sus autores "
-                "y de Topo Soft, y la imagen de la cinta no se distribuye. Parte "
-                "del análisis se apoya en el desensamblado de la versión de ZX "
-                "Spectrum que publicaron sus autores originales; los detalles "
-                "están en el aviso legal.",
+        h_num="La cinta en cifras", h_find="Lo que apareció al desmontarla",
+        h_scr="Lo que la cinta dibuja",
+        cifras=[("100 %", "de la cinta explicada"),
+                (str(LISTADOS), "listados"),
+                (mil(RUTINAS, "es"), "rutinas identificadas"),
+                (mil(CODIGO, "es"), "bytes de código"),
+                (mil(DATOS, "es"), "bytes de datos"),
+                ("0", "bytes sin identificar"),
+                (DENSIDAD_ES, "de densidad de comentarios"),
+                ("0", "rutinas por debajo del 10 %")],
+        nota_scr="Debajo de cada pie está la dirección de donde sale. Todas se "
+                 "rehacen con <code>make imagenes</code> y no hace falta "
+                 "emulador.",
+        pie_leg="Esto es trabajo de documentación y preservación: el código y "
+                "los gráficos siguen siendo de sus autores, y la cinta no se "
+                "distribuye.",
     ),
     "en": dict(
-        titulo="Stardust (1987) — a commented disassembly",
-        claim="A 1987 cassette tape, taken apart block by block. Inside, it's a "
-              "ZX Spectrum conversion that brought the tape system across with "
-              "it, not just the graphics.",
-        ficha=["Topo Soft · <b>1987</b>", "A <b>ZX Spectrum</b> conversion",
-               "<b>Multiload</b> from tape", "MSX1 · <b>64K</b>"],
+        titulo="War in Middle Earth — a commented disassembly",
+        aviso="<b>There is not a single screenshot here.</b> Every picture is "
+              "<b>drawn from the tape</b>: the bytes are read in the ranges the "
+              "listing delimits and developed the way the game develops them, "
+              "with their masks and with the colour attribute each drawing "
+              "carries glued to it. That drawings come out instead of noise is "
+              "the proof the ranges have been read correctly. The listing and "
+              "the numbers come from the binary and are reproduced with "
+              "<code>make</code>.",
+        claim="A ZX Spectrum conversion that brought across the whole tape "
+              "system, the colour attributes glued to every tile, and even the "
+              "beeper sound engine… which here <b>nothing ever calls</b>. The "
+              "four places that ask for a sound effect all land on a bare "
+              "<code>ret</code>, and of the MSX's PSG only the two joystick "
+              "registers are ever touched: <b>this game is silent</b>.",
+        ficha=["Melbourne House / Dro Soft · <b>1989</b>",
+               "Tape, <b>62,261 bytes</b>",
+               "MSX1 · <b>64 KB, no BIOS</b>",
+               "Converted by <b>Animagic S.A.</b>"],
         nav=[("#numbers", "The numbers"), ("#findings", "What turned up"),
-             ("#screens", "The graphics"), ("#method", "How it was done")],
+             ("#screens", "What it draws")],
         docnav=[("GETTING-STARTED.html", "Getting started"),
                 ("THE-GAME.html", "The game"),
-                ("THE-TAPE.html", "The tape"), ("THE-CODE.html", "The code"),
+                ("THE-TAPE.html", "The tape"),
+                ("THE-CODE.html", "The code"),
                 ("FINDINGS.html", "Findings"),
                 ("OPEN-QUESTIONS.html", "Open questions")],
         otro=("es/", "En castellano"),
-        h_num="The game in numbers", h_find="What turned up when we took it apart",
-        h_scr="The graphics", h_met="How it was done",
-        cifras=[("100%", "of the binary owned"), ("106", "routines identified"),
-                ("7+1", "ship zones, plus one on foot"), ("20,076", "bytes of code"),
-                ("73,785", "bytes of data"), ("0", "bytes unidentified")],
-        nota_scr="None of this is a screen capture: it's drawn straight from the "
-                 "binary's own data, using the same geometry the game itself "
-                 "uses. Which makes it a check as much as an illustration, "
-                 "because if the block's layout were wrong, what would come out "
-                 "is noise, not a recognisable tileset.",
-        pie_gracias="Thanks to Araubi. Their recording of a complete playthrough "
-                    "in the emulator is what made it possible to trace the code "
-                    "behind the screens a scripted run never reaches, and to get "
-                    "all the way to the second part of the game. A good deal of "
-                    "what this page tells comes from it.",
-        pie_leg="This is documentation and preservation work on a 1987 game: the "
-                "code and artwork still belong to their authors and to Topo "
-                "Soft, and the tape image isn't distributed. Part of the "
-                "analysis leans on the ZX Spectrum disassembly published by its "
-                "original authors; the details are in the legal notice.",
+        h_num="The tape in numbers",
+        h_find="What turned up when we took it apart",
+        h_scr="What the tape draws",
+        cifras=[("100%", "of the tape explained"),
+                (str(LISTADOS), "listings"),
+                (mil(RUTINAS, "en"), "routines identified"),
+                (mil(CODIGO, "en"), "bytes of code"),
+                (mil(DATOS, "en"), "bytes of data"),
+                ("0", "bytes unidentified"),
+                (DENSIDAD_EN, "comment density"),
+                ("0", "routines below 10%")],
+        nota_scr="Under each caption is the address it comes from. They are "
+                 "all rebuilt by <code>make imagenes</code> and no emulator is "
+                 "needed.",
+        pie_leg="This is documentation and preservation work: the code and "
+                "artwork still belong to their authors, and the tape is not "
+                "distributed.",
     ),
 }
 
 HALLAZGOS = {
     "es": [
-        ("La cinta no es una cinta de MSX",
-         "<p>Un juego de MSX se graba en bloques KCS, que es el formato del "
-         "sistema. Stardust no: sus cuatro bloques de datos son bloques del "
-         "ZX Spectrum, con su bandera, sus datos y un XOR de comprobación al "
-         "final, y los cuatro lo traen correcto.</p>"
-         "<p>Y el cargador tampoco es de aquí: es una reimplementación de "
-         "LD-BYTES, la rutina de carga de la ROM del Spectrum, con su mismo "
-         "interfaz de registros.</p>"),
-        ("El cargador trae una puerta trasera para trainers",
-         "<p>Antes de arrancar el juego, el cargador salva 94 bytes a memoria "
-         "alta y les echa un vistazo: si empiezan por tres <code>0xC9</code>, "
-         "los toma por una lista de parches y los aplica sobre el juego que "
-         "acaba de cargar, dirección y valor, uno detrás de otro.</p>"
-         "<p>Y la cuenta cuadra sola: tres bytes de firma, uno de contador y "
-         "treinta parches de tres bytes, noventa y cuatro en total. Está "
-         "pensado para treinta pokes exactos, que es justo lo que usaban los "
-         "cargadores de las revistas de la época.</p>"),
-        ("Dos juegos en una cinta",
-         "<p>Al superar la última zona de naves, el juego vuelve al cassette a "
-         "por una segunda parte en la que el protagonista sigue a pie. Y no "
-         "usa la rutina del cargador para eso, aunque sigue viva en memoria: "
-         "trae la suya, que enciende el motor de la cinta y lee el bit de "
-         "datos por el chip de sonido.</p>"
-         "<p>Los dos programas ni siquiera comparten motor. En la primera "
-         "parte cada objeto lleva una estructura de 8 bytes con la rutina que "
-         "lo gobierna apuntada dentro; en la segunda, los enemigos viven en "
-         "tablas ligeras de 5 bytes que mueven bucles fijos —cuatro andantes "
-         "como mucho, y los voladores aparte—. Sí hay objetos de 46 bytes en "
-         "la segunda parte, pero no son enemigos: son los tres canales del "
-         "intérprete de sonido.</p>"),
-        ("Lo que el MSX obligó a cambiar",
-         "<p>El Spectrum escribe directamente en su memoria de pantalla, que "
-         "es RAM normal. En el MSX la memoria de vídeo está detrás del chip "
-         "gráfico, así que hay que mandársela por un puerto, byte a byte.</p>"
-         "<p>Por eso esta versión carga con un buffer de pantalla que el "
-         "original no necesita: 3840 bytes en 0x4000-0x4EFF, de 24 de ancho "
-         "por 160 de alto, que el volcado envía a la VRAM en tres bandas, "
-         "columna a columna. Veinticuatro bytes son 192 píxeles, más estrecho "
-         "que la pantalla, y por eso el marco de los lados no se mueve nunca: "
-         "lo que sobra está a lo alto, que es justo por donde scrollea.</p>"
-         "<p>Y esos ejes son fáciles de leer al revés. El <code>ld b,028h</code> "
-         "del volcado parece decir «40 columnas», pero es el bucle interior, "
-         "el que recoge 40 bytes de una misma columna a saltos de 24. Lo caza "
-         "dibujarlo: partido de 24 en 24 sale la tabla de récords, legible; "
-         "de 40 en 40, ruido.</p>"),
-        ("Sprites dibujados a mano",
-         "<p>El MSX tiene sprites por hardware, pero aquí no se usan: se "
-         "dibujan por software, a la manera del Spectrum, desplazando el "
-         "dibujo bit a bit y componiéndolo con AND y OR.</p>"
-         "<p>Las dos partes del juego llevan la misma rutina para eso, "
-         "copiada y reubicada de una a otra. El pintor de sprites mide 198 "
-         "bytes, y si emparejas bien sus dos mitades las únicas diferencias "
-         "son diez direcciones reubicadas y un solo byte suelto, el del "
-         "recorte por abajo.</p>"),
-        ("Ningún punto de entrada cae dentro de un gráfico",
-         "<p>Sembrar el trazador con rutinas mal ancladas puede hinchar la "
-         "cobertura de golpe sin que nadie lo note: el binario reensambla "
-         "igual, porque son los mismos bytes y solo cambia cómo se leen; el "
-         "presupuesto cierra igual; y una comprobación de trazado que solo "
-         "mire un fichero de excepciones tampoco lo ve. Por eso hay una regla "
-         "para exactamente esto, corriendo en el gate junto al resto: ningún "
-         "punto de entrada puede caer dentro de un rango declarado como "
-         "datos.</p>"
-         "<p>Y luego está la otra prueba, jugar la partida de verdad. "
-         "Reproduciendo una grabación completa de 38 minutos —cortesía de "
-         "Araubi— y anotando por dónde pasa el procesador, resulta que de "
-         "las 1489 direcciones que el juego llega a ejecutar, el trazador ya "
-         "alcanza 1444 por su cuenta; las que faltan pasan a ser puntos de "
-         "entrada, cada una con su cuenta de muestras al lado. La cobertura "
-         "real del bloque de naves acaba en 23,0 %, y la de la segunda "
-         "parte, en 28,6 %.</p>"),
+        ("Este juego es mudo, y se puede señalar dónde se quedó el sonido",
+         "<p>La conversión se trajo del Spectrum su motor de sonido entero: "
+         "está en <code>0x6600</code>, saca las notas por el "
+         "<code>out (0xFE)</code> con el bit 4, y detrás lleva cinco efectos de "
+         "veintiún bytes en <code>0x636F</code>-<code>0x63D7</code>.</p>"
+         "<p><b>No lo llama nadie.</b> Ni una sola instrucción de los cinco "
+         "listados apunta a <code>0x6600</code>. Y los cuatro sitios que piden "
+         "un efecto —<code>0x5F90</code>, <code>0x647A</code>, "
+         "<code>0x6AA1</code> y <code>0x833D</code>— llaman a "
+         "<code>0x65FF</code>, que es <b>un <code>ret</code> pelado</b>.</p>"
+         "<p>Del PSG del MSX sólo se escriben dos registros, el 7 y el 14, y "
+         "los dos son para leer el joystick (<code>0x046E</code>). La única "
+         "rutina que sabría escribir una nota en el PSG, <code>0x04F2</code>, "
+         "no la llama nadie tampoco. No hay un tercer camino: <b>el juego no "
+         "suena</b>.</p>"),
+        ("La pantalla de carga, entera, sacada de la cinta",
+         "<p>Los 12.388 bytes del bloque [08] son una pantalla de SCREEN 2 "
+         "completa: 6.144 de patrones y 6.144 de colores, y las cuentas cierran "
+         "solas (<code>0x88B8</code> + 100 + 6.144 + 6.144 = <code>0xB91C</code>, "
+         "el final exacto del bloque).</p>"
+         "<p>Dibujada, se lee lo que el juego dice de sí mismo: <b>MAELSTROM "
+         "GAMES LTD. PRESENTS</b>, <b>War in Middle Earth</b>, <b>Mike "
+         "Singleton</b> y, abajo a la derecha, <b>CONVERSION by ANIMAGIC "
+         "sa</b>. Y el menú añade el resto: «Programado por C.J.Pink».</p>"),
+        ("Los tiles del mapa van a nueve bytes, y ése es el sello de la conversión",
+         "<p>Un tile de MSX ocupa ocho bytes. Los del mapa de este juego ocupan "
+         "<b>nueve</b>: las ocho líneas del dibujo y, pegado detrás, <b>un "
+         "atributo del ZX Spectrum</b> —tinta en los bits 0-2, papel en los "
+         "3-5, brillo en el 6—.</p>"
+         "<p>Los lee <code>0x75C7</code>-<code>0x75EB</code> cuando el código "
+         "de la rejilla lleva puesto el bit 7. La conversión no rehizo los "
+         "gráficos: se trajo los del Spectrum con su color puesto y los "
+         "traduce al vuelo, en <code>0x049F</code>.</p>"),
+        ("En 0x62FF no está el dibujo del cursor: está lo que el cursor tapa",
+         "<p>Esos 24 bytes estaban documentados como el dibujo de la marca del "
+         "cursor. <b>No lo son.</b> <code>0x6580</code> mete "
+         "<code>0x62FF</code> en el HL alternativo y el bucle de "
+         "<code>0x65B4</code>, por cada uno de los tres bytes de la columna, "
+         "primero <b>lee la pantalla</b> (<code>ld a,(iy+n)</code>), la copia "
+         "ahí, y sólo después compone el cursor encima.</p>"
+         "<p><code>0x64DC</code> hace el camino de vuelta para borrarlo. El "
+         "dibujo de verdad está en <code>0x6345</code>, con su máscara detrás "
+         "(<code>ld ix,0x6345</code> en <code>0x657B</code>). Y los "
+         "<code>0xAD</code> que trae la cinta ahí no son un dibujo: son <b>lo "
+         "que había bajo el cursor el día que se grabó</b>.</p>"),
+        ("El tablero de batalla se monta encima del menú, y es un damero",
+         "<p>La batalla usa <code>0x5E00</code>-<code>0x62FF</code>, que es "
+         "<b>donde vive el código del menú</b>: una vez empezada la partida, el "
+         "menú y sus textos son papel de borrador. Lo dice "
+         "<code>0x8E08</code> con su <code>ld b,0x5E</code>, y el "
+         "<code>ldir</code> de <code>0x904D</code> lo borra entero antes de "
+         "cada batalla.</p>"
+         "<p>Y el tablero es un <b>damero</b>: las cuatro rutinas de "
+         "movimiento (<code>0x893E</code> y compañía) cambian siempre las dos "
+         "coordenadas a la vez, así que la paridad de x+y no cambia nunca. El "
+         "despliegue rechaza los pares de paridad distinta y los obstáculos van "
+         "justo en las casillas del otro color.</p>"),
+        ("El filtro de amigo o enemigo es un interruptor por opcode",
+         "<p>Para recorrer las unidades del bando contrario, el juego no usa "
+         "una bandera: <b>se reescribe la instrucción</b>. "
+         "<code>0x8980</code>-<code>0x8982</code> mete un <code>0xD0</code> en "
+         "<code>0x8AF3</code>, y <code>0x8991</code>-<code>0x8993</code> mete "
+         "un <code>0xD8</code>.</p>"
+         "<p><code>0xD0</code> es <code>ret nc</code> y <code>0xD8</code> es "
+         "<code>ret c</code>. La misma rutina, con el mismo umbral, devuelve "
+         "las de un bando o las del otro según qué opcode se le haya escrito "
+         "encima un momento antes.</p>"),
+        ("El mapa viaja comprimido, y se vuelve a comprimir antes de cada batalla",
+         "<p><code>0x9366</code> aparta los <code>0x16ED</code> bytes "
+         "comprimidos del mapa a <code>0x4000</code> con un <code>ldir</code> y "
+         "los expande a los <code>0x33CD</code> de <code>0xCC00</code> leyendo "
+         "parejas de cuenta y valor. Lo llama <code>0x5E28</code>, en el "
+         "arranque: el mapa <b>llega de la cinta ya comprimido</b>.</p>"
+         "<p>Y <code>0x9394</code> hace lo contrario antes de cada batalla, "
+         "volviéndolo a dejar en <code>0x16EC</code> bytes. No es por ahorrar "
+         "cinta: es por <b>hacer sitio</b>. Lo que se libera, "
+         "<code>0xE2EC</code>-<code>0xFFFF</code>, es exactamente donde viven "
+         "los búferes de la batalla.</p>"),
+        ("Y restos del Spectrum que en un MSX no significan nada",
+         "<p>El <b>modo de control 2</b> del menú —el Interface Two del "
+         "Spectrum— no existe aquí: su puntero, en <code>0x06D7</code>, es "
+         "<code>0x0000</code>, así que el menú salta del 1 al 3.</p>"
+         "<p>El bloque de teclado del ZX de <code>0x5F75</code>-"
+         "<code>0x5FB7</code>, que lee el puerto <code>0xFE</code>, es código "
+         "muerto. Y en la rutina de <b>grabar la partida</b> quedó sin "
+         "convertir la comprobación de la tecla de parada: <code>0x0930</code> "
+         "hace <code>in a,(0xFE)</code>, que en un MSX no es el teclado.</p>"),
     ],
     "en": [
-        ("This isn't an MSX tape",
-         "<p>MSX games are recorded in KCS blocks, the system's own format. Not "
-         "Stardust: its four data blocks are ZX Spectrum blocks, with a flag "
-         "byte, the data and an XOR check at the end, and all four carry it "
-         "correctly.</p>"
-         "<p>The loader isn't native either: it's a reimplementation of "
-         "LD-BYTES, the Spectrum ROM's own load routine, with the same "
-         "register interface.</p>"),
-        ("The loader ships with a back door for trainers",
-         "<p>Before starting the game, the loader saves 94 bytes to high "
-         "memory and takes a look at them: if they begin with three "
-         "<code>0xC9</code>, it treats them as a list of patches and applies "
-         "them to the game it just loaded, address and value, one after "
-         "another.</p>"
-         "<p>And the arithmetic works out on its own: three bytes of "
-         "signature, one counter byte, and thirty patches of three bytes "
-         "each, ninety-four in total. It's sized for exactly thirty pokes, "
-         "which happens to be exactly what the magazine loaders of the day "
-         "were using.</p>"),
-        ("Two games on one tape",
-         "<p>Clearing the last ship zone sends the game back to the cassette "
-         "for a second part where the character carries on on foot. And it "
-         "doesn't reuse the loader's routine for that, even though it's "
-         "still alive in memory: it brings its own, which starts the tape "
-         "motor and reads the data bit off the sound chip.</p>"
-         "<p>The two programs don't even share an engine. In the first part "
-         "each object carries an 8-byte structure with a pointer to its "
-         "governing routine; in the second, the enemies live in light 5-byte "
-         "tables moved by fixed loops —four walkers at most, flyers kept "
-         "apart. There are 46-byte objects in the second part too, but "
-         "they're not enemies: they're the sound interpreter's three "
-         "channels.</p>"),
-        ("What the MSX forced them to change",
-         "<p>The Spectrum writes straight into its screen memory, which is "
-         "ordinary RAM. On the MSX, video memory sits behind the graphics "
-         "chip, so it has to go out through a port, byte by byte.</p>"
-         "<p>Which is why this version carries a screen buffer the original "
-         "never needed: 3840 bytes at 0x4000-0x4EFF, 24 wide by 160 tall, "
-         "sent to VRAM in three bands, column by column. Twenty-four bytes "
-         "are 192 pixels, narrower than the screen, and that's why the frame "
-         "down the sides never moves: the surplus is vertical, which is "
-         "exactly where it scrolls.</p>"
-         "<p>And those axes are easy to read backwards. The dump's "
-         "<code>ld b,028h</code> looks like it's saying \"40 columns\", but "
-         "it's the inner loop, the one collecting 40 bytes from a single "
-         "column in steps of 24. Drawing it settles it: split 24 at a time "
-         "and the high-score table comes out legible; 40 at a time, "
-         "noise.</p>"),
-        ("Sprites drawn by hand",
-         "<p>The MSX has hardware sprites, but they're not used here: sprites "
-         "get drawn in software, the Spectrum way, shifting the image bit by "
-         "bit and compositing it with AND and OR.</p>"
-         "<p>Both halves of the game carry the same routine for that, copied "
-         "and relocated from one to the other. The sprite painter is 198 "
-         "bytes long, and pair its two halves correctly and the only "
-         "differences are ten relocated addresses and one loose byte, the "
-         "bottom clip.</p>"),
-        ("No entry point falls inside a picture",
-         "<p>Seed the tracer with badly anchored routines and coverage can "
-         "inflate in one go without anyone noticing: the binary still "
-         "reassembles, because it's the same bytes and only the reading "
-         "changes; the budget still closes; and a trace check that only "
-         "looks at a file of exceptions won't catch it either. So there's a "
-         "rule for exactly this, running in the gate alongside the rest: no "
-         "entry point may fall inside a range declared as data.</p>"
-         "<p>And then there's the other proof, actually playing the game. "
-         "Replaying a complete 38-minute recording —courtesy of Araubi— and "
-         "noting where the processor goes, it turns out that of the 1489 "
-         "addresses the game actually executes, the tracer already reaches "
-         "1444 on its own; the ones it misses become entry points, each with "
-         "its sample count beside it. The ship block's real coverage lands "
-         "at 23.0%, and the second part's at 28.6%.</p>"),
+        ("This game is silent, and you can point at where the sound stopped",
+         "<p>The conversion brought the Spectrum's whole sound engine across: "
+         "it sits at <code>0x6600</code>, drives the notes through "
+         "<code>out (0xFE)</code> with bit 4, and behind it are five "
+         "twenty-one-byte effects at <code>0x636F</code>-<code>0x63D7</code>.</p>"
+         "<p><b>Nothing ever calls it.</b> Not one instruction in the five "
+         "listings points at <code>0x6600</code>. And the four places that ask "
+         "for an effect — <code>0x5F90</code>, <code>0x647A</code>, "
+         "<code>0x6AA1</code> and <code>0x833D</code> — call "
+         "<code>0x65FF</code>, which is <b>a bare <code>ret</code></b>.</p>"
+         "<p>Of the MSX's PSG only two registers are ever written, 7 and 14, "
+         "and both are for reading the joystick (<code>0x046E</code>). The one "
+         "routine that would know how to write a note to the PSG, "
+         "<code>0x04F2</code>, is never called either. There is no third path: "
+         "<b>the game makes no sound</b>.</p>"),
+        ("The loading screen, whole, pulled out of the tape",
+         "<p>The 12,388 bytes of block [08] are a complete SCREEN 2 picture: "
+         "6,144 of patterns and 6,144 of colours, and the sums close on their "
+         "own (<code>0x88B8</code> + 100 + 6,144 + 6,144 = <code>0xB91C</code>, "
+         "the exact end of the block).</p>"
+         "<p>Drawn, it says what the game says about itself: <b>MAELSTROM GAMES "
+         "LTD. PRESENTS</b>, <b>War in Middle Earth</b>, <b>Mike Singleton</b> "
+         "and, bottom right, <b>CONVERSION by ANIMAGIC sa</b>. The menu adds "
+         "the rest: “Programado por C.J.Pink”.</p>"),
+        ("The map tiles are nine bytes long, and that is the conversion's fingerprint",
+         "<p>An MSX tile takes eight bytes. This game's map tiles take "
+         "<b>nine</b>: the eight lines of the drawing and, glued behind them, "
+         "<b>a ZX Spectrum attribute</b> — ink in bits 0-2, paper in 3-5, "
+         "bright in 6.</p>"
+         "<p><code>0x75C7</code>-<code>0x75EB</code> read them when the grid "
+         "code has bit 7 set. The conversion did not redraw the artwork: it "
+         "brought the Spectrum's across with its colour already attached and "
+         "translates it on the fly, at <code>0x049F</code>.</p>"),
+        ("0x62FF is not the cursor's artwork: it is what the cursor covers up",
+         "<p>Those 24 bytes were documented as the cursor mark's drawing. "
+         "<b>They are not.</b> <code>0x6580</code> loads <code>0x62FF</code> "
+         "into the alternate HL and the loop at <code>0x65B4</code>, for each "
+         "of the column's three bytes, first <b>reads the screen</b> "
+         "(<code>ld a,(iy+n)</code>), copies it there, and only then composites "
+         "the cursor on top.</p>"
+         "<p><code>0x64DC</code> walks it back to erase. The real artwork is at "
+         "<code>0x6345</code>, with its mask behind it "
+         "(<code>ld ix,0x6345</code> at <code>0x657B</code>). And the "
+         "<code>0xAD</code> bytes the tape carries there are not a drawing: "
+         "they are <b>whatever was under the cursor the day it was saved</b>.</p>"),
+        ("The battle board is built on top of the menu, and it is a draughtboard",
+         "<p>Battle uses <code>0x5E00</code>-<code>0x62FF</code>, which is "
+         "<b>where the menu's code lives</b>: once a game has started, the menu "
+         "and its text are scrap paper. <code>0x8E08</code> says so with its "
+         "<code>ld b,0x5E</code>, and the <code>ldir</code> at "
+         "<code>0x904D</code> wipes the lot before every battle.</p>"
+         "<p>And the board is a <b>draughtboard</b>: the four movement routines "
+         "(<code>0x893E</code> and friends) always change both coordinates at "
+         "once, so the parity of x+y never changes. Deployment rejects any pair "
+         "whose parities differ, and the obstacles go on exactly the squares of "
+         "the other colour.</p>"),
+        ("The friend-or-foe filter is an opcode switch",
+         "<p>To walk the other side's units the game does not use a flag: "
+         "<b>it rewrites the instruction</b>. "
+         "<code>0x8980</code>-<code>0x8982</code> writes a <code>0xD0</code> "
+         "into <code>0x8AF3</code>, and <code>0x8991</code>-<code>0x8993</code> "
+         "writes a <code>0xD8</code>.</p>"
+         "<p><code>0xD0</code> is <code>ret nc</code> and <code>0xD8</code> is "
+         "<code>ret c</code>. The same routine, with the same threshold, hands "
+         "back one side's units or the other's depending on which opcode was "
+         "written over it a moment earlier.</p>"),
+        ("The map travels compressed, and gets recompressed before every battle",
+         "<p><code>0x9366</code> moves the map's <code>0x16ED</code> compressed "
+         "bytes out to <code>0x4000</code> with an <code>ldir</code> and "
+         "expands them into the <code>0x33CD</code> at <code>0xCC00</code>, "
+         "reading count/value pairs. <code>0x5E28</code> calls it at boot: the "
+         "map <b>arrives from tape already compressed</b>.</p>"
+         "<p>And <code>0x9394</code> does the reverse before every battle, "
+         "packing it back down to <code>0x16EC</code> bytes. That is not to "
+         "save tape: it is to <b>make room</b>. What it frees, "
+         "<code>0xE2EC</code>-<code>0xFFFF</code>, is exactly where the battle "
+         "buffers live.</p>"),
+        ("And Spectrum leftovers that mean nothing on an MSX",
+         "<p>The menu's <b>control mode 2</b> — the Spectrum's Interface Two — "
+         "does not exist here: its pointer, at <code>0x06D7</code>, is "
+         "<code>0x0000</code>, so the menu jumps from 1 to 3.</p>"
+         "<p>The ZX keyboard block at <code>0x5F75</code>-<code>0x5FB7</code>, "
+         "which reads port <code>0xFE</code>, is dead code. And in the "
+         "<b>save-game</b> routine the break-key check was never converted: "
+         "<code>0x0930</code> does <code>in a,(0xFE)</code>, which on an MSX is "
+         "not the keyboard.</p>"),
     ],
 }
 
-IMAGENES = [("tiles.png", "Los 111 tiles del decorado", "The 111 scenery tiles"),
-            ("sprites.png", "Los 83 sprites", "The 83 sprites"),
-            ("carga.png", "La pantalla de carga, firmada CANO",
-             "The loading screen, signed CANO"),
-            ("charset.png", "La tipografía: 59 caracteres", "The charset: 59 characters")]
+GALERIA = [
+    ("carga.png",
+     "DIBUJADA de 0x891C y 0xA11C — la pantalla de carga entera: 6.144 bytes de "
+     "patrones y 6.144 de color, tal como los sube el cargador. Aqui esta el "
+     "juego diciendo quien lo hizo",
+     "DRAWN from 0x891C and 0xA11C — the whole loading screen: 6,144 bytes of "
+     "patterns and 6,144 of colour, exactly as the loader uploads them. This is "
+     "the game saying who made it"),
+    ("tiles-del-mapa.png",
+     "DIBUJADOS de 0x9E00 — los 128 tiles del mapa, con el color que dice su "
+     "atributo del Spectrum. Van a NUEVE bytes: ocho de dibujo y el atributo "
+     "pegado detras",
+     "DRAWN from 0x9E00 — the 128 map tiles, in the colour their Spectrum "
+     "attribute names. They are NINE bytes each: eight of drawing and the "
+     "attribute glued behind"),
+    ("sprites-de-dos-en-dos.png",
+     "DIBUJADOS de 0xA2E8 — los sprites de batalla apilados de dos en dos. "
+     "Medido: cada uno son 32 bytes de 16x8 en parejas mascara/dibujo. Que las "
+     "entradas consecutivas encajen en figuras de 16x16 es una lectura de la "
+     "imagen, no una rutina que se haya encontrado",
+     "DRAWN from 0xA2E8 — the battle sprites stacked in pairs. Measured: each "
+     "one is 32 bytes of 16x8 in mask/drawing pairs. That consecutive entries "
+     "fit together into 16x16 figures is a reading of the picture, not a "
+     "routine anyone has found"),
+    ("sprites-de-batalla.png",
+     "DIBUJADOS de 0xA2E8 — los mismos 176 sprites, uno a uno. El orden de sus "
+     "bytes no es obvio: van en parejas mascara/dibujo y en zigzag, porque la "
+     "rutina de 0x887B escribe izquierda, derecha, baja una linea y vuelve",
+     "DRAWN from 0xA2E8 — the same 176 sprites, one by one. The byte order is "
+     "not obvious: they go in mask/drawing pairs and in zig-zag, because the "
+     "routine at 0x887B writes left, right, down a line and back"),
+    ("fuente.png",
+     "DIBUJADA de 0xC800 — los 128 caracteres de ocho bytes. Los 33 primeros "
+     "estan a cero: el primero con dibujo es el 0x21, y de ahi salen marcos, "
+     "flechas, digitos, mayusculas y minusculas",
+     "DRAWN from 0xC800 — the 128 eight-byte characters. The first 33 are all "
+     "zero: the first with any drawing is 0x21, and from there come frames, "
+     "arrows, digits, upper and lower case"),
+]
 
 
 def img64(ruta):
@@ -259,64 +361,63 @@ def img64(ruta):
         return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
 
-def logo_png(binpath, ruta):
-    """El logo STARDUST de la cabecera, dibujado desde la cinta.
+def rotulo(imgdir, salida):
+    """Recorta el titulo de la pantalla de carga para la cabecera.
 
-    Es el bitmap de 0x47A0, los primeros 256 bytes del bloque del juego:
-    128x16 pixeles a 16 bytes por fila, el mismo rotulo que el modo atraccion
-    anima en el area de juego. Blanco sobre negro, que es como se ve, y a
-    escala 4 (512x64) para la cabecera.
+    No es un montaje ni una fuente de fuera: son las filas 24 a 68 de la propia
+    pantalla que el juego ensena mientras carga, que es donde esta escrito
+    "War in Middle Earth".
     """
-    from render_maps import png
-    d = open(binpath, "rb").read()
-    ESC = 4
-    px = [[(0, 0, 0)] * 128 * ESC for _ in range(16 * ESC)]
-    for y in range(16):
-        for bx in range(16):
-            b = d[y * 16 + bx]
-            for bit in range(8):
-                if b & (0x80 >> bit):
-                    for sy in range(ESC):
-                        for sx in range(ESC):
-                            px[y * ESC + sy][(bx * 8 + bit) * ESC + sx] = (255, 255, 255)
-    png(ruta, 128 * ESC, 16 * ESC, px)
+    fuente = os.path.join(imgdir, "carga.png")
+    if not os.path.exists(fuente):
+        return None
+    return fuente
 
 
 def main(argv):
-    if len(argv) < 5:
+    if len(argv) < 4:
         print(__doc__)
         return 2
-    imgdir, salida, idioma = argv[2], argv[3], argv[4]
+    imgdir, salida, idioma = argv[1:4]
     t = TXT[idioma]
-    ruta_logo = os.path.join(imgdir, "logo.png")
-    logo_png(argv[1], ruta_logo)
+
+    ruta_logo = rotulo(imgdir, salida)
+    cabecera = ("<h1>War in Middle Earth</h1>" if not ruta_logo
+                else f'<img src="{img64(ruta_logo)}" alt="War in Middle Earth">')
 
     nav = "".join(f'<a href="{h}">{x}</a>' for h, x in t["nav"])
     nav += "".join(f'<a href="{h}">{x}</a>' for h, x in t["docnav"])
-    nav += f'<a href="{t["otro"][0]}" style="margin-left:auto;color:var(--oro)">{t["otro"][1]}</a>'
+    nav += (f'<a href="{t["otro"][0]}" style="margin-left:auto;color:var(--oro)">'
+            f'{t["otro"][1]}</a>')
 
     cifras = "".join(f'<div class="cifra"><b>{v}</b><span>{e}</span></div>'
                      for v, e in t["cifras"])
     halls = "".join(f'<div class="hall"><h3>{tit}</h3>{cuerpo}</div>'
                     for tit, cuerpo in HALLAZGOS[idioma])
     imgs = ""
-    for fich, es, en in IMAGENES:
+    faltan = []
+    for fich, es, en in GALERIA:
         ruta = os.path.join(imgdir, fich)
         if not os.path.exists(ruta):
+            faltan.append(fich)
             continue
         pie = es if idioma == "es" else en
         imgs += (f'<figure><img src="{img64(ruta)}" alt="{pie}">'
                  f'<figcaption>{pie}</figcaption></figure>')
+    if faltan:
+        print("  (faltan %d imagenes: %s)" % (len(faltan), " ".join(faltan)))
 
     html = f"""<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{t['titulo']}</title>
 <style>{ESTILO}</style>
 <header class="top">
-  <img src="{img64(ruta_logo)}" alt="Stardust (1987)">
+  {cabecera}
   <p class="claim">{t['claim']}</p>
   <p class="ficha">{' · '.join(t['ficha'])}</p>
 </header>
+<p class="ficha" style="border:1px solid var(--oro);padding:.8em 1em;margin:1.5em 0">
+{t['aviso']}</p>
 <nav>{nav}</nav>
 <section id="numbers">
   <h2>{t['h_num']}</h2>
@@ -328,7 +429,7 @@ def main(argv):
   <p class="n">{t['nota_scr']}</p>
   <div class="galeria">{imgs}</div>
 </section>
-<footer><p>{t['pie_gracias']}</p><p>{t['pie_leg']}</p></footer>
+<footer><p>{t['pie_leg']}</p></footer>
 """
     with open(salida, "w", encoding="utf-8") as f:
         f.write(html)

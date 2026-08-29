@@ -12,7 +12,8 @@
 ; ----------------------------------------------------------------------
 ; DATOS tiles_del_mapa: Tiles del mapa: hasta 128 de 9 bytes (8 lineas + 1
 ;   atributo ZX); los lee 0x75C7-0x75EB cuando el codigo de la rejilla lleva
-;   el bit 7 (dibujados en work/omsx/tiles9_9e00.png)
+;   el bit 7 (dibujados en docs/imagenes/tiles-del-mapa.png con
+;   tools/render_graficos.py, con el color que dice su atributo)
 ;   0x9e00..0xa280  (1152 bytes)
 DATA_tiles_del_mapa:
 	defb 000h,040h,001h,000h,010h,000h,044h,000h,038h	; 9e00  .@....D.8
@@ -159,9 +160,11 @@ DATA_ceros_antes_de_los_sprites:
 
 ; ----------------------------------------------------------------------
 ; DATOS sprites_de_batalla: 176 sprites de batalla de 16x8 con mascara, 32 B
-;   cada uno (0xA2E8 + (tipo-4)*32 en 0x87B4-0x87C4 y 0x87E9-0x87FB); los leen
-;   0x880B-0x8824, 0x887C-0x8895, 0x88B9-0x88C6, 0x88DA-0x88EE y 0x88F3-0x8903
-;   durante la batalla
+;   cada uno en PAREJAS mascara/dibujo y en zigzag (0x887B: izquierda,
+;   derecha, baja, izquierda), dibujados en
+;   docs/imagenes/sprites-de-batalla.png (0xA2E8 + (tipo-4)*32 en
+;   0x87B4-0x87C4 y 0x87E9-0x87FB); los leen 0x880B-0x8824, 0x887C-0x8895,
+;   0x88B9-0x88C6, 0x88DA-0x88EE y 0x88F3-0x8903 durante la batalla
 ;   0xa2e8..0xb8e8  (5632 bytes)
 DATA_sprites_de_batalla:
 	defb 0ffh,000h,0ffh,000h,0ffh,000h,0ffh,000h,0ffh,000h,0ffh,000h,0ffh,000h,0ffh,000h,0c0h,018h,007h,070h,00fh,080h,0e0h,007h,0c0h,01fh,01fh,0c0h,00fh,0e0h,080h,01fh	; a2e8  ...................p............
@@ -608,10 +611,11 @@ DATA_ram_de_trabajo_c600:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; c7f0  ................
 
 ; ----------------------------------------------------------------------
-; DATOS fuente: La FUENTE: 128 caracteres de 8 bytes (texturas del terreno en
-;   los codigos bajos, marcos, flechas, digitos y letras); la leen
-;   0x7620-0x763C y el volcado a VRAM de 0x043F (dibujada en
-;   work/omsx/tiles8_c800.png)
+; DATOS fuente: La FUENTE: 128 caracteres de 8 bytes. Los codigos 0x00-0x20
+;   estan A CERO (33 caracteres vacios, contados byte a byte); el primero con
+;   dibujo es 0x21 y de ahi salen marcos, flechas, digitos, mayusculas y
+;   minusculas. La leen 0x7620-0x763C y el volcado a VRAM de 0x043F (dibujada
+;   en docs/imagenes/fuente.png con tools/render_graficos.py)
 ;   0xc800..0xcc00  (1024 bytes)
 DATA_fuente:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h	; c800  ........

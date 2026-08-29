@@ -1,0 +1,111 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open questions — War in Middle Earth (1989)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-TAPE.html">The tape</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html">Findings</a><a href="OPEN-QUESTIONS.html" style=color:var(--tinta)>Open questions</a><a href="es/PREGUNTAS-ABIERTAS.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="open-questions">Open questions</h1>
+<p><a href="GETTING-STARTED.html">Getting started</a> · <a href="THE-GAME.html">The game</a> · <a href="THE-TAPE.html">The tape</a> · <a href="THE-CODE.html">The code</a> · <a href="FINDINGS.html">Findings</a></p>
+<p>What is still open, keeping MEASURED and ASSUMED apart. What is measured carries its measurement; what is assumed is labelled as such and <b>has not been written into the listing as if it were a fact</b>.</p>
+<hr>
+<h2 id="measured-and-closed">MEASURED, and closed</h2>
+<ul><li>The whole tape: <b>62,261 bytes, 62,261 explained, zero unexplained</b>.</li><li>All five listings <b>reassemble byte for byte</b> with pasmo.</li><li><b>52 data ranges</b> declared, all crossed against the trace.</li><li>Commented at <b>29.7%</b>, with no routine below 10% out of 767.</li><li>The budget was closed with <b>Araubi&#x27;s complete playthrough</b>: the 13.8 KB that had never been seen running were the two ending screens.</li></ul>
+<hr>
+<h2 id="assumed-labelled-as-such">ASSUMED (labelled as such)</h2>
+<ul><li><b>That bit 4 of <code>0xBD00+n</code> means &quot;carries the Ring&quot;.</b> What is measured is that <code>0x733E</code> looks for the first unit with that bit, that the game loop checks whether that unit is on <code>(0x68, 0x3F)</code>, and that it decides victory (<code>0x7F7D</code>) and defeat (<code>0x9218</code>). Everything points the same way, but the binary does not say it in so many words.</li><li><b>That units <code>0x16</code> and <code>0x17</code> are Sauron and Saruman.</b> The chain is long: <code>0x72FD</code> stores the bearer and does <code>inc a</code> to mark the row, and <code>0x7314</code> does <code>dec a</code> on the way back; so row = unit + 1 and row 0 is &quot;Vuelve&quot;, making unit <em>n</em> the *n+1*th name in the list at <code>0x6B46</code>. Counting gives Gollum, Sauron and Saruman. It fits with <code>0x6AE3</code> skipping exactly those two when painting armies, and with <code>0x7514</code> (choosing an enemy) accepting exactly <code>{0x16, 0x17, &gt;= 0x78}</code>. It is a deduction, not a direct reading.</li><li><b>That the figures stack in pairs.</b> Measured: each sprite is 32 bytes of 16×8. That consecutive entries fit together into 16×16 figures is what you see when you draw them, but <b>no routine that stacks them has been found</b>.</li></ul>
+<hr>
+<h2 id="open-what-could-not-be-closed">OPEN: what could not be closed</h2>
+<h3 id="1-the-insides-of-the-state-tables">1. The insides of the state tables</h3>
+<p><code>0xB8E8</code>-<code>0xC600</code> and <code>0xE400</code>-<code>0xE678</code> are delimited and we know who reads them (<code>0x6AC2</code>, <code>0x6EAC</code>, <code>0x8F7A</code>, <code>0x92E4</code>, <code>0x81A9</code>, <code>0x8189</code>, <code>0x7FF0</code>), but they have <b>not been broken down field by field</b>. <code>0xB900</code> is called X and <code>0xBA00</code> Y because <code>0x8108</code> multiplies the first by 102, which is the column stride, and <code>0x8166</code> walks columns in the outer loop; that is consistent, not proven.</p>
+<h3 id="2-what-the-map-s-second-pass-adds">2. What the map&#x27;s second pass adds</h3>
+<p>Drawing the map takes three passes. The second (<code>0x7714</code>) indexes <code>0x77B5</code> with <b>the same low nibble</b> the terrain pass already used (<code>0x7687</code>), and what it contributes could not be established.</p>
+<h3 id="3-who-sets-bit-7-of-a-map-byte">3. Who sets bit 7 of a map byte</h3>
+<p>The third pass of <code>0x7708</code> only paints if that bit is set. It is set from <code>0x8F70</code>, <code>0x8044</code> and <code>0x80BD</code>, but on what criterion was not settled.</p>
+<h3 id="4-the-nibble-shuffling-with-the-countdown">4. The nibble shuffling with the countdown</h3>
+<p><code>0x6A76</code>-<code>0x6A94</code> takes the operand of <code>0x8333</code> — the month countdown, set to 255 at <code>0x7F4F</code> — stores it <b>multiplied by 16</b>, and puts its high nibble minus one into the low nibble of <code>0xC000+bearer</code>. With 255 in there, that leaves the countdown at 240 the first time and at 0 the second. Either it is a deliberate penalty, or that byte has a second use nobody has worked out. It is commented by describing <b>what it does</b>, without interpreting it.</p>
+<h3 id="5-0x9144-reads-what-0x904d-has-just-cleared">5. <code>0x9144</code> reads what <code>0x904D</code> has just cleared</h3>
+<p>In the same routine, a few instructions apart: <code>0x904D</code> zeroes <code>0x5E00</code>+<code>0x4FF</code> — <code>0x6010</code> included — and <code>0x9144</code> then does <code>ld hl,0x6010 / ld a,(hl) / ld (0x8B19),a</code>. Either it is meant to read the battle board, or it is a Spectrum leftover where that byte lived somewhere else. The mechanism is commented, not the intent.</p>
+<h3 id="6-rows-of-tiles-that-are-computed-and-never-drawn">6. Rows of tiles that are computed and never drawn</h3>
+<p><code>0x86AF</code> works out <b>19 rows</b> of tiles (<code>ld c,0x13</code> at <code>0x86CC</code>) but the drawing loop does 16×16. Three rows prepared and never seen.</p>
+<h3 id="7-two-ranges-that-ought-to-be-split-off">7. Two ranges that ought to be split off</h3>
+<p>They currently sit inside <code>textos_de_los_paneles</code> and deserve names of their own: <code>0x83F8</code>-<code>0x83FB</code>, the four two-bit fills (<code>00</code>, <code>FF</code>, <code>AA</code>, <code>55</code>), and <code>0x846F</code>-<code>0x8496</code>, the five terrain textures <code>0x80BD</code> picks from.</p>
+<footer><p><em>War in Middle Earth</em> was published by Melbourne House and distributed by Dro Soft. Its own loading screen signs it: <b>MAELSTROM GAMES LTD. PRESENTS</b>, <b>Mike Singleton</b> and <b>CONVERSION by ANIMAGIC sa</b>; the menu adds “Programado por C.J.Pink”. All rights in the game remain with their holders. This is preservation, study and documentation work.</p></footer></div>

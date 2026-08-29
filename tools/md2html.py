@@ -49,20 +49,18 @@ for _en, _es in _PAREJAS:
 # ...ADEMAS DE... JULIO MARTIN / MUSICA COMPUESTA POR GOMINOLAS / BASADO EN UNA
 # IDEA ORIGINAL DE JOSE MANUEL MU&OZ". La pantalla de carga va firmada CANO.
 PIE = {
-    "es": "<em>Stardust</em> lo publicó Topo Soft en 1987. Según la pantalla de "
-          "créditos del propio juego, la conversión es de <b>Carlos Arias</b>, los "
-          "gráficos de <b>Juan Carlos y Javier Arévalo</b> —además de <b>Julio "
-          "Martín</b>—, la música de <b>Gominolas</b>, y está basado en una idea "
-          "original de <b>José Manuel Muñoz</b>; la pantalla de carga va firmada "
-          "<b>Cano</b>. Todos los derechos sobre el juego siguen siendo de sus "
-          "titulares. Este trabajo es de preservación, estudio y documentación.",
-    "en": "<em>Stardust</em> was published by Topo Soft in 1987. By the game's own "
-          "credits screen, the conversion is by <b>Carlos Arias</b>, the graphics by "
-          "<b>Juan Carlos and Javier Arévalo</b> —along with <b>Julio Martín</b>—, "
-          "the music by <b>Gominolas</b>, and it is based on an original idea by "
-          "<b>José Manuel Muñoz</b>; the loading screen is signed <b>Cano</b>. All "
-          "rights in the game remain with their holders. This is preservation, study "
-          "and documentation work.",
+    "es": "<em>War in Middle Earth</em> lo publicó Melbourne House y lo distribuyó "
+          "Dro Soft. Su propia pantalla de carga lo firma: <b>MAELSTROM GAMES LTD. "
+          "PRESENTS</b>, <b>Mike Singleton</b> y <b>CONVERSION by ANIMAGIC sa</b>; el "
+          "menú añade «Programado por C.J.Pink». Todos los derechos sobre el juego "
+          "siguen siendo de sus titulares. Este trabajo es de preservación, estudio y "
+          "documentación.",
+    "en": "<em>War in Middle Earth</em> was published by Melbourne House and "
+          "distributed by Dro Soft. Its own loading screen signs it: <b>MAELSTROM "
+          "GAMES LTD. PRESENTS</b>, <b>Mike Singleton</b> and <b>CONVERSION by "
+          "ANIMAGIC sa</b>; the menu adds “Programado por C.J.Pink”. All rights in "
+          "the game remain with their holders. This is preservation, study and "
+          "documentation work.",
 }
 
 
@@ -232,7 +230,7 @@ def main(docdir, idioma="en"):
         dst = os.path.join(docdir, fn[:-3] + ".html")
         texto = open(src, encoding="utf-8").read()
         m = re.search(r"^#\s+(.*)$", texto, re.M)
-        titulo = (m.group(1) if m else fn[:-3]) + " — Stardust (1987)"
+        titulo = (m.group(1) if m else fn[:-3]) + " — War in Middle Earth (1989)"
         open(dst, "w", encoding="utf-8").write(
             convierte(texto, titulo, fn[:-3] + ".html", idioma))
         print(f"  {fn} -> {os.path.basename(dst)}")

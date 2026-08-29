@@ -117,9 +117,13 @@ sanity: work/juego.trace.json work/loader.trace.json work/pantalla.trace.json
 	@echo "=================================================================="
 	@python3 tools/presupuesto.py work src
 
+# Las imagenes NO son capturas: se dibujan con los bytes de la cinta,
+# repitiendo lo que hace el propio cargador. Si el reparto estuviera mal,
+# saldria ruido en vez de un dibujo.
 imagenes: extracted/.stamp
 	@mkdir -p docs/imagenes
-	python3 tools/render_carga.py work/pantalla.raw docs/imagenes/carga.png
+	@python3 tools/render_carga.py work/pantalla.raw docs/imagenes/carga.png
+	@python3 tools/render_graficos.py work/alto.raw docs/imagenes
 
 verify: listados sanity
 	@echo "=================================================================="
@@ -140,8 +144,8 @@ test:
 web: imagenes
 	python3 tools/md2html.py docs en
 	python3 tools/md2html.py docs/es es
-	python3 tools/make_web.py work/juego64.bin docs/imagenes docs/index.html en
-	python3 tools/make_web.py work/juego64.bin docs/imagenes docs/es/index.html es
+	python3 tools/make_web.py docs/imagenes docs/index.html en
+	python3 tools/make_web.py docs/imagenes docs/es/index.html es
 	@touch docs/.nojekyll
 	@python3 tools/check_enlaces.py docs
 

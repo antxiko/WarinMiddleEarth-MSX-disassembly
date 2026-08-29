@@ -1,0 +1,143 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Findings — War in Middle Earth (1989)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-TAPE.html">The tape</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html" style=color:var(--tinta)>Findings</a><a href="OPEN-QUESTIONS.html">Open questions</a><a href="es/HALLAZGOS.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="findings">Findings</h1>
+<p><a href="GETTING-STARTED.html">Getting started</a> · <a href="THE-GAME.html">The game</a> · <a href="THE-TAPE.html">The tape</a> · <a href="THE-CODE.html">The code</a> · <a href="OPEN-QUESTIONS.html">Open questions</a></p>
+<p>Almost everything on this page came out of reading the listing instruction by instruction in order to comment it. Each item carries its address, which is what lets anyone check it.</p>
+<hr>
+<h2 id="1-the-game-is-silent-and-you-can-point-at-where-the-sound-stopped">1. The game is silent, and you can point at where the sound stopped</h2>
+<p>The conversion brought the Spectrum&#x27;s <b>whole</b> sound engine across: it sits at <code>0x6600</code>, drives the notes through <code>out (0xFE)</code> with bit 4 — the ZX beeper — and behind it are five twenty-one-byte effects at <code>0x636F</code>-<code>0x63D7</code>.</p>
+<p><b>Nothing ever calls it.</b> Not one instruction in the five listings points at <code>0x6600</code>.</p>
+<p>And the four places that ask for an effect — <code>0x5F90</code>, <code>0x647A</code>, <code>0x6AA1</code> and <code>0x833D</code> — call <code>0x65FF</code>, which is <b>a bare <code>ret</code></b>.</p>
+<p>What about the MSX&#x27;s PSG? Exactly <b>two registers are ever written, 7 and 14</b>, and both in the joystick routine at <code>0x046E</code>: 7 to set the ports as input, 14 to read them. Not one tone or volume register in the whole tape. The one routine that would know how to write a note to the PSG, <code>0x04F2</code>, is never called either, and was already annotated as dead code.</p>
+<p>There is no third path. <b>This game makes no sound.</b></p>
+<hr>
+<h2 id="2-0x62ff-is-not-the-cursor-s-artwork-it-is-what-the-cursor-covers-up">2. <code>0x62FF</code> is not the cursor&#x27;s artwork: it is what the cursor covers up</h2>
+<p>Those 24 bytes were documented, in this very project, as &quot;the cursor mark&#x27;s drawing&quot;. <b>That is false</b>, and the listing leaves no room for doubt.</p>
+<p><code>0x6580</code> loads <code>0x62FF</code> into the alternate HL, and the loop at <code>0x65B4</code>-<code>0x65D5</code>, for each of the column&#x27;s three bytes, does this:</p>
+<pre><code>65B4  ld a,(iy+000h)   ; READS the screen
+65B7  exx
+65B8  ld (hl),a        ; and saves it at 0x62FF++
+65B9  inc hl
+65BA  exx
+65BB  and e            ; and ONLY THEN composites the cursor
+65BC  or b
+65BD  ld (iy+000h),a</code></pre>
+<p>And <code>0x64DC</code> walks it back (<code>ld a,(de) / ld (hl),a</code>) to erase.</p>
+<p>The real artwork is at <code>0x6345</code>, with its mask behind it (<code>ld ix,0x6345</code> at <code>0x657B</code>).</p>
+<p>The lovely part is what that makes of the bytes the tape carries: the <code>0xAD</code> bytes sitting at <code>0x62FF</code> are not a drawing, they are <b>whatever was underneath the cursor the day the tape was recorded</b>.</p>
+<hr>
+<h2 id="3-the-map-tiles-are-nine-bytes-long">3. The map tiles are nine bytes long</h2>
+<p>An MSX tile takes eight bytes. This game&#x27;s map tiles take <b>nine</b>: the eight lines of the drawing and, glued behind them, <b>a ZX Spectrum attribute</b> — ink in bits 0-2, paper in 3-5, bright in 6.</p>
+<p><code>0x75C7</code>-<code>0x75EB</code> read them when the grid code has bit 7 set. The conversion did not redraw the artwork: it brought the Spectrum&#x27;s across with its colour already attached and translates it on the fly, with the routine at <code>0x049F</code>, which turns a Spectrum attribute into a SCREEN 2 colour byte.</p>
+<p>It is the cleanest fingerprint of the conversion anywhere on the tape, and it is why the tiles in the gallery come out in their real colours: the attribute they carry inside is read.</p>
+<hr>
+<h2 id="4-the-battle-board-is-built-on-top-of-the-menu-and-it-is-a-draughtboard">4. The battle board is built on top of the menu, and it is a draughtboard</h2>
+<p>Battle uses <code>0x5E00</code>-<code>0x62FF</code>, which is <b>where the menu&#x27;s code lives</b>. <code>0x8E08</code> says so with its <code>ld b,0x5E</code>, and the <code>ldir</code> at <code>0x904D</code> wipes 0x500 bytes there before every battle. Once a game has started, the menu and its text are scrap paper.</p>
+<p>And the board is a <b>draughtboard</b>: the four movement routines (<code>0x893E</code>, <code>0x894D</code>, <code>0x895C</code>, <code>0x896B</code>) always change both coordinates at once — the first one, for instance, does <code>inc b / dec c</code> — so the parity of x+y never changes. The figures <b>only move diagonally</b>. Deployment (<code>0x8D6E</code>) rejects any pair whose parities differ, and the obstacles (<code>0x9079</code>) go on exactly the squares of the other colour.</p>
+<hr>
+<h2 id="5-the-friend-or-foe-filter-is-an-opcode-switch">5. The friend-or-foe filter is an opcode switch</h2>
+<p>To walk the other side&#x27;s units the game uses neither a flag nor a branch: <b>it rewrites the instruction</b>.</p>
+<pre><code>8980  ld a,0d0h        ; 0xD0 = ret nc
+8982  ld (08af3h),a
+...
+8991  ld a,0d8h        ; 0xD8 = ret c
+8993  ld (08af3h),a</code></pre>
+<p>The same routine, with the same threshold, hands back one side&#x27;s units or the other&#x27;s depending on which <b>opcode</b> was written over it a moment earlier.</p>
+<hr>
+<h2 id="6-the-map-travels-compressed-and-gets-recompressed-before-every-battle">6. The map travels compressed, and gets recompressed before every battle</h2>
+<p><code>0x9366</code> moves the map&#x27;s <code>0x16ED</code> compressed bytes out to <code>0x4000</code> with an <code>ldir</code> and then expands them into the <code>0x33CD</code> at <code>0xCC00</code>, reading count/value pairs. <code>0x5E28</code> calls it at boot: the map <b>arrives from tape already compressed</b>.</p>
+<p>And <code>0x9394</code> does the reverse before every battle, packing it back down to <code>0x16EC</code> bytes. That is not to save tape — the tape is already recorded — it is to <b>make room in RAM</b>: what it frees, <code>0xE2EC</code>-<code>0xFFFF</code>, is exactly where the battle buffers live.</p>
+<hr>
+<h2 id="7-the-battle-sprites-are-not-laid-out-the-way-they-look">7. The battle sprites are not laid out the way they look</h2>
+<p>176 sprites of 16×8 with a mask, 32 bytes each, at <code>0xA2E8</code> + <code>(type-4)*32</code>. But those 32 bytes are <b>not &quot;16 of drawing and 16 of mask&quot;</b>: they go in <b>pairs</b>, mask first and drawing behind, because the routine that paints them does <code>and (hl) / inc hl / or (hl) / inc hl</code> for every screen byte.</p>
+<p>And they do not run top to bottom but in <b>zig-zag</b>: <code>0x887B</code> writes the left, <code>inc e</code> to the right, <code>inc d</code> to drop a line and <code>dec e</code> to come back left, saving itself the trouble of reloading DE. Drawing them assuming the obvious order gives convincing noise, which is the worst kind of error.</p>
+<hr>
+<h2 id="8-spectrum-leftovers-that-mean-nothing-on-an-msx">8. Spectrum leftovers that mean nothing on an MSX</h2>
+<ul><li>The menu&#x27;s <b>control mode 2</b> — the Spectrum&#x27;s Interface Two — does not exist here: its pointer, at <code>0x06D7</code>, is <code>0x0000</code>, which is why the menu jumps from 1 to 3.</li><li>The ZX keyboard block at <code>0x5F75</code>-<code>0x5FB7</code>, which reads port <code>0xFE</code>, is dead code.</li><li>And in the <b>save-game</b> routine the break-key check was never converted: <code>0x0930</code> does <code>in a,(0xFE)</code>, which on an MSX is not the keyboard.</li></ul>
+<hr>
+<h2 id="9-things-that-never-get-to-run">9. Things that never get to run</h2>
+<ul><li><b><code>0x68C8</code>: the <code>ld a,0x3C</code> is good for nothing.</b> <code>L_67C5</code> is only entered from <code>L_67B0</code> (<code>0x67B4</code> and <code>0x67BE</code> are the only two references), and there C is 0, 2 or 3. With C=0 execution never reaches it, so at <code>0x68CA</code> bit 1 of C is always set, the <code>inc a</code> always runs and A always comes out <code>0x3D</code>. Consequence: a unit records in bit 7 of its coordinates which way it was going round an obstacle, but on resuming it <b>always turns the same way</b>.</li><li><b><code>ld hl,(0x6543)</code> at <code>0x6578</code> is a dead load</b>: <code>0x658F</code> overwrites it before it is used, and the only exit in between (<code>jr nc,L_65F9</code>) does not touch HL either.</li><li><b>The font at <code>0xC800</code> starts empty</b>: codes <code>0x00</code>-<code>0x20</code> are <b>33 characters of zeros</b>, counted byte by byte. The first one with any drawing is <code>0x21</code>.</li></ul>
+<footer><p><em>War in Middle Earth</em> was published by Melbourne House and distributed by Dro Soft. Its own loading screen signs it: <b>MAELSTROM GAMES LTD. PRESENTS</b>, <b>Mike Singleton</b> and <b>CONVERSION by ANIMAGIC sa</b>; the menu adds “Programado por C.J.Pink”. All rights in the game remain with their holders. This is preservation, study and documentation work.</p></footer></div>
