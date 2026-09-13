@@ -185,6 +185,32 @@ rest, never.
 > and 0x8925) with the toss at 0x89B4, the wheel of four at 0x9163 over the
 > table at 0x94B7, and the blows in `RESUELVE_LOS_COMBATES` (0x8E95).
 
+## The difficulty level is one single thing
+
+The menu offers "6. Level", 1 to 15, and you would assume that decides how many
+troops Sauron brings, or how clever he is. It does not. When the game starts,
+that number is handed out **only to the units of one type: the orcs**, and the
+only thing it changes is **how often they hit**.
+
+The thing is, orcs are nearly all of Sauron's army — 132 units out of his 138,
+and 2,223 of his 2,235 figures — so the difference tells. And it tells a lot,
+because the number is **multiplied by itself** before being used:
+
+| level | an orc hits |
+|---|---|
+| 1 | 0.4% of blows |
+| 5 | 9.8% |
+| 10 | 39.1% |
+| 15 | 87.9% |
+
+At level 1 they can barely land one; at 15 they hardly miss. What each blow
+takes off, the figures' life, how many troops there are or how they move about
+the map: **the level touches none of it**. Nor does it touch the Ring.
+
+> In the listing: `REPARTE_EL_NIVEL` (0x5E8D) writes the level into the low
+> nibble of 0xC100 for type-5 units. In battle, 0x8D29 multiplies it by itself
+> into 0xE400, which is what the random byte at 0x8ED0 is thrown against.
+
 ## Why Gandalf and Aragorn disappear
 
 The old explanation — "they run out of army" — **does not hold**, and anyone who
@@ -216,6 +242,32 @@ It isn't bad luck: it's his troop type.
 > `EJERCITO_DESHECHO` (0x8F0D) and on to `BORRA_EL_EJERCITO_DEL_MAPA` (0x8F1A).
 > The wiping of the losing side, at 0x91B4 and 0x91CE, dealt out by 0x91DB. The
 > four recoveries, in `CUATRO_SI_ES_TIPO_0_1_O_7` (0x8DC0).
+
+## The easiest way to lose, and it gives no warning
+
+There is one square on the map the game watches **every time round the loop**:
+Minas Tirith. If **no** unit of yours is left standing on it and at least one of
+the enemy's is, the game ends right there. No battle, no message, nothing: the
+defeat screen.
+
+And there is a catch. When you give an order on a square, **it goes to every
+unit standing there**, not to the one you had in mind. Minas Tirith starts with
+**twenty-one**: Denethor and twenty armies of Gondor. One order and the whole
+garrison marches out.
+
+We have watched it happen in a real game. Ninety seconds in, the player gave an
+order on that square and all twenty-one set off; ten seconds later Minas Tirith
+was empty. On day 49 of the first month a unit of Sauron's walked up, found the
+city undefended, and that was the end of the game: **not one battle fought**.
+
+So the practical rule is short: **never empty Minas Tirith**. Leaving a single
+unit inside keeps this from firing.
+
+> In the listing: `MIRA_QUIEN_ESTA_EN_LA_CASILLA_56_3F` (0x92DE) and its jump to
+> defeat at 0x9309. It has two callers, and the one that matters is **0x7F80,
+> inside the game loop**. That (0x56,0x3F) is Minas Tirith comes from the game's
+> own table of places, at 0x7A5E. The order that moves the whole square is
+> `ORDEN_PARA_TODOS` (0x7280).
 
 ## What the machine does not do
 
