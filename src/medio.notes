@@ -149,6 +149,14 @@ C 0x5E79 0x61CA son los tres digitos de "6. Nivel 001", en el texto del menu
 C 0x5E7C 0x7113 escribe A en decimal, tres cifras, donde apunta HL
 L 0x5E82 MENU_TECLA_0  Tecla 0: reparte el nivel elegido y arranca la partida
 C 0x5E86 El nivel que dejo 0x5E71 en su operando
+B 0x5E8D El NIVEL DE DIFICULTAD del menu, que es una sola cosa: la punteria
+  de los orcos. El nivel va de 1 a 15 (0x5E71) y aqui se reparte, pero SOLO a
+  las unidades de tipo 5 -los orcos-, que son 132 y ponen 2.223 de las 2.235
+  figuras del bando de Sauron. En la batalla, 0x8D29 multiplica ese nibble por
+  si mismo y lo deja en 0xE400, que es lo que se compara con un byte al azar
+  (0x8ED0): el nivel 1 acierta 1 de cada 256 golpes y el 15, 225 de 256. No
+  toca nada mas: ni el plazo del Anillo (0x7F4F lo pone a 255 siempre), ni la
+  vida, ni lo que quita cada golpe.
 L 0x5E8D REPARTE_EL_NIVEL  A las unidades de tipo 5 les mete el nivel en 0xC100
 C 0x5E8E Nibble bajo de 0xBD00+n: el tipo de unidad
 C 0x5E90 Solo las de tipo 5, que segun la lista de razas de 0x7D06 son los Orcos

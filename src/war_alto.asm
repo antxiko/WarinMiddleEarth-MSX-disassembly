@@ -506,12 +506,14 @@ DATA_ram_de_trabajo_be00:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; bff0  ................
 
 ; ----------------------------------------------------------------------
-; DATOS unidades_tabla_c000: Una tira por unidad que el menu toca en
-;   0x5E8D-0x5E9E (el nivel) y de la que 0x926E gasta el nibble bajo cada vez
-;   que se usa la tecla R para salir de una batalla: a cero, derrota. El
-;   nibble alto se conserva
+; DATOS unidades_retiradas: Los usos de la tecla R de cada unidad: 0x926E
+;   gasta el nibble bajo cada vez que se sale de una batalla con ella, y a
+;   cero es DERROTA. El nibble alto se conserva. Tambien lo mira la entrega
+;   del Anillo: 0x6A73 manda a DERROTA si la unidad elegida lo tiene a cero, y
+;   0x6A86-0x6A95 lo reescribe con el nibble alto de la cuenta atras de meses
+;   menos uno
 ;   0xc000..0xc100  (256 bytes)
-DATA_unidades_tabla_c000:
+DATA_unidades_retiradas:
 	defb 0a8h,058h,053h,086h,096h,07ah,079h,078h,078h,088h,095h,087h,084h,056h,085h,085h	; c000  .XS..zyxx....V..
 	defb 085h,085h,055h,051h,066h,041h,0c0h,0c0h,094h,094h,094h,094h,094h,094h,094h,094h	; c010  ..UQfA..........
 	defb 094h,094h,094h,094h,094h,094h,094h,094h,085h,085h,085h,085h,085h,085h,085h,085h	; c020  ................
@@ -531,9 +533,14 @@ DATA_unidades_tabla_c000:
 
 ; ----------------------------------------------------------------------
 ; DATOS unidades_acierto_y_golpe: De aqui salen los dos numeros con los que
-;   peleara cada figura suya: el nibble BAJO da lo que acierta (a 0xE400, tras
-;   multiplicarlo en 0x8D29) y el ALTO lo que quita cada golpe (a 0xE500, por
-;   0x8D2F)
+;   peleara cada figura suya: el nibble BAJO da lo que acierta (a 0xE400:
+;   0x8D29 lo multiplica por si mismo, y el resultado se compara con un byte
+;   al azar en 0x8ED0) y el ALTO lo que quita cada golpe (a 0xE500, por
+;   0x8D2F). ESTE ES EL NIVEL DE DIFICULTAD: al arrancar la partida,
+;   REPARTE_EL_NIVEL (0x5E8D) mete el nivel elegido en el menu -de 1 a 15- en
+;   el nibble bajo de las 132 unidades de tipo 5, los orcos, que son TODO el
+;   ejercito de Sauron menos seis unidades. Al cuadrado y sobre 256: del 0,4 %
+;   de acierto en el nivel 1 al 88 % en el 15
 ;   0xc100..0xc200  (256 bytes)
 DATA_unidades_acierto_y_golpe:
 	defb 06ah,08ah,0aah,059h,079h,027h,038h,027h,027h,066h,079h,068h,057h,06ah,068h,068h	; c100  j..Yy'8''fyhWjhh

@@ -104,6 +104,10 @@ MENU_TECLA_0:		; Tecla 0: reparte el nivel elegido y arranca la partida
 	ld a,(05e70h)		;5e86   ; El nivel que dejo 0x5E71 en su operando
 	ld c,a			;5e89
 	ld hl,0bd00h		;5e8a
+
+; ----------------------------------------------------------------------
+; El NIVEL DE DIFICULTAD del menu, que es una sola cosa: la punteria
+; ----------------------------------------------------------------------
 REPARTE_EL_NIVEL:		; A las unidades de tipo 5 les mete el nivel en 0xC100
 	ld a,(hl)			;5e8d
 	and 00fh		;5e8e   ; Nibble bajo de 0xBD00+n: el tipo de unidad
