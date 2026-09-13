@@ -185,6 +185,31 @@ rest, never.
 > and 0x8925) with the toss at 0x89B4, the wheel of four at 0x9163 over the
 > table at 0x94B7, and the blows in `RESUELVE_LOS_COMBATES` (0x8E95).
 
+## And a table the game never quite reads right
+
+Each troop type carries its terrain table, the same one that decides what it
+costs to walk anywhere. When a battle is set up, the game goes to that table for
+what **this** troop type suffers on **this** terrain, to take it off its
+figures' life: the idea, clearly, was that troops who move badly over a place
+should fight worse on it.
+
+It never happens. The sum it looks up with is wrong — it steps by eight where it
+should step by sixteen, and mixes the terrain into the index instead of adding
+it — so out of the whole table it can only land on ten scattered slots, and all
+ten hold the same number. **It always comes back with a 3**, whatever the troops
+and whatever the ground.
+
+This is not guesswork from reading the code: we put the Z80 itself through that
+routine with all **160 combinations** of troop type and terrain, with the game
+loaded in memory, and it returns the same value in all one hundred and sixty.
+The other two places in the game that read this same table do walk it properly,
+which suggests a line went missing here.
+
+So two things anyone would take for granted — that some troops are tougher than
+others, and that the ground you fight on counts — **make no difference at all**.
+The only thing setting how hard a figure is to put down is how tired its unit
+was from walking.
+
 ## The difficulty level is one single thing
 
 The menu offers "6. Level", 1 to 15, and you would assume that decides how many
