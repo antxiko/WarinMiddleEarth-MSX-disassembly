@@ -185,6 +185,32 @@ los demás, ninguna.
 > (0x8908 y 0x8925) con el sorteo en 0x89B4, la rueda de cuatro en 0x9163 sobre
 > la tabla de 0x94B7, y los golpes en `RESUELVE_LOS_COMBATES` (0x8E95).
 
+## El nivel de dificultad es una sola cosa
+
+El menú ofrece «6. Nivel», del 1 al 15, y uno se imagina que ahí se decide
+cuánta tropa trae Sauron, o lo listo que es. No. Al empezar la partida, ese
+número se reparte **sólo entre las unidades de un tipo: los orcos**, y lo único
+que cambia es **lo que aciertan cuando pelean**.
+
+Pasa que los orcos son casi todo el ejército de Sauron —132 unidades de las 138
+que tiene, y 2.223 de sus 2.235 figuras—, así que la diferencia se nota. Y se
+nota mucho, porque el número **se multiplica por sí mismo** antes de usarse:
+
+| nivel | un orco acierta |
+|---|---|
+| 1 | 0,4 % de los golpes |
+| 5 | 9,8 % |
+| 10 | 39,1 % |
+| 15 | 87,9 % |
+
+En el nivel 1 casi no dan una; en el 15 no fallan. Lo que quita cada golpe, la
+vida de las figuras, cuánta tropa hay o cómo se mueve por el mapa: **eso no lo
+toca el nivel**. Y el Anillo, tampoco.
+
+> En el listado: `REPARTE_EL_NIVEL` (0x5E8D) mete el nivel en el nibble bajo de
+> 0xC100 de las unidades de tipo 5. En la batalla, 0x8D29 lo multiplica por sí
+> mismo hacia 0xE400, que es contra lo que tira el byte al azar de 0x8ED0.
+
 ## Por qué desaparecen Gandalf y Aragorn
 
 La explicación que se daba antes —«se quedan sin ejército»— **no vale**, y quien
@@ -217,6 +243,33 @@ pronto, una y otra vez. No es mala suerte: es su tipo de tropa.
 > `EJERCITO_DESHECHO` (0x8F0D) y de ahí a `BORRA_EL_EJERCITO_DEL_MAPA` (0x8F1A).
 > El borrado del bando perdedor, en 0x91B4 y 0x91CE, repartido por 0x91DB. Las
 > cuatro levantadas, en `CUATRO_SI_ES_TIPO_0_1_O_7` (0x8DC0).
+
+## La forma más fácil de perder, y no avisa
+
+Hay una casilla del mapa que el juego vigila **en cada vuelta**: Minas Tirith.
+Si en ella no queda **ninguna** unidad tuya y hay al menos una del enemigo, la
+partida se acaba ahí mismo. Sin batalla, sin mensaje, sin nada: pantalla de
+derrota.
+
+Y trae trampa. Cuando das una orden sobre una casilla, **se la das a todas las
+unidades que haya en ella**, no a la que tú estabas mirando. Minas Tirith
+empieza con **veintiuna**: Denethor y veinte ejércitos de Gondor. Una sola orden
+y sale la guarnición entera.
+
+Lo hemos visto pasar en una partida de verdad. A los noventa segundos de
+empezar, el jugador dio una orden sobre esa casilla y las veintiuna se pusieron
+en marcha; diez segundos después Minas Tirith estaba vacía. El día 49 del primer
+mes llegó andando una unidad de Sauron, se encontró la ciudad sola y ahí terminó
+la partida: **cero batallas en todo el juego**.
+
+Así que la regla práctica es corta: **no vacíes nunca Minas Tirith**. Con dejar
+una unidad dentro, esto no se dispara.
+
+> En el listado: `MIRA_QUIEN_ESTA_EN_LA_CASILLA_56_3F` (0x92DE) y su salto a la
+> derrota en 0x9309. Tiene dos llamadores, y el importante es **0x7F80, dentro
+> del bucle de partida**. Que (0x56,0x3F) es Minas Tirith lo dice la propia
+> tabla de lugares del juego, en 0x7A5E. La orden para toda la casilla es
+> `ORDEN_PARA_TODOS` (0x7280).
 
 ## Lo que la máquina no hace
 
