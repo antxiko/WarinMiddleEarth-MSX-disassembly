@@ -6004,13 +6004,13 @@ VENTAJA_DEL_TERRENO:		; D = 100 en los terrenos 7, 8 y 9, 50 en el 11 y 0 en el 
 	ret			;8de3
 
 ; ----------------------------------------------------------------------
-; EL INDICE DE ESTA TABLA ESTA MAL, Y POR ESO SIEMPRE SALE LO MISMO.
+; ESTA RUTINA LEE UN BYTE CUALQUIERA DE LA PAGINA 0x6D00.
 ; ----------------------------------------------------------------------
-FUERZA_DE_LA_TROPA:		; A = tipo; lee la tabla de 0x6D47 y le suma la ventaja del terreno
+FUERZA_DE_LA_TROPA:		; A = el 0xC200 de la unidad; lee un byte de la pagina 0x6D00 y le suma la ventaja del terreno
 	add a,a			;8de4
 	add a,a			;8de5
 	add a,a			;8de6
-	add a,047h		;8de7   ; 0x6D47: la tabla de tropas del bloque de textos. Solo hay TRES add a,a antes: tipo*8, no tipo*16
+	add a,047h		;8de7   ; 0x6D47: la tabla de tropas. Pero lo que se ha multiplicado por ocho es el 0xC200 de la unidad, no un tipo de tropa
 	or 000h		;8de9   ; Operando en 0x8DEA, que escribe 0x902F
 	ld l,a			;8deb
 	adc a,06dh		;8dec

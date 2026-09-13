@@ -185,7 +185,7 @@ los demás, ninguna.
 > (0x8908 y 0x8925) con el sorteo en 0x89B4, la rueda de cuatro en 0x9163 sobre
 > la tabla de 0x94B7, y los golpes en `RESUELVE_LOS_COMBATES` (0x8E95).
 
-## Y una tabla que el juego nunca llega a leer bien
+## Y una tabla que el juego busca donde no está
 
 Cada tipo de tropa trae su tabla de terrenos, la misma que decide lo que le
 cuesta andar por cada sitio. Al montar una batalla, el juego va a buscar en esa
@@ -193,22 +193,28 @@ tabla lo que a **ese** tipo de tropa le supone **ese** terreno, para
 descontárselo a la vida de sus figuras: la idea, se ve, era que una tropa que se
 mueve mal por un sitio peleara peor en él.
 
-Nunca pasa. La cuenta con la que busca está mal hecha —salta de ocho en ocho
-donde debería saltar de dieciséis, y mezcla el terreno con el índice en vez de
-sumarlo—, así que de toda la tabla sólo puede caer en diez posiciones sueltas, y
-en las diez hay el mismo número. **Siempre saca un 3**, sea cual sea la tropa y
-sea cual sea el terreno.
+No ocurre nada de eso, y por un motivo más gordo que una cuenta mal hecha: **la
+rutina ni siquiera recibe el tipo de tropa**. Lo que le llega es lo que le queda
+de fuelle a la unidad —el mismo número que se gasta andando—, lo multiplica por
+ocho y con eso se va a la tabla. Como el resultado se sale de ella por todos
+lados, acaba leyendo lo que haya en esa página de memoria: unas veces un valor
+de la tabla, otras la ficha de la última unidad que anduvo por el mapa, otras la
+red de caminos, y otras el código que empieza justo detrás.
 
-No es una sospecha de leer el código: hemos puesto al propio Z80 a ejecutar esa
-rutina con las **160 combinaciones** posibles de tropa y terreno, con el juego
-cargado en memoria, y devuelve lo mismo en las ciento sesenta. Los otros dos
-sitios del juego que leen esa misma tabla sí la recorren bien, lo que hace
-pensar que aquí faltó una línea.
+Lo hemos ejecutado con las **4.096 combinaciones** posibles, con el juego
+cargado y el propio Z80 haciendo el trabajo. Sale un 3 en dos de cada tres casos
+—porque la tabla está llena de treses—, pero también salen otros diez valores
+distintos, y la «fuerza» que se descuenta acaba yendo de 8 a 200 según lo cansada
+que estuviera la unidad. El terreno apenas puede cambiar nada: de todo el número,
+sólo alcanza a mover un bit.
 
-Así que dos cosas que uno daría por descontadas —que unas tropas aguanten más
-que otras, y que el terreno donde peleas cuente— **no influyen en nada**. Lo
-único que decide la dureza de una figura es lo cansada que llegara su unidad de
-andar.
+Los otros dos sitios del juego que leen esta misma tabla sí la recorren bien, y
+uno de ellos hace exactamente lo que aquí se pretendía. Aquí se coló algo.
+
+Así que lo que uno daría por descontado —que unas tropas aguanten más que otras,
+y que el terreno donde peleas cuente— **no pasa**. Lo que decide la dureza de una
+figura es el cansancio de su unidad, y por partida doble: una vez a propósito y
+otra por accidente.
 
 ## El nivel de dificultad es una sola cosa
 

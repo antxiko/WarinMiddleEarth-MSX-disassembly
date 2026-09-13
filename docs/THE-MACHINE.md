@@ -185,7 +185,7 @@ rest, never.
 > and 0x8925) with the toss at 0x89B4, the wheel of four at 0x9163 over the
 > table at 0x94B7, and the blows in `RESUELVE_LOS_COMBATES` (0x8E95).
 
-## And a table the game never quite reads right
+## And a table the game looks for in the wrong place
 
 Each troop type carries its terrain table, the same one that decides what it
 costs to walk anywhere. When a battle is set up, the game goes to that table for
@@ -193,22 +193,28 @@ what **this** troop type suffers on **this** terrain, to take it off its
 figures' life: the idea, clearly, was that troops who move badly over a place
 should fight worse on it.
 
-It never happens. The sum it looks up with is wrong — it steps by eight where it
-should step by sixteen, and mixes the terrain into the index instead of adding
-it — so out of the whole table it can only land on ten scattered slots, and all
-ten hold the same number. **It always comes back with a 3**, whatever the troops
-and whatever the ground.
+None of that happens, and for a bigger reason than a miscalculated sum: **the
+routine is never even given the troop type**. What reaches it is how much walk
+the unit has left — the very number walking spends — which it multiplies by
+eight and takes to the table. Since the result falls outside it in every
+direction, it ends up reading whatever is on that page of memory: sometimes a
+value from the table, sometimes the entry of the last unit that walked on the
+map, sometimes the road network, sometimes the code that begins right behind it.
 
-This is not guesswork from reading the code: we put the Z80 itself through that
-routine with all **160 combinations** of troop type and terrain, with the game
-loaded in memory, and it returns the same value in all one hundred and sixty.
+We ran it through all **4,096** possible combinations, with the game loaded and
+the Z80 itself doing the work. A 3 comes back in two cases out of three — the
+table is full of threes — but ten other values come back too, and the "strength"
+being subtracted ends up anywhere from 8 to 200 depending on how tired the unit
+was. The terrain can barely affect it: of that whole number, it only reaches one
+bit.
+
 The other two places in the game that read this same table do walk it properly,
-which suggests a line went missing here.
+and one of them does exactly what was meant here. Something went astray.
 
-So two things anyone would take for granted — that some troops are tougher than
-others, and that the ground you fight on counts — **make no difference at all**.
-The only thing setting how hard a figure is to put down is how tired its unit
-was from walking.
+So what anyone would take for granted — that some troops are tougher than
+others, and that the ground you fight on counts — **does not happen**. What
+decides how hard a figure is to put down is its unit's tiredness, twice over:
+once on purpose and once by accident.
 
 ## The difficulty level is one single thing
 
