@@ -1,0 +1,145 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How the machine plays — War in Middle Earth (1989)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-TAPE.html">The tape</a><a href="THE-CODE.html">The code</a><a href="THE-MACHINE.html" style=color:var(--tinta)>The machine</a><a href="FINDINGS.html">Findings</a><a href="OPEN-QUESTIONS.html">Open questions</a><a href="es/LA-MAQUINA.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="how-the-machine-plays">How the machine plays</h1>
+<p>What the computer is really doing while you stare at the map: where it sends its armies, how it fights, and why Gandalf and Aragorn keep vanishing on you.</p>
+<p>Everything here was read in the disassembly, not played. Each section ends with the exact routines it came from, in case anyone wants to check.</p>
+<h2 id="the-short-answer">The short answer</h2>
+<p>There is no plan. The machine does not know where you are, is not coming for you, defends nothing and never changes its mind. All it does is take an army, look up which road junction it is standing on and <b>toss a coin</b> to pick which of the two exits to follow. Then again. And again, for the whole game.</p>
+<p>Everything else — the feeling of being surrounded, of them turning up exactly where you didn&#x27;t want them, of a hero disappearing without warning — comes out of that coin and three or four very dumb rules.</p>
+<h2 id="one-piece-per-turn-and-back-in-the-queue">One piece per turn, and back in the queue</h2>
+<p>The game keeps a list of 256 pieces: your characters, your armies and Sauron&#x27;s, all mixed into the same list. Each time round the loop it <b>moves exactly one</b>, the next on the list, and hands over the turn. When it reaches the end it starts again at the first.</p>
+<p>No unit moves &quot;faster&quot; for being important: they all get the same turn, and the machine does not choose which one to move. Whoever&#x27;s turn it is, moves.</p>
+<blockquote>In the listing: <code>MUEVE_LA_SIGUIENTE_UNIDAD</code> (0x6719). The piece number lives inside the instruction itself and wraps round on overflow.</blockquote>
+<h2 id="middle-earth-has-roads-and-these-are-they">Middle Earth has roads, and these are they</h2>
+<p>When one of the machine&#x27;s armies gets its turn and has already arrived where it was going, it needs a new destination. It does not choose one: the game ships a <b>network of junctions</b>, and each junction has exactly two places written down that you can go on to. The computer finds the junction it is standing on, tosses the coin and heads for the other one.</p>
+<p>There are two separate networks. A large one of 64 junctions covering the whole map, and a small one of 15 that is the central corridor. And the small one is nothing but <b>a slice of the large one, renumbered</b>: its fifteen junctions are fifteen of the sixty-four, with the exits rewritten to point inside the short list.</p>
+<p>Which network you get depends only on your number in the list: the armies in the last stretch use the small one, those in the stretch before it the large one, Sauron the large one and Saruman the small one. The named characters use neither, because you move those yourself.</p>
+<p><img src="imagenes/ia_redes.png" alt="The two road networks over the map"></p>
+<p>The junctions land right on top of the roads the game draws on its own map: not a coincidence, it is the same network. The straight lines in the picture are only &quot;from this junction to the next one&quot;; the actual path is improvised square by square by the unit.</p>
+<p>One look at that picture explains something anyone who has played will have noticed: the dark armies always show up in the same places. They can only show up there.</p>
+<blockquote>In the listing: <code>DESTINO_POR_LA_RED_GRANDE</code> (0x69C1), with the 64-point table at 0x6BFB, and <code>DESTINO_POR_LA_RED_CHICA</code> (0x6993), with the 15 at 0x6CFB. Each point is four bytes: column, row and its two exits. The split, in <code>REPARTE_POR_NUMERO</code> (0x6A17).</blockquote>
+<h2 id="a-step-that-way-and-a-swerve">A step that way, and a swerve</h2>
+<p>With the destination set, walking is simple: work out which way it lies and take a step that way… <em>almost</em>. Before taking the step the game pulls a random number and adds a swerve to the direction, so sometimes it comes out crooked. That is why the troops don&#x27;t walk in straight lines and look like they are hesitating.</p>
+<p>The swerve is not evenly spread. Out of every sixteen draws, ten go straight, four veer one way and only two the other: the machine <b>leans harder to one side than the other</b>.</p>
+<p>If the terrain won&#x27;t let it through, it tries twice more with another swerve, and failing that it starts working round the obstacle: it looks both ways to see which side gets out sooner and hugs that edge until it is clear. The code that carries on working round on later turns <b>has a bug</b> and always turns the same way, whether or not it pays.</p>
+<p>And terrain matters per troop type: each class of unit carries its own little table of sixteen terrains with what each one costs. Two terrains are marked impassable for everyone, and others cost five times what a road costs. That cost is not just time: it is the number of turns the unit stands still before it can move again.</p>
+<p>That table, incidentally, has <b>ten entries and not sixteen</b>. The troop types the tape actually uses run from 0 to 9, and the game&#x27;s code begins right behind the tenth entry.</p>
+<blockquote>In the listing: <code>DA_UN_PASO</code> (0x67C5), the sixteen swerves at 0x6B23, <code>TRES_INTENTOS</code> (0x6809), and the detour in <code>BUSCA_HUECO_GIRANDO</code> (0x686E) and <code>SIGUE_RODEANDO</code> (0x68BD), with the bug at 0x68CA. The terrain entries, at 0x6D47.</blockquote>
+<h2 id="walking-is-tiring-and-the-tired-stop-dead">Walking is tiring, and the tired stop dead</h2>
+<p>Every unit carries a number that drops each time it moves. When it falls below a floor, the unit <b>stops wherever it is</b> and rests until it recovers; only then does it walk again. Nobody decides that: it is automatic, and it happens to your armies exactly as it happens to Sauron&#x27;s.</p>
+<p>That same number later decides how much life its soldiers have in a battle. Troops that arrive worn out from walking fight worse. It is the closest thing to a tactical idea in the whole game, and it isn&#x27;t even a decision: it is a subtraction.</p>
+<blockquote>In the listing: the counter is at 0xC200+n, decremented at 0x6752, and below 11 it jumps to <code>SE_PLANTA</code> (0x6951). <code>DESCANSA</code> (0x6945) takes it back up to 40.</blockquote>
+<h2 id="the-deployment-isn-t-computed-it-comes-on-the-tape">The deployment isn&#x27;t computed: it comes on the tape</h2>
+<p>You would expect the computer to lay out its armies when a game starts. It does nothing of the sort. <b>The positions of all 256 pieces come recorded on the tape</b>, as they are, and starting a new game only sets the clock going. Game one and game one hundred begin exactly the same.</p>
+<p><img src="imagenes/ia_despliegue.png" alt="The opening deployment of both sides"></p>
+<p>That is everything in the game, in its first second. The named characters start bunched into a single square. Sauron has more troops than you from the start, and has them in fewer, fatter piles.</p>
+<p>Sauron, on top of that, never leaves his tower. In the full game measured on the emulator he did not take a single step; and there is a rule saying that <b>if you do manage to destroy his army, he is put back on his square with full strength</b>. He cannot be removed from there.</p>
+<blockquote>In the listing: the state strips 0xB900 (column), 0xBA00 (row), 0xBD00 (type) and 0xC500 (troops), which arrive inside the tape&#x27;s high block. <code>EMPIEZA_PARTIDA_NUEVA</code> (0x7F43) only touches the 0xC600 state. Sauron&#x27;s restoration, in <code>PON_EL_EJERCITO_16_EN_SU_SITIO</code> (0x922C).</blockquote>
+<h2 id="nobody-decides-to-enter-a-battle">Nobody decides to enter a battle</h2>
+<p>The battle is not chosen. Every time a piece — any piece — takes a step, the game counts who is on that square; if both sides are there, <b>battle, and no questions asked</b>. All it takes is an orc patrol walking over where you happened to be standing.</p>
+<p>What happens then:</p>
+<ol><li>The strength of each side on that square is added up. If they don&#x27;t all fit on the board it is trimmed with a quota, and those left out sit the fight out.</li><li>The board is laid out as a draughtboard: you only move diagonally, so pieces never change square colour. <b>Fifteen obstacles are thrown at random</b> across the middle.</li><li>Each figure is dropped on a drawn square. The draw is loaded: one side comes out biased towards one edge and the other towards the opposite one, so the fight starts face to face without anyone having ordered it.</li></ol>
+<blockquote>In the listing: <code>REPARTE_LOS_QUE_ENTRAN</code> (0x8F70) and the quota at 0x8FD1; the draughtboard and obstacles at 0x9070; the loaded draw, with the band table built at 0x908D and flipped for the second side at 0x90F7.</blockquote>
+<h2 id="every-figure-is-on-its-own">Every figure is on its own</h2>
+<p>There is no single command here either. Each figure, on its turn, does this: if something is already touching it, it fights; if not, it <b>looks for the nearest enemy — but only within a distance drawn at that moment</b>. If the draw comes out short, it sees nobody even with someone three squares away.</p>
+<p>To walk towards its target it has two ways of picking the diagonal — check one coordinate first, or the other — and it <b>tosses for which one to use</b>. If the square it was heading for is taken, it tries another diagonal, also at random. And if that one is taken too, it stays put.</p>
+<p>Turns go round a wheel of four: one pass resolves the blows, the next moves one side, and two of the wheel&#x27;s four slots <b>are empty</b> and do nothing at all. Hence that odd, lurching rhythm the battle has.</p>
+<p>A blow is a die against a number: if the roll comes in under what that figure hits for, it takes life off the other one. At zero it falls. A few troop types get back up as many as four times with full life before going down for good; the rest, never.</p>
+<blockquote>In the listing: <code>MUEVE_LAS_UNIDADES</code> (0x897D), <code>BUSCA_A_QUIEN_PERSEGUIR</code> (0x8A86) with the drawn distance at 0x8A8E, the two direction routines (0x8908 and 0x8925) with the toss at 0x89B4, the wheel of four at 0x9163 over the table at 0x94B7, and the blows in <code>RESUELVE_LOS_COMBATES</code> (0x8E95).</blockquote>
+<h2 id="why-gandalf-and-aragorn-disappear">Why Gandalf and Aragorn disappear</h2>
+<p>The old explanation — &quot;they run out of army&quot; — <b>does not hold</b>, and anyone who has played a lot is right not to swallow it. The named characters <b>never have an army at all</b>: the slot saying how many troops a piece carries reads <b>zero</b> for all twenty-four, from the moment the tape finishes loading. They travel alone.</p>
+<p>And there is the problem. When a figure falls on the board, the game goes to take a soldier off the army it belonged to, but first checks whether any are left. It finds that zero, reads it as <em>&quot;nothing left&quot;</em> and <b>wipes the piece off the map there and then</b>. No wearing down, no warning, no second chance: the character disappears at the first blow that puts his figure down.</p>
+<p>Two more things on top of that:</p>
+<ul><li><b>You don&#x27;t decide to enter the battle.</b> If an enemy army steps onto the square your hero was on, in he goes.</li><li><b>When the battle ends, the losing side is wiped off the map entirely.</b> Everyone who went in, whether their figures fell or not. A character can disappear without anyone ever touching him, purely for being on the wrong square when his side loses.</li></ul>
+<p>The only thing telling them apart is how many times their figure gets back up before falling: Gandalf is one of the four-times ones and Aragorn gets up not at all. That is why Gandalf lasts half a game and Aragorn goes early, over and over. It isn&#x27;t bad luck: it&#x27;s his troop type.</p>
+<blockquote>In the listing: the zero read as exhausted, at 0x8F06, which jumps to <code>EJERCITO_DESHECHO</code> (0x8F0D) and on to <code>BORRA_EL_EJERCITO_DEL_MAPA</code> (0x8F1A). The wiping of the losing side, at 0x91B4 and 0x91CE, dealt out by 0x91DB. The four recoveries, in <code>CUATRO_SI_ES_TIPO_0_1_O_7</code> (0x8DC0).</blockquote>
+<h2 id="what-the-machine-does-not-do">What the machine does not do</h2>
+<p>Having read the whole program, the list of what is <em>not</em> there is shorter to write than the list of what is:</p>
+<ul><li>It never looks at where the player is. Nowhere in the code is that asked in order to decide a move.</li><li>It never masses troops or sends them at a common objective: each army tosses its own coin at its own junction.</li><li>It defends nothing, does not protect Sauron and does not cut roads.</li><li>It does not learn or shift behaviour as the game goes: the clock exists only so that your time runs out.</li><li>And in battle, no figure knows what its own side is doing.</li></ul>
+<p>What there is instead is a huge map, plenty of troops spread over it and a great many coin tosses a second. That is enough to make it feel like somebody is playing against you. And in a way it works better this way: a 1988 machine with a real plan would have been more predictable than this one, which has none.</p>
+<h2 id="the-pictures-on-this-page">The pictures on this page</h2>
+<p>They are not screenshots. The map is decompressed exactly as the game does it at boot and painted square by square repeating what its drawing engine does; the junctions of both networks and the starting positions are then marked on top, straight from the tape&#x27;s data. <code>tools/render_redes.py</code> makes them, and if any of those ranges were mislabelled the result would be noise instead of Middle Earth.</p>
+<footer><p><em>War in Middle Earth</em> was published by Melbourne House and distributed by Dro Soft. Its own loading screen signs it: <b>MAELSTROM GAMES LTD. PRESENTS</b>, <b>Mike Singleton</b> and <b>CONVERSION by ANIMAGIC sa</b>; the menu adds “Programado por C.J.Pink”. All rights in the game remain with their holders. This is preservation, study and documentation work.</p></footer></div>

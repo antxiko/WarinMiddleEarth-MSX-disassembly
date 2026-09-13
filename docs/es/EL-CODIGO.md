@@ -60,8 +60,8 @@ operando automodificado deciden adónde se va.
 | `war_loader` | 379 | 150 | 39,6 % | 0 de 48 |
 | `war_pantalla` | 14 | 10 | 71,4 % | 0 de 1 |
 | `war_bajo` | 785 | 226 | 28,8 % | 0 de 96 |
-| `war_medio` | 5.664 | 1.645 | **29,0 %** | **0 de 621** |
-| **total** | **6.844** | **2.031** | **29,7 %** | **0 de 767** |
+| `war_medio` | 5.664 | 1.646 | **29,1 %** | **0 de 621** |
+| **total** | **6.844** | **2.032** | **29,7 %** | **0 de 767** |
 
 El listón de la serie son dos cifras, y las dos se cumplen: **más del 22 % de
 densidad y ninguna rutina por debajo del 10 %**.

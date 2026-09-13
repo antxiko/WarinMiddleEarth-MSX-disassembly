@@ -345,92 +345,127 @@ DATA_sprites_de_batalla:
 	defb 0fch,003h,00fh,070h,01fh,020h,0fch,003h,0feh,001h,00fh,0b0h,00fh,0b0h,0fch,002h,0fch,003h,00fh,0d0h,007h,0d8h,0ffh,000h,0ffh,000h,087h,078h,0ffh,000h,0ffh,000h	; b8c8  ...p. .....................x....
 
 ; ----------------------------------------------------------------------
-; DATOS tablas_de_estado_b900: Tablas de estado del juego (0xB900 la apuntan
-;   0x6AC2, 0x6EAC, 0x8F7A...; las lee 0x92E4 en bloque; formato pendiente)
-;   0xb8e8..0xbe00  (1304 bytes)
-DATA_tablas_de_estado_b900:
+; DATOS cola_antes_del_estado: 24 bytes delante de las tiras de estado, sin
+;   lector conocido
+;   0xb8e8..0xb900  (24 bytes)
+DATA_cola_antes_del_estado:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; b8e8  ................
-	defb 000h,000h,000h,000h,000h,000h,000h,000h,045h,045h,045h,045h,045h,045h,045h,045h	; b8f8  ........EEEEEEEE
-	defb 045h,045h,062h,049h,05ch,064h,041h,045h,045h,04ah,046h,056h,05dh,045h,06fh,041h	; b908  EEbI\dAEEJFV]EoA
-	defb 016h,016h,017h,017h,017h,017h,06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh	; b918  ......nnnnnnnnnn
-	defb 04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,05ch,05ch,05ch,05ch,05ch,05ch,05ch	; b928  KKKKKKKKK\\\\\\\
-	defb 05ch,064h,064h,064h,064h,064h,064h,064h,064h,05ah,035h,035h,035h,035h,035h,035h	; b938  \ddddddddZ555555
-	defb 035h,035h,041h,041h,041h,041h,041h,045h,045h,045h,045h,045h,045h,045h,045h,04ah	; b948  55AAAAAEEEEEEEEJ
-	defb 04ah,04ah,04ah,04ah,046h,046h,046h,046h,046h,056h,056h,056h,056h,056h,056h,056h	; b958  JJJJFFFFFVVVVVVV
-	defb 056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,05dh,05dh,05dh	; b968  VVVVVVVVVVVVV]]]
-	defb 054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h	; b978  TTTTTTTTTTTTTTTT
-	defb 054h,061h,063h,063h,061h,061h,061h,061h,061h,061h,061h,061h,061h,061h,068h,068h	; b988  Taccaaaaaaaaaahh
-	defb 05fh,05fh,05fh,05fh,05fh,05fh,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h	; b998  ______``````````
-	defb 060h,060h,060h,060h,060h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h	; b9a8  `````ccccccccccc
-	defb 063h,063h,063h,063h,068h,068h,068h,068h,068h,068h,068h,068h,073h,073h,073h,073h	; b9b8  cccchhhhhhhhssss
-	defb 073h,073h,073h,073h,073h,073h,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh	; b9c8  ssssssoooooooooo
-	defb 06fh,06fh,06fh,06fh,06fh,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; b9d8  oooooAAAAAAAAAAA
-	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; b9e8  AAAAAAAAAAAAAAAA
-	defb 041h,041h,041h,041h,041h,041h,041h,041h,017h,017h,017h,017h,017h,017h,017h,017h	; b9f8  AAAAAAAA........
-	defb 017h,017h,00dh,024h,010h,00fh,03bh,038h,038h,036h,04ch,03fh,043h,016h,040h,036h	; ba08  ...$..;886L?C.@6
-	defb 00ch,00ch,00fh,00fh,00fh,00fh,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h	; ba18  ................
-	defb 023h,023h,023h,023h,023h,023h,023h,023h,023h,010h,010h,010h,010h,010h,010h,010h	; ba28  #########.......
-	defb 010h,00fh,00fh,00fh,00fh,00fh,013h,013h,013h,019h,019h,019h,019h,019h,019h,019h	; ba38  ................
-	defb 019h,019h,03bh,03bh,03bh,03bh,03bh,038h,038h,038h,038h,038h,038h,038h,038h,036h	; ba48  ..;;;;;888888886
-	defb 036h,036h,036h,036h,04ch,04ch,04ch,04ch,04ch,03fh,03fh,03fh,03fh,03fh,03fh,03fh	; ba58  6666LLLLL???????
-	defb 03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,043h,043h,043h	; ba68  ?????????????CCC
-	defb 027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h	; ba78  ''''''''''''''''
-	defb 027h,03ch,041h,041h,03ch,03ch,03ch,03ch,03ch,03ch,03ch,03ch,03ch,03ch,04bh,04bh	; ba88  '<AA<<<<<<<<<<KK
-	defb 040h,040h,040h,040h,040h,040h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h	; ba98  @@@@@@7777777777
-	defb 037h,037h,037h,037h,037h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; baa8  77777AAAAAAAAAAA
-	defb 041h,041h,041h,041h,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04dh,04dh,04dh,04dh	; bab8  AAAAKKKKKKKKMMMM
-	defb 04dh,04dh,04dh,04dh,04dh,04dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh	; bac8  MMMMMM==========
-	defb 03dh,03dh,03dh,03dh,03dh,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bad8  =====66666666666
-	defb 036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bae8  6666666666666666
-	defb 036h,036h,036h,036h,036h,036h,036h,036h,045h,045h,045h,045h,045h,045h,045h,045h	; baf8  66666666EEEEEEEE
-	defb 045h,045h,062h,049h,05ch,064h,041h,045h,045h,04ah,046h,056h,05dh,045h,06fh,041h	; bb08  EEbI\dAEEJFV]EoA
-	defb 016h,016h,017h,017h,017h,017h,06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh	; bb18  ......nnnnnnnnnn
-	defb 04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,05ch,05ch,05ch,05ch,05ch,05ch,05ch	; bb28  KKKKKKKKK\\\\\\\
-	defb 05ch,064h,064h,064h,064h,064h,064h,064h,064h,05ah,035h,035h,035h,035h,035h,035h	; bb38  \ddddddddZ555555
-	defb 035h,035h,041h,041h,041h,041h,041h,045h,045h,045h,045h,045h,045h,045h,045h,04ah	; bb48  55AAAAAEEEEEEEEJ
-	defb 04ah,04ah,04ah,04ah,046h,046h,046h,046h,046h,056h,056h,056h,056h,056h,056h,056h	; bb58  JJJJFFFFFVVVVVVV
-	defb 056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,05dh,05dh,05dh	; bb68  VVVVVVVVVVVVV]]]
-	defb 054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h,054h	; bb78  TTTTTTTTTTTTTTTT
-	defb 054h,061h,063h,063h,061h,061h,061h,061h,061h,061h,061h,061h,061h,061h,068h,068h	; bb88  Taccaaaaaaaaaahh
-	defb 05fh,05fh,05fh,05fh,05fh,05fh,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h	; bb98  ______``````````
-	defb 060h,060h,060h,060h,060h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h	; bba8  `````ccccccccccc
-	defb 063h,063h,063h,063h,068h,068h,068h,068h,068h,068h,068h,068h,073h,073h,073h,073h	; bbb8  cccchhhhhhhhssss
-	defb 073h,073h,073h,073h,073h,073h,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh	; bbc8  ssssssoooooooooo
-	defb 06fh,06fh,06fh,06fh,06fh,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; bbd8  oooooAAAAAAAAAAA
-	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; bbe8  AAAAAAAAAAAAAAAA
-	defb 041h,041h,041h,041h,041h,041h,041h,041h,017h,017h,017h,017h,017h,017h,017h,017h	; bbf8  AAAAAAAA........
-	defb 017h,017h,00dh,024h,010h,00fh,03bh,038h,038h,036h,04ch,03fh,043h,016h,040h,036h	; bc08  ...$..;886L?C.@6
-	defb 00ch,00ch,00fh,00fh,00fh,00fh,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h	; bc18  ................
-	defb 023h,023h,023h,023h,023h,023h,023h,023h,023h,010h,010h,010h,010h,010h,010h,010h	; bc28  #########.......
-	defb 010h,00fh,00fh,00fh,00fh,00fh,013h,013h,013h,019h,019h,019h,019h,019h,019h,019h	; bc38  ................
-	defb 019h,019h,03bh,03bh,03bh,03bh,03bh,038h,038h,038h,038h,038h,038h,038h,038h,036h	; bc48  ..;;;;;888888886
-	defb 036h,036h,036h,036h,04ch,04ch,04ch,04ch,04ch,03fh,03fh,03fh,03fh,03fh,03fh,03fh	; bc58  6666LLLLL???????
-	defb 03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,043h,043h,043h	; bc68  ?????????????CCC
-	defb 027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h,027h	; bc78  ''''''''''''''''
-	defb 027h,03ch,041h,041h,03ch,03ch,03ch,03ch,03ch,03ch,03ch,03ch,03ch,03ch,04bh,04bh	; bc88  '<AA<<<<<<<<<<KK
-	defb 040h,040h,040h,040h,040h,040h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h	; bc98  @@@@@@7777777777
-	defb 037h,037h,037h,037h,037h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; bca8  77777AAAAAAAAAAA
-	defb 041h,041h,041h,041h,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04dh,04dh,04dh,04dh	; bcb8  AAAAKKKKKKKKMMMM
-	defb 04dh,04dh,04dh,04dh,04dh,04dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh	; bcc8  MMMMMM==========
-	defb 03dh,03dh,03dh,03dh,03dh,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bcd8  =====66666666666
-	defb 036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bce8  6666666666666666
-	defb 036h,036h,036h,036h,036h,036h,036h,036h,000h,002h,002h,003h,004h,016h,006h,006h	; bcf8  66666666........
-	defb 006h,003h,004h,003h,003h,002h,002h,002h,009h,002h,002h,002h,002h,008h,0c7h,087h	; bd08  ................
-	defb 004h,004h,004h,004h,004h,004h,004h,004h,004h,004h,004h,004h,004h,004h,004h,004h	; bd18  ................
-	defb 003h,003h,003h,003h,003h,003h,003h,003h,003h,003h,003h,003h,003h,003h,003h,003h	; bd28  ................
-	defb 003h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd38  ................
-	defb 002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd48  ................
-	defb 002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd58  ................
-	defb 002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd68  ................
-	defb 0c1h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bd78  ................
-	defb 0c5h,0c1h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bd88  ................
-	defb 0c1h,0c1h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bd98  ................
-	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bda8  ................
-	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bdb8  ................
-	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bdc8  ................
-	defb 0c5h,0c5h,0c5h,0c5h,0c5h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h	; bdd8  ................
-	defb 085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h	; bde8  ................
-	defb 085h,085h,085h,085h,085h,085h,085h,085h	; bdf8  ........
+	defb 000h,000h,000h,000h,000h,000h,000h,000h	; b8f8  ........
+
+; ----------------------------------------------------------------------
+; DATOS unidades_columna: La columna de cada unidad en el mapa (0x8108 la
+;   multiplica por 102). El bit 7 no es coordenada: es una de las banderas con
+;   las que 0x67B0 recuerda por que lado estaba rodeando un obstaculo
+;   0xb900..0xba00  (256 bytes)
+DATA_unidades_columna:
+	defb 045h,045h,045h,045h,045h,045h,045h,045h,045h,045h,062h,049h,05ch,064h,041h,045h	; b900  EEEEEEEEEEbI\dAE
+	defb 045h,04ah,046h,056h,05dh,045h,06fh,041h,016h,016h,017h,017h,017h,017h,06eh,06eh	; b910  EJFV]EoA......nn
+	defb 06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh	; b920  nnnnnnnnKKKKKKKK
+	defb 04bh,05ch,05ch,05ch,05ch,05ch,05ch,05ch,05ch,064h,064h,064h,064h,064h,064h,064h	; b930  K\\\\\\\\ddddddd
+	defb 064h,05ah,035h,035h,035h,035h,035h,035h,035h,035h,041h,041h,041h,041h,041h,045h	; b940  dZ55555555AAAAAE
+	defb 045h,045h,045h,045h,045h,045h,045h,04ah,04ah,04ah,04ah,04ah,046h,046h,046h,046h	; b950  EEEEEEEJJJJJFFFF
+	defb 046h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h	; b960  FVVVVVVVVVVVVVVV
+	defb 056h,056h,056h,056h,056h,05dh,05dh,05dh,054h,054h,054h,054h,054h,054h,054h,054h	; b970  VVVVV]]]TTTTTTTT
+	defb 054h,054h,054h,054h,054h,054h,054h,054h,054h,061h,063h,063h,061h,061h,061h,061h	; b980  TTTTTTTTTaccaaaa
+	defb 061h,061h,061h,061h,061h,061h,068h,068h,05fh,05fh,05fh,05fh,05fh,05fh,060h,060h	; b990  aaaaaahh______``
+	defb 060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,063h,063h,063h	; b9a0  `````````````ccc
+	defb 063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,068h,068h,068h,068h	; b9b0  cccccccccccchhhh
+	defb 068h,068h,068h,068h,073h,073h,073h,073h,073h,073h,073h,073h,073h,073h,06fh,06fh	; b9c0  hhhhssssssssssoo
+	defb 06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,041h,041h,041h	; b9d0  oooooooooooooAAA
+	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; b9e0  AAAAAAAAAAAAAAAA
+	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; b9f0  AAAAAAAAAAAAAAAA
+
+; ----------------------------------------------------------------------
+; DATOS unidades_fila: La fila de cada unidad, con la otra bandera de rodeo en
+;   el bit 7. Las dos a cero quieren decir "no esta en el mapa": es lo que
+;   deja BORRA_EL_EJERCITO_DEL_MAPA (0x8F1A)
+;   0xba00..0xbb00  (256 bytes)
+DATA_unidades_fila:
+	defb 017h,017h,017h,017h,017h,017h,017h,017h,017h,017h,00dh,024h,010h,00fh,03bh,038h	; ba00  ...........$..;8
+	defb 038h,036h,04ch,03fh,043h,016h,040h,036h,00ch,00ch,00fh,00fh,00fh,00fh,010h,010h	; ba10  86L?C.@6........
+	defb 010h,010h,010h,010h,010h,010h,010h,010h,023h,023h,023h,023h,023h,023h,023h,023h	; ba20  ........########
+	defb 023h,010h,010h,010h,010h,010h,010h,010h,010h,00fh,00fh,00fh,00fh,00fh,013h,013h	; ba30  #...............
+	defb 013h,019h,019h,019h,019h,019h,019h,019h,019h,019h,03bh,03bh,03bh,03bh,03bh,038h	; ba40  ..........;;;;;8
+	defb 038h,038h,038h,038h,038h,038h,038h,036h,036h,036h,036h,036h,04ch,04ch,04ch,04ch	; ba50  888888866666LLLL
+	defb 04ch,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh	; ba60  L???????????????
+	defb 03fh,03fh,03fh,03fh,03fh,043h,043h,043h,027h,027h,027h,027h,027h,027h,027h,027h	; ba70  ?????CCC''''''''
+	defb 027h,027h,027h,027h,027h,027h,027h,027h,027h,03ch,041h,041h,03ch,03ch,03ch,03ch	; ba80  '''''''''<AA<<<<
+	defb 03ch,03ch,03ch,03ch,03ch,03ch,04bh,04bh,040h,040h,040h,040h,040h,040h,037h,037h	; ba90  <<<<<<KK@@@@@@77
+	defb 037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,041h,041h,041h	; baa0  7777777777777AAA
+	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,04bh,04bh,04bh,04bh	; bab0  AAAAAAAAAAAAKKKK
+	defb 04bh,04bh,04bh,04bh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,03dh,03dh	; bac0  KKKKMMMMMMMMMM==
+	defb 03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,036h,036h,036h	; bad0  =============666
+	defb 036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bae0  6666666666666666
+	defb 036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; baf0  6666666666666666
+
+; ----------------------------------------------------------------------
+; DATOS unidades_destino_columna: La columna de su destino; o, si la tira de
+;   al lado vale 0xFE o mas, el NUMERO de la unidad a la que persigue (0x6961
+;   sigue la cadena hasta 256 saltos)
+;   0xbb00..0xbc00  (256 bytes)
+DATA_unidades_destino_columna:
+	defb 045h,045h,045h,045h,045h,045h,045h,045h,045h,045h,062h,049h,05ch,064h,041h,045h	; bb00  EEEEEEEEEEbI\dAE
+	defb 045h,04ah,046h,056h,05dh,045h,06fh,041h,016h,016h,017h,017h,017h,017h,06eh,06eh	; bb10  EJFV]EoA......nn
+	defb 06eh,06eh,06eh,06eh,06eh,06eh,06eh,06eh,04bh,04bh,04bh,04bh,04bh,04bh,04bh,04bh	; bb20  nnnnnnnnKKKKKKKK
+	defb 04bh,05ch,05ch,05ch,05ch,05ch,05ch,05ch,05ch,064h,064h,064h,064h,064h,064h,064h	; bb30  K\\\\\\\\ddddddd
+	defb 064h,05ah,035h,035h,035h,035h,035h,035h,035h,035h,041h,041h,041h,041h,041h,045h	; bb40  dZ55555555AAAAAE
+	defb 045h,045h,045h,045h,045h,045h,045h,04ah,04ah,04ah,04ah,04ah,046h,046h,046h,046h	; bb50  EEEEEEEJJJJJFFFF
+	defb 046h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h,056h	; bb60  FVVVVVVVVVVVVVVV
+	defb 056h,056h,056h,056h,056h,05dh,05dh,05dh,054h,054h,054h,054h,054h,054h,054h,054h	; bb70  VVVVV]]]TTTTTTTT
+	defb 054h,054h,054h,054h,054h,054h,054h,054h,054h,061h,063h,063h,061h,061h,061h,061h	; bb80  TTTTTTTTTaccaaaa
+	defb 061h,061h,061h,061h,061h,061h,068h,068h,05fh,05fh,05fh,05fh,05fh,05fh,060h,060h	; bb90  aaaaaahh______``
+	defb 060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,063h,063h,063h	; bba0  `````````````ccc
+	defb 063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,063h,068h,068h,068h,068h	; bbb0  cccccccccccchhhh
+	defb 068h,068h,068h,068h,073h,073h,073h,073h,073h,073h,073h,073h,073h,073h,06fh,06fh	; bbc0  hhhhssssssssssoo
+	defb 06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,06fh,041h,041h,041h	; bbd0  oooooooooooooAAA
+	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; bbe0  AAAAAAAAAAAAAAAA
+	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h	; bbf0  AAAAAAAAAAAAAAAA
+
+; ----------------------------------------------------------------------
+; DATOS unidades_destino_fila: La fila de su destino. De 0xFE arriba no es una
+;   fila: dice que lo de 0xBB00 es una unidad a la que seguir
+;   0xbc00..0xbd00  (256 bytes)
+DATA_unidades_destino_fila:
+	defb 017h,017h,017h,017h,017h,017h,017h,017h,017h,017h,00dh,024h,010h,00fh,03bh,038h	; bc00  ...........$..;8
+	defb 038h,036h,04ch,03fh,043h,016h,040h,036h,00ch,00ch,00fh,00fh,00fh,00fh,010h,010h	; bc10  86L?C.@6........
+	defb 010h,010h,010h,010h,010h,010h,010h,010h,023h,023h,023h,023h,023h,023h,023h,023h	; bc20  ........########
+	defb 023h,010h,010h,010h,010h,010h,010h,010h,010h,00fh,00fh,00fh,00fh,00fh,013h,013h	; bc30  #...............
+	defb 013h,019h,019h,019h,019h,019h,019h,019h,019h,019h,03bh,03bh,03bh,03bh,03bh,038h	; bc40  ..........;;;;;8
+	defb 038h,038h,038h,038h,038h,038h,038h,036h,036h,036h,036h,036h,04ch,04ch,04ch,04ch	; bc50  888888866666LLLL
+	defb 04ch,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh,03fh	; bc60  L???????????????
+	defb 03fh,03fh,03fh,03fh,03fh,043h,043h,043h,027h,027h,027h,027h,027h,027h,027h,027h	; bc70  ?????CCC''''''''
+	defb 027h,027h,027h,027h,027h,027h,027h,027h,027h,03ch,041h,041h,03ch,03ch,03ch,03ch	; bc80  '''''''''<AA<<<<
+	defb 03ch,03ch,03ch,03ch,03ch,03ch,04bh,04bh,040h,040h,040h,040h,040h,040h,037h,037h	; bc90  <<<<<<KK@@@@@@77
+	defb 037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,037h,041h,041h,041h	; bca0  7777777777777AAA
+	defb 041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,041h,04bh,04bh,04bh,04bh	; bcb0  AAAAAAAAAAAAKKKK
+	defb 04bh,04bh,04bh,04bh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,04dh,03dh,03dh	; bcc0  KKKKMMMMMMMMMM==
+	defb 03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,03dh,036h,036h,036h	; bcd0  =============666
+	defb 036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bce0  6666666666666666
+	defb 036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h,036h	; bcf0  6666666666666666
+
+; ----------------------------------------------------------------------
+; DATOS unidades_tipo_y_banderas: Nibble bajo: el tipo de tropa, que indexa
+;   las fichas de 0x6D47 y las tablas de dibujo. Bit 4: lleva el Anillo (lo
+;   busca 0x733E). Bit 5: ha entrado en la batalla que se esta resolviendo (lo
+;   pone 0x9004 y lo mira 0x91DB para borrar al bando perdedor)
+;   0xbd00..0xbe00  (256 bytes)
+DATA_unidades_tipo_y_banderas:
+	defb 000h,002h,002h,003h,004h,016h,006h,006h,006h,003h,004h,003h,003h,002h,002h,002h	; bd00  ................
+	defb 009h,002h,002h,002h,002h,008h,0c7h,087h,004h,004h,004h,004h,004h,004h,004h,004h	; bd10  ................
+	defb 004h,004h,004h,004h,004h,004h,004h,004h,003h,003h,003h,003h,003h,003h,003h,003h	; bd20  ................
+	defb 003h,003h,003h,003h,003h,003h,003h,003h,003h,002h,002h,002h,002h,002h,002h,002h	; bd30  ................
+	defb 002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd40  ................
+	defb 002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd50  ................
+	defb 002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h,002h	; bd60  ................
+	defb 002h,002h,002h,002h,002h,002h,002h,002h,0c1h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bd70  ................
+	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c1h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bd80  ................
+	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c1h,0c1h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bd90  ................
+	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bda0  ................
+	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bdb0  ................
+	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h	; bdc0  ................
+	defb 0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,0c5h,085h,085h,085h	; bdd0  ................
+	defb 085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h	; bde0  ................
+	defb 085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h,085h	; bdf0  ................
 
 ; ----------------------------------------------------------------------
 ; DATOS ram_de_trabajo_be00: Ceros: RAM de trabajo que viene cargada
@@ -471,10 +506,12 @@ DATA_ram_de_trabajo_be00:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; bff0  ................
 
 ; ----------------------------------------------------------------------
-; DATOS tablas_de_estado_c100: Tablas de estado (0xC1xx las toca el menu en
-;   0x5E8D-0x5E9E: nivel; formato pendiente)
-;   0xc000..0xc600  (1536 bytes)
-DATA_tablas_de_estado_c100:
+; DATOS unidades_tabla_c000: Una tira por unidad que el menu toca en
+;   0x5E8D-0x5E9E (el nivel) y de la que 0x926E gasta el nibble bajo cada vez
+;   que se usa la tecla R para salir de una batalla: a cero, derrota. El
+;   nibble alto se conserva
+;   0xc000..0xc100  (256 bytes)
+DATA_unidades_tabla_c000:
 	defb 0a8h,058h,053h,086h,096h,07ah,079h,078h,078h,088h,095h,087h,084h,056h,085h,085h	; c000  .XS..zyxx....V..
 	defb 085h,085h,055h,051h,066h,041h,0c0h,0c0h,094h,094h,094h,094h,094h,094h,094h,094h	; c010  ..UQfA..........
 	defb 094h,094h,094h,094h,094h,094h,094h,094h,085h,085h,085h,085h,085h,085h,085h,085h	; c020  ................
@@ -491,6 +528,14 @@ DATA_tablas_de_estado_c100:
 	defb 050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h	; c0d0  PPPPPPPPPPPPPPPP
 	defb 050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h	; c0e0  PPPPPPPPPPPPPPPP
 	defb 050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h	; c0f0  PPPPPPPPPPPPPPPP
+
+; ----------------------------------------------------------------------
+; DATOS unidades_acierto_y_golpe: De aqui salen los dos numeros con los que
+;   peleara cada figura suya: el nibble BAJO da lo que acierta (a 0xE400, tras
+;   multiplicarlo en 0x8D29) y el ALTO lo que quita cada golpe (a 0xE500, por
+;   0x8D2F)
+;   0xc100..0xc200  (256 bytes)
+DATA_unidades_acierto_y_golpe:
 	defb 06ah,08ah,0aah,059h,079h,027h,038h,027h,027h,066h,079h,068h,057h,06ah,068h,068h	; c100  j..Yy'8''fyhWjhh
 	defb 058h,068h,068h,056h,099h,045h,0f8h,0f8h,066h,066h,066h,066h,066h,066h,066h,066h	; c110  XhhV.E..ffffffff
 	defb 066h,066h,066h,066h,066h,066h,066h,066h,056h,056h,056h,056h,056h,056h,056h,056h	; c120  ffffffffVVVVVVVV
@@ -507,6 +552,14 @@ DATA_tablas_de_estado_c100:
 	defb 034h,056h,056h,045h,056h,023h,023h,056h,056h,023h,045h,034h,045h,056h,045h,034h	; c1d0  4VVEV##VV#E4EVE4
 	defb 056h,034h,045h,056h,034h,023h,034h,023h,056h,045h,056h,023h,045h,034h,056h,034h	; c1e0  V4EV4#4#VEV#E4V4
 	defb 056h,045h,056h,045h,034h,056h,023h,045h,034h,034h,045h,034h,056h,023h,023h,034h	; c1f0  VEVE4V#E44E4V##4
+
+; ----------------------------------------------------------------------
+; DATOS unidades_fuelle: Lo que le queda de andar a cada unidad: 0x6752 le
+;   resta uno por paso y por debajo de 11 la unidad SE PLANTA (0x6951) hasta
+;   recuperarse; ademas es el numero por el que se multiplica la vida de sus
+;   figuras en batalla (0x8D38)
+;   0xc200..0xc300  (256 bytes)
+DATA_unidades_fuelle:
 	defb 09eh,05bh,06dh,07bh,092h,07eh,06ch,06fh,06ch,06fh,07ah,072h,07ah,06eh,063h,077h	; c200  .[m{.~lolozrzncw
 	defb 01bh,064h,06dh,069h,068h,020h,048h,047h,07ah,089h,091h,07eh,094h,095h,07dh,08bh	; c210  .dmih HGz..~..}.
 	defb 086h,092h,07ah,091h,085h,094h,087h,07fh,08ah,082h,085h,087h,06fh,078h,078h,089h	; c220  ..z.........oxx.
@@ -523,6 +576,12 @@ DATA_tablas_de_estado_c100:
 	defb 071h,05fh,05fh,061h,068h,065h,072h,06ch,072h,073h,072h,069h,06fh,073h,05fh,05eh	; c2d0  q__aherlrsrios_^
 	defb 076h,05eh,075h,073h,074h,074h,073h,05fh,066h,076h,076h,06fh,060h,073h,06ah,069h	; c2e0  v^ustts_fvvo`sji
 	defb 065h,05fh,063h,067h,074h,073h,076h,05dh,076h,06ah,06eh,076h,06fh,06fh,062h,073h	; c2f0  e_cgtsv]vjnvoobs
+
+; ----------------------------------------------------------------------
+; DATOS unidades_meses: Un contador por unidad al que 0x8340 le suma uno cada
+;   mes del juego, saturando en 255
+;   0xc300..0xc400  (256 bytes)
+DATA_unidades_meses:
 	defb 0c0h,0b0h,0a0h,090h,0c0h,0b0h,090h,090h,090h,070h,0a0h,0a0h,080h,090h,0a0h,0a0h	; c300  .........p......
 	defb 080h,090h,080h,070h,0a0h,080h,0d0h,0d0h,090h,090h,090h,090h,090h,090h,090h,090h	; c310  ...p............
 	defb 090h,090h,090h,090h,090h,090h,090h,090h,090h,090h,090h,090h,090h,090h,090h,090h	; c320  ................
@@ -539,6 +598,13 @@ DATA_tablas_de_estado_c100:
 	defb 050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h	; c3d0  PPPPPPPPPPPPPPPP
 	defb 050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h	; c3e0  PPPPPPPPPPPPPPPP
 	defb 050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h,050h	; c3f0  PPPPPPPPPPPPPPPP
+
+; ----------------------------------------------------------------------
+; DATOS figuras_dibujo: El dibujo de cada FIGURA del tablero de batalla (no de
+;   cada unidad del mapa): lo escribe 0x8D8A con el tipo de tropa por dos, e
+;   indexa la tabla de 0x94C7
+;   0xc400..0xc500  (256 bytes)
+DATA_figuras_dibujo:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; c400  ................
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,004h,004h,004h,004h,004h,004h,004h,004h	; c410  ................
 	defb 004h,004h,004h,004h,004h,004h,004h,004h,003h,003h,003h,003h,003h,003h,003h,003h	; c420  ................
@@ -555,6 +621,14 @@ DATA_tablas_de_estado_c100:
 	defb 005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h	; c4d0  ................
 	defb 005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h	; c4e0  ................
 	defb 005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h,005h	; c4f0  ................
+
+; ----------------------------------------------------------------------
+; DATOS unidades_tropa: Cuantas figuras pone cada unidad en un tablero de
+;   batalla, y la cuenta de las que le quedan vivas. Los 24 personajes con
+;   nombre traen CERO, y 0x8F07 lee ese cero como "ya no queda nada": por eso
+;   desaparecen del mapa al primer golpe que les tumban la figura
+;   0xc500..0xc600  (256 bytes)
+DATA_unidades_tropa:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; c500  ................
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,01fh,008h,00ch,004h,013h,018h,017h,01eh	; c510  ................
 	defb 015h,011h,016h,009h,006h,01ch,007h,012h,00eh,016h,00ch,010h,00eh,014h,006h,008h	; c520  ................

@@ -31,7 +31,7 @@ DATOS = 50191
 LISTADOS = 5
 RUTINAS = 767
 INSTRUCCIONES = 6844
-COMENTARIOS = 2031
+COMENTARIOS = 2032
 DENSIDAD_ES = "29,7 %"
 DENSIDAD_EN = "29.7%"
 
@@ -66,6 +66,7 @@ TXT = {
         docnav=[("EMPEZAR.html", "Empezar"), ("EL-JUEGO.html", "El juego"),
                 ("LA-CINTA.html", "La cinta"),
                 ("EL-CODIGO.html", "El código"),
+                ("LA-MAQUINA.html", "La máquina"),
                 ("HALLAZGOS.html", "Hallazgos"),
                 ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas")],
         otro=("../", "In English"),
@@ -112,6 +113,7 @@ TXT = {
                 ("THE-GAME.html", "The game"),
                 ("THE-TAPE.html", "The tape"),
                 ("THE-CODE.html", "The code"),
+                ("THE-MACHINE.html", "The machine"),
                 ("FINDINGS.html", "Findings"),
                 ("OPEN-QUESTIONS.html", "Open questions")],
         otro=("es/", "En castellano"),

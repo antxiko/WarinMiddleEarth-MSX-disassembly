@@ -49,6 +49,17 @@ listado como si fuera un hecho**.
 porque `0x8108` multiplica la primera por 102, que es el paso de columna, y
 `0x8166` recorre columnas en el bucle exterior; es consistente, no demostrado.
 
+**Cerrada en parte.** Leer el código con el que decide la máquina (ver *La
+máquina*) ha puesto nombre definitivo a varias de estas tiras: `0xBB00`/`0xBC00`
+es el destino, `0xBD00` lleva el tipo de tropa en su nibble bajo, `0xC200` es el
+número que gasta andar, `0xC500` cuántas figuras pone la ficha en un tablero de
+batalla y `0xC600` su estado. Y el índice de todas ellas es **el mismo índice de
+la lista de nombres** de `0x6B46`, que recorre `BUSCA_EL_NOMBRE` (`0x6981`) con
+el número de unidad: eso es lo que hace que la ficha `0x16` sea Sauron y la
+`0x17` Saruman, y cuadra con los cinco sitios donde el código trata a esas dos
+aparte. Sigue abierto qué son los bits altos de `0xBD00` más allá del 4 y el 5,
+y las tiras `0xC000`, `0xC100` y `0xE600`.
+
 ### 2. Qué añade la segunda pasada del mapa
 
 El dibujo del mapa hace tres pasadas. La segunda (`0x7714`) indexa `0x77B5` con

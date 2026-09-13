@@ -28,7 +28,24 @@ D 0x8030 0x8044 tabla_de_10_palabras_8030 Tabla de 10 palabras (indice 1..10) qu
 F 0x8030 w1
 
 # --- textos y datos del juego -------------------------------------------------
-D 0x6AF5 0x6DE7 textos_y_tablas_del_anillo Textos ("El Anillo se ha perdido.") y tablas (0x6B13, 0x6B34, 0x6B3D, 0x6B46, 0x6BE4 los apuntan; formato pendiente)
+D 0x6AF5 0x6B13 texto_anillo_perdido "El Anillo se ha perdido." (0x6AA5 lo pinta), con su relleno hasta el cero
+D 0x6B13 0x6B23 saltos_de_las_ocho_direcciones Lo que hay que sumar a la posicion en cada una de las ocho direcciones: pareja (fila, columna) con signo. Lo indexan 0x6925 y 0x68F8 con direccion*2
+F 0x6B13 2
+D 0x6B23 0x6B33 bandazos_al_azar Los 16 bandazos que 0x680F suma a la direccion buena, elegidos con los cuatro bits bajos del azar. NO estan repartidos a partes iguales: diez son 0 (recto), cuatro +1 y dos -1
+F 0x6B23 16
+D 0x6B33 0x6B34 byte_suelto_6b33 Un 0x99 al que no se le ha encontrado llamador: queda entre los bandazos y los saltos de mapa
+D 0x6B34 0x6B3C saltos_de_mapa_por_direccion El desplazamiento dentro del mapa de cada direccion, un byte con signo: -1, +101, +102, +103, +1, -101, -102 y -103. Lo lee el `ld a,(iy+n)` de 0x6820 con IY aqui
+F 0x6B34 8
+D 0x6B3C 0x6B46 cabecera_de_la_lista_de_personajes 0x6B3D es la cabecera de una lista de menu (renglones y anchura, como las que pinta 0x642A) y detras va su primera opcion, "Vuelve"
+D 0x6B46 0x6BFB nombres_de_los_personajes Los 24 nombres separados por 0xB7, de Gandalf a Saruman, que recorre BUSCA_EL_NOMBRE (0x6981): el indice de la lista ES el numero de unidad, asi que la 0x16 es Sauron y la 0x17 Saruman
+D 0x6BFB 0x6CFB red_de_caminos_grande La red por la que la maquina manda sus ejercitos: 64 cruces de cuatro bytes -columna, fila y los indices de sus DOS salidas-. La recorre BUSCA_EN_LA_RED (0x69F3) desde 0x69C1
+F 0x6BFB 4
+D 0x6CFB 0x6D37 red_de_caminos_chica Lo mismo con 15 cruces, para las unidades de 0xDD arriba y para Saruman (0x6993). Son quince cruces DE LA RED GRANDE -los 11, 18-29, 43, 62 y 63- con las salidas reescritas para que apunten dentro de esta lista corta
+F 0x6CFB 4
+D 0x6D37 0x6D47 ficha_de_terreno_en_curso Los 16 costes de terreno de la unidad que se esta moviendo. No es una tabla fija: 0x6738 copia aqui la ficha de su tipo en cada vuelta, y 0x68AB la lee con el nibble bajo del byte de mapa
+F 0x6D37 16
+D 0x6D47 0x6DE7 fichas_de_tropa Lo que le cuesta cada uno de los 16 terrenos a cada tipo de tropa: 16 bytes por tipo. Son DIEZ fichas y no dieciseis -detras de la decima ya empieza el codigo de 0x6DE7-, y los tipos que usa la cinta van del 0 al 9. Negativo es intransitable: los terrenos 1 y 2 lo son para todos
+F 0x6D47 16
 D 0x77A0 0x7E4F textos_y_tablas_de_batalla Textos de batalla ("Comienza la Batalla") y tablas (0x7554, 0x76C1, 0x76DE, 0x7702, 0x76DB, 0x76BE las apuntan; formato pendiente)
 D 0x83F8 0x8572 textos_de_los_paneles Textos y marcos de los paneles: "Volver/Cargar/Salvar", "Pulsa Fuego", File/Memo/Time, numeros romanos I..VII, "El Anillo corrompe al que lo usa", "Ningun mensaje" (los leen 0x7E81-0x7EA0 y 0x8280)
 D 0x93D9 0x93E5 punteros_de_los_mensajes Seis punteros a los mensajes de abajo (0x9180, 0x9189, 0x925B)
@@ -382,7 +399,7 @@ C 0x6721 Al dar la vuelta (unidad 0) toca repintar el mapa
 C 0x6724 0x6AAF vuelve a marcar en los atributos donde esta cada ejercito
 L 0x6728 CARGA_LA_FICHA_DEL_TIPO  Copia a 0x6D37 los 16 costes de terreno del tipo de esta unidad
 C 0x6728 Nibble bajo de 0xBD00+n: el tipo de unidad, de 0 a 15
-C 0x6731 HL = 0x6D47 + tipo*16: la ficha de ese tipo
+C 0x6731 HL = 0x6D47 + tipo*16: la ficha de ese tipo. Solo hay DIEZ fichas (0x6D47-0x6DE7) y la cinta solo usa los tipos 0 a 9
 C 0x6738 Los 16 costes, uno por clase de terreno, a 0x6D37
 C 0x6742 0xC600+n es el estado de la unidad
 C 0x6745 Bit 6: ya esta andando, con la direccion en los tres bits de abajo
@@ -424,7 +441,7 @@ L 0x67FF COLUMNA_MAYOR  Direcciones 5, 6 y 7: el otro lado de la brujula
 L 0x6809 TRES_INTENTOS  Prueba tres veces la direccion buena con un bandazo al azar
 C 0x680C La direccion elegida, al operando de 0x6864
 L 0x680F PRUEBA_UNA_DIRECCION  Suma un bandazo al azar y mira si el terreno de esa celda deja pasar
-C 0x6812 0x6B23: 16 bandazos de -1, 0 o +1, elegidos al azar
+C 0x6812 0x6B23: 16 bandazos de -1, 0 o +1, elegidos al azar. El reparto NO es parejo: diez rectos, cuatro a un lado y dos al otro
 C 0x681D La direccion con el bandazo va al desplazamiento de 0x6820
 C 0x6820 IY = 0x6B34: -1, +101, +102, +103, +1, -101, -102 y -103 en el mapa
 C 0x6823 0x68AB dice lo que cuesta ese terreno; negativo es intransitable
@@ -518,12 +535,16 @@ L 0x6A01 PUNTO_SIGUIENTE  Los otros dos bytes del punto son sus dos salidas
 C 0x6A07 Si no aparece, se cogen las salidas del primer punto de la tabla
 L 0x6A0D YA_HA_LLEGADO  La unidad esta en su destino: le toca destino nuevo
 C 0x6A0D 0xC200+n sube, sin pasar de 255
+B 0x6A17 EL DESTINO NO SE ELIGE: SE SORTEA. La unidad que ha llegado a un
+  cruce de su red coge una de las DOS salidas que ese cruce trae apuntadas, y
+  cual de las dos lo decide un bit del generador de 0x63FB (0x69A2, 0x69D0).
+  No se mira donde esta el jugador en ningun momento.
 L 0x6A17 REPARTE_POR_NUMERO  El numero de unidad decide por que red de caminos se busca destino
 C 0x6A17 De 0xDD para arriba, red chica
 C 0x6A1C De 0x78 a 0xDC, red grande
 C 0x6A21 La unidad 0x16 va por la red grande
 C 0x6A26 Y la 0x17 por la chica
-C 0x6A2D Las demas se quedan quietas con el estado 1
+C 0x6A2D Las demas -los 22 personajes con nombre, de Gandalf a Gollum- se quedan quietas con el estado 1: a esas las mueve el jugador
 B 0x6A33 La entrega del Anillo. 0x72F5 apunta en 0x6A4C quien lo lleva y le
   pone de destino la unidad elegida en el menu (0xBC00 a 0xFF); a partir de
   ahi 0x6A47 mira cada vuelta si los dos han coincidido en la misma celda.
@@ -2169,6 +2190,7 @@ L 0x8EFD FIGURA_ABATIDA  La figura cae: si era la ultima de su ejercito, el ejer
 C 0x8EFD Quita la figura del tablero y de la lista
 C 0x8F01 0xC600 del contrario: a que ejercito pertenecia
 C 0x8F04 0xC500 de ese ejercito: cuantas figuras le quedaban
+C 0x8F07 A CERO NO SE RESTA, SE DA POR DESHECHO. Los 24 personajes con nombre traen 0xC500 = 0 de la cinta: no llevan tropa, y por eso desaparecen del mapa al PRIMER golpe que les tumba la figura
 C 0x8F0A Una menos; si aun quedan, se acabo
 L 0x8F0D EJERCITO_DESHECHO  Sin figuras: el ejercito se borra del mapa
 L 0x8F10 SIGUIENTE_EN_COMBATE  Recupera el puntero de la lista de 0xBE00
@@ -2338,6 +2360,12 @@ C 0x91BC 0x897E: el ultimo indice de figuras
 C 0x91C0 Operando en 0x91C1: la raya menos uno
 L 0x91C2 MIRA_SI_VIVE_EL_OTRO  Con que quede una viva, la batalla sigue
 C 0x91C4 Aun queda alguien: otra vuelta del bucle
+B 0x91D1 Al bando que pierde se le BORRA DEL MAPA entero. 0x91B4 y 0x91CE
+  reparten las dos rutinas: al ganador le toca NO_HACE_NADA (0x8F19) y al
+  perdedor BORRA_EL_EJERCITO_DEL_MAPA (0x8F1A). Se le aplica a TODO ejercito
+  con el bit 5 de 0xBD00 -o sea, a todo el que entro en la batalla-, le
+  quedaran figuras o no. Un personaje puede desaparecer sin que le tocaran:
+  basta con estar en la casilla cuando su bando pierde.
 L 0x91D1 SE_ACABO_LA_BATALLA  Deja en los dos call de abajo quien gana y quien pierde, y se lo aplica a cada ejercito
 C 0x91D1 0x91EE es el operando del call de 0x91ED
 C 0x91D4 0x91F3 es el operando del call de 0x91F2

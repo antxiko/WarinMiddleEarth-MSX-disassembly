@@ -954,7 +954,7 @@ CARGA_LA_FICHA_DEL_TIPO:		; Copia a 0x6D37 los 16 costes de terreno del tipo de 
 	add a,a			;672e
 	add a,a			;672f
 	add a,a			;6730
-	add a,047h		;6731   ; HL = 0x6D47 + tipo*16: la ficha de ese tipo
+	add a,047h		;6731   ; HL = 0x6D47 + tipo*16: la ficha de ese tipo. Solo hay DIEZ fichas (0x6D47-0x6DE7) y la cinta solo usa los tipos 0 a 9
 	ld l,a			;6733
 	adc a,06dh		;6734
 	sub l			;6736
@@ -1100,7 +1100,7 @@ TRES_INTENTOS:		; Prueba tres veces la direccion buena con un bandazo al azar
 	ld (06864h),a		;680c   ; La direccion elegida, al operando de 0x6864
 PRUEBA_UNA_DIRECCION:		; Suma un bandazo al azar y mira si el terreno de esa celda deja pasar
 	call SIGUIENTE_AL_AZAR		;680f
-	and 00fh		;6812   ; 0x6B23: 16 bandazos de -1, 0 o +1, elegidos al azar
+	and 00fh		;6812   ; 0x6B23: 16 bandazos de -1, 0 o +1, elegidos al azar. El reparto NO es parejo: diez rectos, cuatro a un lado y dos al otro
 	add a,023h		;6814
 	ld l,a			;6816
 	adc a,06bh		;6817
@@ -1450,6 +1450,10 @@ YA_HA_LLEGADO:		; La unidad esta en su destino: le toca destino nuevo
 	inc (hl)			;6a13
 	jr nz,REPARTE_POR_NUMERO		;6a14
 	dec (hl)			;6a16
+
+; ----------------------------------------------------------------------
+; EL DESTINO NO SE ELIGE: SE SORTEA. La unidad que ha llegado a un
+; ----------------------------------------------------------------------
 REPARTE_POR_NUMERO:		; El numero de unidad decide por que red de caminos se busca destino
 	cp 0ddh		;6a17   ; De 0xDD para arriba, red chica
 	jp nc,DESTINO_POR_LA_RED_CHICA		;6a19
@@ -1460,7 +1464,7 @@ REPARTE_POR_NUMERO:		; El numero de unidad decide por que red de caminos se busc
 	cp 017h		;6a26   ; Y la 0x17 por la chica
 	jp z,DESTINO_POR_LA_RED_CHICA		;6a28
 	ld h,0c6h		;6a2b
-	ld (hl),001h		;6a2d   ; Las demas se quedan quietas con el estado 1
+	ld (hl),001h		;6a2d   ; Las demas -los 22 personajes con nombre, de Gandalf a Gollum- se quedan quietas con el estado 1: a esas las mueve el jugador
 	ld hl,(067dah)		;6a2f
 	ret			;6a32
 
@@ -1607,59 +1611,198 @@ SIGUIENTE_UNIDAD_DEL_MAPA:		; Marca las unidades 0 a 0x77, saltandose la 0x16 y 
 	ret			;6af4
 
 ; ----------------------------------------------------------------------
-; DATOS textos_y_tablas_del_anillo: Textos ("El Anillo se ha perdido.") y
-;   tablas (0x6B13, 0x6B34, 0x6B3D, 0x6B46, 0x6BE4 los apuntan; formato
-;   pendiente)
-;   0x6af5..0x6de7  (754 bytes)
-DATA_textos_y_tablas_del_anillo:
+; DATOS texto_anillo_perdido: "El Anillo se ha perdido." (0x6AA5 lo pinta),
+;   con su relleno hasta el cero
+;   0x6af5..0x6b13  (30 bytes)
+DATA_texto_anillo_perdido:
 	defb 045h,06ch,020h,041h,06eh,069h,06ch,06ch,06fh,020h,073h,065h,020h,068h,061h,020h	; 6af5  El Anillo se ha 
-	defb 070h,065h,072h,064h,069h,064h,06fh,02eh,020h,020h,020h,020h,020h,000h,0ffh,000h	; 6b05  perdido.     ...
-	defb 0ffh,001h,000h,001h,001h,001h,001h,000h,001h,0ffh,000h,0ffh,0ffh,0ffh,000h,001h	; 6b15  ................
-	defb 000h,0ffh,000h,001h,000h,000h,001h,000h,000h,0ffh,000h,000h,000h,001h,099h,0ffh	; 6b25  ................
-	defb 065h,066h,067h,001h,09bh,09ah,099h,0ffh,015h,009h,056h,075h,065h,06ch,076h,065h	; 6b35  efg.......Vuelve
-	defb 0b7h,047h,061h,06eh,064h,061h,06ch,066h,0b7h,041h,072h,061h,067h,06fh,072h,06eh	; 6b45  .Gandalf.Aragorn
-	defb 0b7h,042h,06fh,072h,06fh,06dh,069h,072h,0b7h,04ch,065h,067h,06fh,06ch,061h,073h	; 6b55  .Boromir.Legolas
-	defb 0b7h,047h,069h,06dh,06ch,069h,0b7h,046h,072h,06fh,064h,06fh,0b7h,053h,061h,06dh	; 6b65  .Gimli.Frodo.Sam
-	defb 0b7h,04dh,065h,072h,072h,079h,0b7h,050h,069h,070h,070h,069h,06eh,0b7h,045h,06ch	; 6b75  .Merry.Pippin.El
-	defb 072h,06fh,06eh,064h,0b7h,044h,061h,069h,06eh,020h,049h,049h,0b7h,043h,065h,06ch	; 6b85  rond.Dain II.Cel
-	defb 065h,062h,06fh,072h,06eh,0b7h,054h,068h,072h,061h,06eh,064h,075h,069h,06ch,0b7h	; 6b95  eborn.Thranduil.
-	defb 042h,072h,061h,06eh,064h,020h,049h,049h,049h,0b7h,054h,068h,065h,06fh,064h,072h	; 6ba5  Brand III.Theodr
-	defb 065h,064h,0b7h,054h,068h,065h,06fh,064h,065h,06eh,0b7h,045h,06fh,077h,079h,06eh	; 6bb5  ed.Theoden.Eowyn
-	defb 0b7h,045h,06fh,06dh,065h,072h,0b7h,049h,06dh,072h,061h,068h,069h,06ch,0b7h,044h	; 6bc5  .Eomer.Imrahil.D
-	defb 065h,06eh,065h,074h,068h,06fh,072h,0b7h,046h,061h,072h,061h,06dh,069h,072h,0b7h	; 6bd5  enethor.Faramir.
-	defb 047h,06fh,06ch,06ch,075h,06dh,0b7h,053h,061h,075h,072h,06fh,06eh,0b7h,053h,061h	; 6be5  Gollum.Sauron.Sa
-	defb 072h,075h,06dh,061h,06eh,0b7h,06fh,040h,005h,003h,068h,03fh,000h,000h,068h,046h	; 6bf5  ruman.o@..h?..hF
-	defb 001h,003h,063h,041h,004h,005h,05fh,040h,003h,009h,064h,03ah,000h,007h,061h,03ch	; 6c05  ..cA.._@..d:..a<
-	defb 005h,005h,060h,037h,01eh,013h,05ch,043h,013h,004h,05bh,046h,008h,00ah,059h,046h	; 6c15  ..`7..\C..[F..YF
-	defb 009h,00bh,057h,046h,012h,015h,05ch,04bh,009h,009h,060h,056h,00ch,00ch,063h,05ah	; 6c25  ..WF..\K..`V..cZ
-	defb 00dh,00dh,044h,063h,00eh,00eh,051h,049h,00bh,012h,046h,04ch,010h,017h,04eh,046h	; 6c35  ..Dc..QI..FL..NF
-	defb 011h,017h,05bh,03eh,007h,014h,05ah,03eh,03eh,015h,058h,03fh,016h,03eh,056h,03fh	; 6c45  ..[>..Z>>.X?.>V?
-	defb 016h,016h,048h,044h,010h,018h,042h,03eh,017h,019h,041h,03bh,01ah,018h,041h,03ah	; 6c55  ..HD..B>..A;..A:
-	defb 019h,01dh,042h,038h,01ch,01ah,041h,036h,01dh,02bh,047h,039h,03eh,01bh,05dh,032h	; 6c65  ..B8..A6.+G9>.]2
-	defb 01fh,014h,05ah,028h,020h,021h,054h,027h,029h,01eh,05ah,01ah,022h,023h,064h,00fh	; 6c75  ..Z( !T').Z."#d.
-	defb 021h,021h,051h,019h,024h,029h,04ch,019h,025h,025h,046h,019h,026h,027h,045h,017h	; 6c85  !!Q.$)L.%%F.&'E.
-	defb 027h,028h,043h,019h,032h,028h,045h,01eh,029h,027h,04eh,021h,028h,02ah,049h,024h	; 6c95  '(C.2(E.)'N!(*I$
-	defb 03fh,03fh,038h,02ah,01ch,02ch,035h,028h,02bh,02dh,033h,022h,02bh,02eh,02fh,022h	; 6ca5  ??8*.,5(+-3"+./"
-	defb 02dh,02fh,02ch,021h,02eh,030h,025h,01eh,031h,038h,025h,01bh,02fh,02fh,03ch,019h	; 6cb5  -/,!.0%.18%.//<.
-	defb 033h,033h,035h,019h,034h,034h,033h,01ah,035h,02dh,030h,01bh,036h,02fh,02bh,019h	; 6cc5  335.443.5-0.6/+.
-	defb 037h,037h,029h,019h,038h,039h,029h,01bh,031h,02fh,028h,016h,031h,03ah,022h,017h	; 6cd5  77).89).1/(.1:".
-	defb 03bh,039h,01fh,017h,03ah,03ch,019h,019h,03bh,03dh,014h,01eh,03ch,030h,04eh,03ch	; 6ce5  ;9..:<..;=..<0N<
-	defb 01dh,015h,044h,02fh,01dh,01dh,057h,046h,003h,003h,04eh,046h,000h,000h,05ah,03eh	; 6cf5  ..D/..WF..NF..Z>
-	defb 004h,004h,058h,03fh,003h,00dh,056h,03fh,004h,004h,048h,044h,001h,001h,042h,03eh	; 6d05  ..X?..V?..HD..B>
-	defb 005h,005h,041h,03bh,006h,00bh,041h,03ah,007h,00ch,042h,038h,008h,00bh,041h,036h	; 6d15  ..A;..A:..B8..A6
-	defb 009h,00eh,047h,039h,00dh,00ah,038h,02ah,00ah,00ah,04eh,03ch,00bh,003h,044h,02fh	; 6d25  ..G9..8*..N<..D/
-	defb 008h,00bh,003h,0ffh,0ffh,00fh,003h,003h,003h,00fh,003h,003h,00fh,003h,0ffh,003h	; 6d35  ................
-	defb 0ffh,003h,003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h	; 6d45  ................
-	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6d55  ................
-	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6d65  ................
-	defb 00fh,003h,003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h	; 6d75  ................
-	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6d85  ................
-	defb 003h,002h,003h,0ffh,0ffh,00fh,003h,003h,002h,003h,003h,003h,003h,003h,00fh,00fh	; 6d95  ................
-	defb 003h,002h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h	; 6da5  ................
-	defb 00fh,003h,003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h	; 6db5  ................
-	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6dc5  ................
-	defb 00fh,003h,003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh	; 6dd5  ................
-	defb 00fh,003h	; 6de5
+	defb 070h,065h,072h,064h,069h,064h,06fh,02eh,020h,020h,020h,020h,020h,000h	; 6b05  perdido.     .
+
+; ----------------------------------------------------------------------
+; DATOS saltos_de_las_ocho_direcciones: Lo que hay que sumar a la posicion en
+;   cada una de las ocho direcciones: pareja (fila, columna) con signo. Lo
+;   indexan 0x6925 y 0x68F8 con direccion*2
+;   0x6b13..0x6b23  (16 bytes)
+DATA_saltos_de_las_ocho_direcciones:
+	defb 0ffh,000h	; 6b13
+	defb 0ffh,001h	; 6b15
+	defb 000h,001h	; 6b17
+	defb 001h,001h	; 6b19
+	defb 001h,000h	; 6b1b
+	defb 001h,0ffh	; 6b1d
+	defb 000h,0ffh	; 6b1f
+	defb 0ffh,0ffh	; 6b21
+
+; ----------------------------------------------------------------------
+; DATOS bandazos_al_azar: Los 16 bandazos que 0x680F suma a la direccion
+;   buena, elegidos con los cuatro bits bajos del azar. NO estan repartidos a
+;   partes iguales: diez son 0 (recto), cuatro +1 y dos -1
+;   0x6b23..0x6b33  (16 bytes)
+DATA_bandazos_al_azar:
+	defb 000h,001h,000h,0ffh,000h,001h,000h,000h,001h,000h,000h,0ffh,000h,000h,000h,001h	; 6b23  ................
+
+; ----------------------------------------------------------------------
+; DATOS byte_suelto_6b33: Un 0x99 al que no se le ha encontrado llamador:
+;   queda entre los bandazos y los saltos de mapa
+;   0x6b33..0x6b34  (1 bytes)
+DATA_byte_suelto_6b33:
+	defb 099h	; 6b33
+
+; ----------------------------------------------------------------------
+; DATOS saltos_de_mapa_por_direccion: El desplazamiento dentro del mapa de
+;   cada direccion, un byte con signo: -1, +101, +102, +103, +1, -101, -102 y
+;   -103. Lo lee el `ld a,(iy+n)` de 0x6820 con IY aqui
+;   0x6b34..0x6b3c  (8 bytes)
+DATA_saltos_de_mapa_por_direccion:
+	defb 0ffh,065h,066h,067h,001h,09bh,09ah,099h	; 6b34  .efg....
+
+; ----------------------------------------------------------------------
+; DATOS cabecera_de_la_lista_de_personajes: 0x6B3D es la cabecera de una lista
+;   de menu (renglones y anchura, como las que pinta 0x642A) y detras va su
+;   primera opcion, "Vuelve"
+;   0x6b3c..0x6b46  (10 bytes)
+DATA_cabecera_de_la_lista_de_personajes:
+	defb 0ffh,015h,009h,056h,075h,065h,06ch,076h,065h,0b7h	; 6b3c  ...Vuelve.
+
+; ----------------------------------------------------------------------
+; DATOS nombres_de_los_personajes: Los 24 nombres separados por 0xB7, de
+;   Gandalf a Saruman, que recorre BUSCA_EL_NOMBRE (0x6981): el indice de la
+;   lista ES el numero de unidad, asi que la 0x16 es Sauron y la 0x17 Saruman
+;   0x6b46..0x6bfb  (181 bytes)
+DATA_nombres_de_los_personajes:
+	defb 047h,061h,06eh,064h,061h,06ch,066h,0b7h,041h,072h,061h,067h,06fh,072h,06eh,0b7h	; 6b46  Gandalf.Aragorn.
+	defb 042h,06fh,072h,06fh,06dh,069h,072h,0b7h,04ch,065h,067h,06fh,06ch,061h,073h,0b7h	; 6b56  Boromir.Legolas.
+	defb 047h,069h,06dh,06ch,069h,0b7h,046h,072h,06fh,064h,06fh,0b7h,053h,061h,06dh,0b7h	; 6b66  Gimli.Frodo.Sam.
+	defb 04dh,065h,072h,072h,079h,0b7h,050h,069h,070h,070h,069h,06eh,0b7h,045h,06ch,072h	; 6b76  Merry.Pippin.Elr
+	defb 06fh,06eh,064h,0b7h,044h,061h,069h,06eh,020h,049h,049h,0b7h,043h,065h,06ch,065h	; 6b86  ond.Dain II.Cele
+	defb 062h,06fh,072h,06eh,0b7h,054h,068h,072h,061h,06eh,064h,075h,069h,06ch,0b7h,042h	; 6b96  born.Thranduil.B
+	defb 072h,061h,06eh,064h,020h,049h,049h,049h,0b7h,054h,068h,065h,06fh,064h,072h,065h	; 6ba6  rand III.Theodre
+	defb 064h,0b7h,054h,068h,065h,06fh,064h,065h,06eh,0b7h,045h,06fh,077h,079h,06eh,0b7h	; 6bb6  d.Theoden.Eowyn.
+	defb 045h,06fh,06dh,065h,072h,0b7h,049h,06dh,072h,061h,068h,069h,06ch,0b7h,044h,065h	; 6bc6  Eomer.Imrahil.De
+	defb 06eh,065h,074h,068h,06fh,072h,0b7h,046h,061h,072h,061h,06dh,069h,072h,0b7h,047h	; 6bd6  nethor.Faramir.G
+	defb 06fh,06ch,06ch,075h,06dh,0b7h,053h,061h,075h,072h,06fh,06eh,0b7h,053h,061h,072h	; 6be6  ollum.Sauron.Sar
+	defb 075h,06dh,061h,06eh,0b7h	; 6bf6
+
+; ----------------------------------------------------------------------
+; DATOS red_de_caminos_grande: La red por la que la maquina manda sus
+;   ejercitos: 64 cruces de cuatro bytes -columna, fila y los indices de sus
+;   DOS salidas-. La recorre BUSCA_EN_LA_RED (0x69F3) desde 0x69C1
+;   0x6bfb..0x6cfb  (256 bytes)
+DATA_red_de_caminos_grande:
+	defb 06fh,040h,005h,003h	; 6bfb
+	defb 068h,03fh,000h,000h	; 6bff
+	defb 068h,046h,001h,003h	; 6c03
+	defb 063h,041h,004h,005h	; 6c07
+	defb 05fh,040h,003h,009h	; 6c0b
+	defb 064h,03ah,000h,007h	; 6c0f
+	defb 061h,03ch,005h,005h	; 6c13
+	defb 060h,037h,01eh,013h	; 6c17
+	defb 05ch,043h,013h,004h	; 6c1b
+	defb 05bh,046h,008h,00ah	; 6c1f
+	defb 059h,046h,009h,00bh	; 6c23
+	defb 057h,046h,012h,015h	; 6c27
+	defb 05ch,04bh,009h,009h	; 6c2b
+	defb 060h,056h,00ch,00ch	; 6c2f
+	defb 063h,05ah,00dh,00dh	; 6c33
+	defb 044h,063h,00eh,00eh	; 6c37
+	defb 051h,049h,00bh,012h	; 6c3b
+	defb 046h,04ch,010h,017h	; 6c3f
+	defb 04eh,046h,011h,017h	; 6c43
+	defb 05bh,03eh,007h,014h	; 6c47
+	defb 05ah,03eh,03eh,015h	; 6c4b
+	defb 058h,03fh,016h,03eh	; 6c4f
+	defb 056h,03fh,016h,016h	; 6c53
+	defb 048h,044h,010h,018h	; 6c57
+	defb 042h,03eh,017h,019h	; 6c5b
+	defb 041h,03bh,01ah,018h	; 6c5f
+	defb 041h,03ah,019h,01dh	; 6c63
+	defb 042h,038h,01ch,01ah	; 6c67
+	defb 041h,036h,01dh,02bh	; 6c6b
+	defb 047h,039h,03eh,01bh	; 6c6f
+	defb 05dh,032h,01fh,014h	; 6c73
+	defb 05ah,028h,020h,021h	; 6c77
+	defb 054h,027h,029h,01eh	; 6c7b
+	defb 05ah,01ah,022h,023h	; 6c7f
+	defb 064h,00fh,021h,021h	; 6c83
+	defb 051h,019h,024h,029h	; 6c87
+	defb 04ch,019h,025h,025h	; 6c8b
+	defb 046h,019h,026h,027h	; 6c8f
+	defb 045h,017h,027h,028h	; 6c93
+	defb 043h,019h,032h,028h	; 6c97
+	defb 045h,01eh,029h,027h	; 6c9b
+	defb 04eh,021h,028h,02ah	; 6c9f
+	defb 049h,024h,03fh,03fh	; 6ca3
+	defb 038h,02ah,01ch,02ch	; 6ca7
+	defb 035h,028h,02bh,02dh	; 6cab
+	defb 033h,022h,02bh,02eh	; 6caf
+	defb 02fh,022h,02dh,02fh	; 6cb3
+	defb 02ch,021h,02eh,030h	; 6cb7
+	defb 025h,01eh,031h,038h	; 6cbb
+	defb 025h,01bh,02fh,02fh	; 6cbf
+	defb 03ch,019h,033h,033h	; 6cc3
+	defb 035h,019h,034h,034h	; 6cc7
+	defb 033h,01ah,035h,02dh	; 6ccb
+	defb 030h,01bh,036h,02fh	; 6ccf
+	defb 02bh,019h,037h,037h	; 6cd3
+	defb 029h,019h,038h,039h	; 6cd7
+	defb 029h,01bh,031h,02fh	; 6cdb
+	defb 028h,016h,031h,03ah	; 6cdf
+	defb 022h,017h,03bh,039h	; 6ce3
+	defb 01fh,017h,03ah,03ch	; 6ce7
+	defb 019h,019h,03bh,03dh	; 6ceb
+	defb 014h,01eh,03ch,030h	; 6cef
+	defb 04eh,03ch,01dh,015h	; 6cf3
+	defb 044h,02fh,01dh,01dh	; 6cf7
+
+; ----------------------------------------------------------------------
+; DATOS red_de_caminos_chica: Lo mismo con 15 cruces, para las unidades de
+;   0xDD arriba y para Saruman (0x6993). Son quince cruces DE LA RED GRANDE
+;   -los 11, 18-29, 43, 62 y 63- con las salidas reescritas para que apunten
+;   dentro de esta lista corta
+;   0x6cfb..0x6d37  (60 bytes)
+DATA_red_de_caminos_chica:
+	defb 057h,046h,003h,003h	; 6cfb
+	defb 04eh,046h,000h,000h	; 6cff
+	defb 05ah,03eh,004h,004h	; 6d03
+	defb 058h,03fh,003h,00dh	; 6d07
+	defb 056h,03fh,004h,004h	; 6d0b
+	defb 048h,044h,001h,001h	; 6d0f
+	defb 042h,03eh,005h,005h	; 6d13
+	defb 041h,03bh,006h,00bh	; 6d17
+	defb 041h,03ah,007h,00ch	; 6d1b
+	defb 042h,038h,008h,00bh	; 6d1f
+	defb 041h,036h,009h,00eh	; 6d23
+	defb 047h,039h,00dh,00ah	; 6d27
+	defb 038h,02ah,00ah,00ah	; 6d2b
+	defb 04eh,03ch,00bh,003h	; 6d2f
+	defb 044h,02fh,008h,00bh	; 6d33
+
+; ----------------------------------------------------------------------
+; DATOS ficha_de_terreno_en_curso: Los 16 costes de terreno de la unidad que
+;   se esta moviendo. No es una tabla fija: 0x6738 copia aqui la ficha de su
+;   tipo en cada vuelta, y 0x68AB la lee con el nibble bajo del byte de mapa
+;   0x6d37..0x6d47  (16 bytes)
+DATA_ficha_de_terreno_en_curso:
+	defb 003h,0ffh,0ffh,00fh,003h,003h,003h,00fh,003h,003h,00fh,003h,0ffh,003h,0ffh,003h	; 6d37  ................
+
+; ----------------------------------------------------------------------
+; DATOS fichas_de_tropa: Lo que le cuesta cada uno de los 16 terrenos a cada
+;   tipo de tropa: 16 bytes por tipo. Son DIEZ fichas y no dieciseis -detras
+;   de la decima ya empieza el codigo de 0x6DE7-, y los tipos que usa la cinta
+;   van del 0 al 9. Negativo es intransitable: los terrenos 1 y 2 lo son para
+;   todos
+;   0x6d47..0x6de7  (160 bytes)
+DATA_fichas_de_tropa:
+	defb 003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h,00fh,003h	; 6d47  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh,00fh,003h	; 6d57  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh,00fh,003h	; 6d67  ................
+	defb 003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h,00fh,003h	; 6d77  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh,003h,002h	; 6d87  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,003h,003h,003h,003h,003h,00fh,00fh,003h,002h	; 6d97  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h,00fh,003h	; 6da7  ................
+	defb 003h,0ffh,0ffh,003h,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,003h,00fh,003h	; 6db7  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh,00fh,003h	; 6dc7  ................
+	defb 003h,0ffh,0ffh,00fh,003h,003h,002h,00fh,003h,003h,003h,003h,00fh,00fh,00fh,003h	; 6dd7  ................
 
 ; ======================================================================
 ; CODIGO 0x6de7..0x7697  (2224 bytes)
@@ -6067,7 +6210,7 @@ FIGURA_ABATIDA:		; La figura cae: si era la ultima de su ejercito, el ejercito d
 	ld l,(hl)			;8f03
 	ld h,0c5h		;8f04   ; 0xC500 de ese ejercito: cuantas figuras le quedaban
 	ld a,(hl)			;8f06
-	and a			;8f07
+	and a			;8f07   ; A CERO NO SE RESTA, SE DA POR DESHECHO. Los 24 personajes con nombre traen 0xC500 = 0 de la cinta: no llevan tropa, y por eso desaparecen del mapa al PRIMER golpe que les tumba la figura
 	jr z,EJERCITO_DESHECHO		;8f08
 	dec (hl)			;8f0a   ; Una menos; si aun quedan, se acabo
 	jr nz,SIGUIENTE_EN_COMBATE		;8f0b
@@ -6497,6 +6640,10 @@ MIRA_SI_VIVE_EL_OTRO:		; Con que quede una viva, la batalla sigue
 	jr nz,MIRA_SI_VIVE_EL_OTRO		;91c9
 	ld de,NO_HACE_NADA		;91cb
 	ld hl,BORRA_EL_EJERCITO_DEL_MAPA		;91ce
+
+; ----------------------------------------------------------------------
+; Al bando que pierde se le BORRA DEL MAPA entero. 0x91B4 y 0x91CE
+; ----------------------------------------------------------------------
 SE_ACABO_LA_BATALLA:		; Deja en los dos call de abajo quien gana y quien pierde, y se lo aplica a cada ejercito
 	ld (091eeh),hl		;91d1   ; 0x91EE es el operando del call de 0x91ED
 	ld (EL_OTRO_BANDO+1),de		;91d4   ; 0x91F3 es el operando del call de 0x91F2

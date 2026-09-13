@@ -22,11 +22,13 @@ from estilo_web import ESTILO  # noqa: E402
 # castellano bajo docs/es/.
 NAV_EN = [("index.html", "Home"), ("GETTING-STARTED.html", "Start"),
           ("THE-GAME.html", "The game"), ("THE-TAPE.html", "The tape"),
-          ("THE-CODE.html", "The code"), ("FINDINGS.html", "Findings"),
+          ("THE-CODE.html", "The code"), ("THE-MACHINE.html", "The machine"),
+          ("FINDINGS.html", "Findings"),
           ("OPEN-QUESTIONS.html", "Open questions")]
 NAV_ES = [("index.html", "Portada"), ("EMPEZAR.html", "Empezar"),
           ("EL-JUEGO.html", "El juego"), ("LA-CINTA.html", "La cinta"),
-          ("EL-CODIGO.html", "El código"), ("HALLAZGOS.html", "Hallazgos"),
+          ("EL-CODIGO.html", "El código"), ("LA-MAQUINA.html", "La máquina"),
+          ("HALLAZGOS.html", "Hallazgos"),
           ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas")]
 
 # Cada documento se llama distinto en cada idioma, asi que el selector de idioma
@@ -36,6 +38,7 @@ _PAREJAS = [("GETTING-STARTED.html", "EMPEZAR.html"),
             ("THE-GAME.html", "EL-JUEGO.html"),
             ("THE-TAPE.html", "LA-CINTA.html"),
             ("THE-CODE.html", "EL-CODIGO.html"),
+            ("THE-MACHINE.html", "LA-MAQUINA.html"),
             ("FINDINGS.html", "HALLAZGOS.html"),
             ("OPEN-QUESTIONS.html", "PREGUNTAS-ABIERTAS.html")]
 PAREJA = {}
@@ -43,11 +46,11 @@ for _en, _es in _PAREJAS:
     PAREJA[_en] = _es
     PAREJA[_es] = _en
 
-# El pie va en el idioma de la pagina, y los creditos son los que dice la propia
-# pantalla de creditos del juego (0xF124-0xF2D0 del bloque del juego), leidos del
-# binario: "CONVERSION POR CARLOS ARIAS / GRAFICOS JUAN CARLOS Y JAVIER AREVALO /
-# ...ADEMAS DE... JULIO MARTIN / MUSICA COMPUESTA POR GOMINOLAS / BASADO EN UNA
-# IDEA ORIGINAL DE JOSE MANUEL MU&OZ". La pantalla de carga va firmada CANO.
+# El pie va en el idioma de la pagina, y los creditos son los que dice el propio
+# juego: la pantalla de carga (bloque [08] de la cinta, dibujada por
+# tools/render_carga.py) trae "MAELSTROM GAMES LTD. PRESENTS", "War in Middle
+# Earth", "Mike Singleton" y "CONVERSION by ANIMAGIC sa"; el menu anade
+# "Programado por C.J.Pink".
 PIE = {
     "es": "<em>War in Middle Earth</em> lo publicó Melbourne House y lo distribuyó "
           "Dro Soft. Su propia pantalla de carga lo firma: <b>MAELSTROM GAMES LTD. "

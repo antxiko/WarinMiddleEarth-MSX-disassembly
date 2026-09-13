@@ -1,0 +1,145 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cómo juega la máquina — War in Middle Earth (1989)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,640px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="LA-CINTA.html">La cinta</a><a href="EL-CODIGO.html">El código</a><a href="LA-MAQUINA.html" style=color:var(--tinta)>La máquina</a><a href="HALLAZGOS.html">Hallazgos</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../THE-MACHINE.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="como-juega-la-maquina">Cómo juega la máquina</h1>
+<p>Qué hace de verdad el ordenador mientras tú miras el mapa: a dónde manda sus ejércitos, cómo pelea y por qué se te esfuman Gandalf y Aragorn.</p>
+<p>Todo lo que hay aquí está leído en el desensamblado, no jugando. Al final de cada apartado van las rutinas exactas de las que sale, por si alguien quiere comprobarlo.</p>
+<h2 id="la-respuesta-corta">La respuesta corta</h2>
+<p>No hay ningún plan. La máquina no sabe dónde estás, no va a por ti, no defiende nada y no cambia de idea nunca. Lo único que hace es coger un ejército, mirar en qué cruce de carretera está y <b>tirar una moneda al aire</b> para decidir por cuál de las dos salidas sigue. Y otra vez. Y otra vez, durante toda la partida.</p>
+<p>Todo lo demás —que parezca que te rodean, que aparezcan justo donde no quieres, que un héroe desaparezca sin avisar— sale de esa moneda y de tres o cuatro reglas muy tontas.</p>
+<h2 id="una-ficha-por-vuelta-y-a-la-cola">Una ficha por vuelta, y a la cola</h2>
+<p>El juego lleva una lista de 256 fichas: tus personajes, tus ejércitos y los de Sauron, todos mezclados en la misma lista. En cada vuelta del programa <b>mueve una sola</b>, la siguiente de la lista, y pasa el turno. Cuando llega al final vuelve a empezar por la primera.</p>
+<p>Ninguna unidad se mueve «más rápido» por ser más importante: todas tienen el mismo turno, y la máquina no decide a cuál mover. Le toca a la que le toca.</p>
+<blockquote>En el listado: <code>MUEVE_LA_SIGUIENTE_UNIDAD</code> (0x6719). El número de ficha vive dentro de la propia instrucción y da la vuelta solo al desbordar.</blockquote>
+<h2 id="la-tierra-media-tiene-carreteras-y-son-estas">La Tierra Media tiene carreteras, y son estas</h2>
+<p>Cuando a un ejército de la máquina le toca turno y ya ha llegado a donde iba, hay que darle un destino nuevo. No lo elige: el juego trae grabada una <b>red de cruces</b>, y cada cruce tiene apuntados exactamente dos sitios a los que se puede seguir. El ordenador busca el cruce en el que está, tira la moneda y se va al otro.</p>
+<p>Son dos redes distintas. Una grande, de 64 cruces, que cubre el mapa entero; y una pequeña, de 15, que es el pasillo del centro. Y la pequeña no es otra cosa que <b>un trozo de la grande, renumerado</b>: sus quince cruces son quince de los sesenta y cuatro, con las salidas reescritas para que apunten dentro de la lista corta.</p>
+<p>Qué red te toca depende sólo de tu número en la lista: los ejércitos del último tramo van por la pequeña, los del tramo anterior por la grande, Sauron por la grande y Saruman por la pequeña. Los personajes con nombre no van por ninguna, porque a esos los mueves tú.</p>
+<p><img src="../imagenes/ia_redes.png" alt="Las dos redes de caminos sobre el mapa"></p>
+<p>Los cruces caen justo encima de los caminos que el juego dibuja en el mapa: no es casualidad, es la misma red. Las rectas del dibujo son sólo «de este cruce al siguiente»; el camino de verdad lo va improvisando la unidad casilla a casilla.</p>
+<p>Mirando el dibujo se entiende de golpe algo que cualquiera que haya jugado ha notado: los ejércitos oscuros aparecen siempre por los mismos sitios. Es que sólo pueden aparecer por ahí.</p>
+<blockquote>En el listado: <code>DESTINO_POR_LA_RED_GRANDE</code> (0x69C1), con la tabla de 64 puntos en 0x6BFB, y <code>DESTINO_POR_LA_RED_CHICA</code> (0x6993), con los 15 de 0x6CFB. Cada punto son cuatro bytes: columna, fila y sus dos salidas. El reparto, en <code>REPARTE_POR_NUMERO</code> (0x6A17).</blockquote>
+<h2 id="un-paso-hacia-alla-y-un-bandazo">Un paso hacia allá, y un bandazo</h2>
+<p>Puesto el destino, andar es sencillo: se mira hacia dónde cae y se da un paso en esa dirección… <em>casi</em>. Antes de dar el paso, el juego coge un número al azar y le suma un bandazo a la dirección, así que a veces sale torcido. Por eso las tropas no van en línea recta y parecen dudar.</p>
+<p>El bandazo no está repartido a partes iguales. De cada dieciséis tiradas, diez van rectas, cuatro se desvían hacia un lado y sólo dos hacia el otro: la máquina <b>tira más hacia un lado que hacia el otro</b>.</p>
+<p>Si el terreno de la casilla no deja pasar, prueba otras dos veces con otro bandazo, y si tampoco, se pone a rodear el obstáculo: mira hacia los dos lados a ver por cuál sale antes y se pega a esa orilla hasta salir. El código que continúa el rodeo en los turnos siguientes <b>tiene un fallo</b> y siempre gira en el mismo sentido, salga o no salga a cuenta.</p>
+<p>Y el terreno importa por tipo de tropa: cada clase de unidad trae su tablita de dieciséis terrenos con lo que le cuesta cada uno. Dos terrenos están marcados como prohibidos para todo el mundo, y otros cuestan cinco veces más que un camino. Ese coste no es sólo tiempo: es el número de turnos que la unidad se queda quieta antes de poder mover otra vez.</p>
+<p>Esa tabla, por cierto, tiene <b>diez fichas y no dieciséis</b>. Los tipos de tropa que la cinta usa de verdad van del 0 al 9, y justo detrás de la décima ficha empieza ya el código del juego.</p>
+<blockquote>En el listado: <code>DA_UN_PASO</code> (0x67C5), los dieciséis bandazos en 0x6B23, <code>TRES_INTENTOS</code> (0x6809), y el rodeo en <code>BUSCA_HUECO_GIRANDO</code> (0x686E) y <code>SIGUE_RODEANDO</code> (0x68BD), con el fallo en 0x68CA. Las fichas de terreno, en 0x6D47.</blockquote>
+<h2 id="andar-cansa-y-quien-se-cansa-se-planta">Andar cansa, y quien se cansa se planta</h2>
+<p>Cada unidad lleva un número que baja cada vez que se mueve. Cuando cae por debajo de un mínimo, la unidad <b>se planta donde esté</b> y descansa hasta recuperarse; sólo entonces vuelve a andar. Nadie decide eso: es automático, y le pasa igual a tus ejércitos que a los de Sauron.</p>
+<p>Ese mismo número decide luego cuánta vida tienen sus soldados en una batalla. Una tropa que llega reventada de andar pelea peor. Es lo más parecido a una idea táctica que hay en todo el juego, y ni siquiera es una decisión: es una resta.</p>
+<blockquote>En el listado: el contador está en 0xC200+n, se descuenta en 0x6752 y por debajo de 11 salta a <code>SE_PLANTA</code> (0x6951). <code>DESCANSA</code> (0x6945) lo sube hasta 40.</blockquote>
+<h2 id="el-despliegue-no-se-calcula-viene-en-la-cinta">El despliegue no se calcula: viene en la cinta</h2>
+<p>Uno espera que al empezar una partida el ordenador reparta sus ejércitos. No hace nada de eso. <b>Las posiciones de las 256 fichas vienen grabadas en la cinta</b>, tal cual, y empezar partida nueva sólo pone en marcha el reloj. La primera partida y la número cien empiezan exactamente igual.</p>
+<p><img src="../imagenes/ia_despliegue.png" alt="El despliegue inicial de los dos bandos"></p>
+<p>Ahí está todo lo que hay en la partida, en su primer segundo. Los personajes con nombre salen apiñados en una sola casilla. Sauron tiene más tropa que tú desde el principio, y repartida en menos sitios y más gordos.</p>
+<p>Sauron, además, no se mueve de su torre. En la partida completa que se midió en el emulador no dio un paso; y hay una regla que dice que <b>si llegas a destruir su ejército, se lo devuelven a su casilla con la fuerza al máximo</b>. No se le puede quitar de ahí.</p>
+<blockquote>En el listado: las tiras de estado 0xB900 (columna), 0xBA00 (fila), 0xBD00 (tipo) y 0xC500 (tropa), que llegan dentro del bloque alto de la cinta. <code>EMPIEZA_PARTIDA_NUEVA</code> (0x7F43) sólo toca el estado de 0xC600. La reposición de Sauron, en <code>PON_EL_EJERCITO_16_EN_SU_SITIO</code> (0x922C).</blockquote>
+<h2 id="nadie-decide-entrar-en-combate">Nadie decide entrar en combate</h2>
+<p>La batalla no se elige. Cada vez que una ficha —cualquiera— da un paso, el juego cuenta quién hay en esa casilla; si hay gente de los dos bandos, <b>batalla, y sin preguntar</b>. Basta con que una patrulla de orcos pase por encima de donde tú estabas parado.</p>
+<p>Lo que pasa entonces:</p>
+<ol><li>Se suma la fuerza de cada bando en esa casilla. Si no caben todos en el tablero, se recorta con un cupo, y los que no entran se quedan fuera de la pelea.</li><li>El tablero se monta como un damero: sólo se anda en diagonal, así que las fichas nunca cambian de color de casilla. Se tiran <b>quince obstáculos al azar</b> por el medio.</li><li>Cada figura se coloca en una casilla sorteada. El sorteo está cargado: uno de los bandos sale escorado hacia un borde y el otro hacia el contrario, así que se empieza cara a cara aunque nadie lo haya ordenado.</li></ol>
+<blockquote>En el listado: <code>REPARTE_LOS_QUE_ENTRAN</code> (0x8F70) y el cupo en 0x8FD1; el damero y los obstáculos en 0x9070; el sorteo cargado, con la tabla de tramos que se monta en 0x908D y se le da la vuelta para el segundo bando en 0x90F7.</blockquote>
+<h2 id="cada-muneco-va-a-lo-suyo">Cada muñeco va a lo suyo</h2>
+<p>Aquí tampoco hay mando único. Cada figura, cuando le toca, hace esto: si ya tiene a alguien pegado, pelea; si no, <b>busca al enemigo más cercano… pero sólo dentro de una distancia que se sortea en ese momento</b>. Si la tirada sale corta, no ve a nadie aunque lo tenga a tres casillas.</p>
+<p>Para andar hacia su objetivo tiene dos formas de decidir la diagonal —mirar primero una coordenada o primero la otra— y <b>echa a suertes cuál usa</b>. Si la casilla a la que iba está ocupada, prueba otra diagonal, también al azar. Y si esa también lo está, se queda quieto.</p>
+<p>Los turnos van en rueda de cuatro: en una vuelta se resuelven los golpes, en la siguiente se mueve un bando, y dos de las cuatro casillas de la rueda <b>están vacías</b>, no hacen nada en absoluto. De ahí ese ritmo tan raro, medio a tirones, de la batalla.</p>
+<p>El golpe es un dado contra un número: si la tirada sale por debajo de lo que acierta esa figura, le quita vida al otro. A cero se cae. Unos pocos tipos de tropa se levantan hasta cuatro veces con la vida llena antes de caer del todo; los demás, ninguna.</p>
+<blockquote>En el listado: <code>MUEVE_LAS_UNIDADES</code> (0x897D), <code>BUSCA_A_QUIEN_PERSEGUIR</code> (0x8A86) con la distancia sorteada en 0x8A8E, las dos rutinas de dirección (0x8908 y 0x8925) con el sorteo en 0x89B4, la rueda de cuatro en 0x9163 sobre la tabla de 0x94B7, y los golpes en <code>RESUELVE_LOS_COMBATES</code> (0x8E95).</blockquote>
+<h2 id="por-que-desaparecen-gandalf-y-aragorn">Por qué desaparecen Gandalf y Aragorn</h2>
+<p>La explicación que se daba antes —«se quedan sin ejército»— <b>no vale</b>, y quien haya jugado mucho tiene razón en no tragársela. Los personajes con nombre <b>no tienen ejército en ningún momento</b>: la casilla que dice cuánta tropa lleva cada ficha vale <b>cero</b> para los veinticuatro, desde que la cinta termina de cargar. Van solos.</p>
+<p>Y ahí está el problema. Cuando una figura cae en el tablero, el juego va a descontar un soldado del ejército al que pertenecía, pero antes comprueba si queda alguno. Se encuentra ese cero, lo entiende como <em>«ya no queda nada»</em> y <b>borra la ficha del mapa en ese mismo instante</b>. No hay desgaste, ni aviso, ni segunda oportunidad: el personaje desaparece al primer golpe que le tumba.</p>
+<p>A eso hay que sumarle dos cosas:</p>
+<ul><li><b>Tú no decides entrar en la batalla.</b> Si un ejército enemigo pisa la casilla donde estaba tu héroe, entra, y ya está.</li><li><b>Al acabar la batalla, el bando que pierde se borra entero del mapa.</b> Todos los que habían entrado, hayan caído en el tablero o no. Un personaje puede desaparecer sin que nadie llegara a tocarlo, sólo por estar en la casilla equivocada cuando su bando pierde.</li></ul>
+<p>Lo único que distingue a unos de otros es cuántas veces se levanta su figura antes de caer: Gandalf es de los que se levantan cuatro veces y Aragorn no se levanta ninguna. De ahí que Gandalf aguante media partida y Aragorn se vaya pronto, una y otra vez. No es mala suerte: es su tipo de tropa.</p>
+<blockquote>En el listado: el cero que se lee como agotado, en 0x8F06, que salta a <code>EJERCITO_DESHECHO</code> (0x8F0D) y de ahí a <code>BORRA_EL_EJERCITO_DEL_MAPA</code> (0x8F1A). El borrado del bando perdedor, en 0x91B4 y 0x91CE, repartido por 0x91DB. Las cuatro levantadas, en <code>CUATRO_SI_ES_TIPO_0_1_O_7</code> (0x8DC0).</blockquote>
+<h2 id="lo-que-la-maquina-no-hace">Lo que la máquina no hace</h2>
+<p>Leído el programa entero, la lista de lo que <em>no</em> hay es más corta de escribir que la de lo que hay:</p>
+<ul><li>No mira dónde está el jugador. En ningún sitio del código se pregunta por ti para decidir un movimiento.</li><li>No junta tropas ni las manda a un objetivo común: cada ejército tira su propia moneda en su propio cruce.</li><li>No defiende nada, ni protege a Sauron, ni corta caminos.</li><li>No aprende ni cambia de comportamiento según cómo vaya la partida: el reloj sólo sirve para que se te acabe el tiempo.</li><li>Y en la batalla, ninguna figura sabe lo que hacen las de su bando.</li></ul>
+<p>Lo que hay, en cambio, es un mapa enorme, mucha tropa repartida y un montón de monedas al aire por segundo. Con eso basta para que parezca que alguien está jugando contra ti. Y en cierto modo funciona mejor así: una máquina de 1988 con un plan de verdad habría sido más predecible que esta, que no tiene ninguno.</p>
+<h2 id="los-dibujos-de-esta-pagina">Los dibujos de esta página</h2>
+<p>No son capturas de pantalla. El mapa se descomprime igual que lo hace el juego al arrancar y se pinta casilla a casilla repitiendo lo que hace su motor de dibujo; encima se marcan los cruces de las dos redes y las posiciones de salida, tal como vienen en los datos de la cinta. Los hace <code>tools/render_redes.py</code>, y si alguno de esos rangos estuviera mal etiquetado saldría ruido en vez de la Tierra Media.</p>
+<footer><p><em>War in Middle Earth</em> lo publicó Melbourne House y lo distribuyó Dro Soft. Su propia pantalla de carga lo firma: <b>MAELSTROM GAMES LTD. PRESENTS</b>, <b>Mike Singleton</b> y <b>CONVERSION by ANIMAGIC sa</b>; el menú añade «Programado por C.J.Pink». Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservación, estudio y documentación.</p></footer></div>

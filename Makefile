@@ -16,7 +16,7 @@ TSX  := war.tsx
 TSX_SHA := 13c636328d1714d5e00419141ca1a7ac9c7a3a04d7ec2b26545212aab1d81208
 SYMS := work/msx.sym
 
-.PHONY: all verify clean extract cuerpos trazado listados sanity test cinta imagenes web
+.PHONY: all verify clean extract cuerpos trazado listados sanity test cinta imagenes web densidad
 
 all: verify
 
@@ -124,6 +124,7 @@ imagenes: extracted/.stamp
 	@mkdir -p docs/imagenes
 	@python3 tools/render_carga.py work/pantalla.raw docs/imagenes/carga.png
 	@python3 tools/render_graficos.py work/alto.raw docs/imagenes
+	@python3 tools/render_redes.py work/alto.raw work/medio.raw docs/imagenes/ia
 
 verify: listados sanity
 	@echo "=================================================================="
@@ -134,6 +135,15 @@ verify: listados sanity
 	@sh tools/verify_build.sh src/war_bajo.asm     work/bajo.raw     0x0190
 	@sh tools/verify_build.sh src/war_medio.asm    work/medio.raw    0x5E00
 	@sh tools/verify_build.sh src/war_alto.asm     work/alto.raw     0x9E00
+
+# Rutina a rutina: cuantas instrucciones llevan comentario. El liston de la
+# serie son dos cifras -mas del 22 % en total y ninguna rutina por debajo del
+# 10 %-, y esta regla es la que las mide.
+densidad:
+	@echo "=================================================================="
+	@echo " Densidad de comentarios, listado a listado"
+	@echo "=================================================================="
+	@for f in src/war_*.asm; do echo "== $$f =="; python3 tools/densidad.py $$f; done
 
 test:
 	@echo "=================================================================="

@@ -49,6 +49,17 @@ have **not been broken down field by field**. `0xB900` is called X and `0xBA00`
 Y because `0x8108` multiplies the first by 102, which is the column stride, and
 `0x8166` walks columns in the outer loop; that is consistent, not proven.
 
+**Partly closed.** Reading the machine's decision code (see *The machine*) named
+several of these strips for good: `0xBB00`/`0xBC00` is the destination,
+`0xBD00` the troop type in its low nibble, `0xC200` the number that walking
+spends, `0xC500` how many figures the piece puts on a battle board and `0xC600`
+its state. And the index into all of them is **the same index as the name list**
+at `0x6B46`, which `BUSCA_EL_NOMBRE` (`0x6981`) walks with the unit number: that
+is what makes piece `0x16` Sauron and `0x17` Saruman, and it matches the five
+places where the code singles those two out. What is still open are the high
+flag bits of `0xBD00` beyond bits 4 and 5, and the strips `0xC000`, `0xC100` and
+`0xE600`.
+
 ### 2. What the map's second pass adds
 
 Drawing the map takes three passes. The second (`0x7714`) indexes `0x77B5` with

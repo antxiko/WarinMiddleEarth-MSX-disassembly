@@ -61,8 +61,8 @@ table or a self-modified operand decides where to go.
 | `war_loader` | 379 | 150 | 39.6% | 0 of 48 |
 | `war_pantalla` | 14 | 10 | 71.4% | 0 of 1 |
 | `war_bajo` | 785 | 226 | 28.8% | 0 of 96 |
-| `war_medio` | 5,664 | 1,645 | **29.0%** | **0 of 621** |
-| **total** | **6,844** | **2,031** | **29.7%** | **0 of 767** |
+| `war_medio` | 5,664 | 1,646 | **29.1%** | **0 of 621** |
+| **total** | **6,844** | **2,032** | **29.7%** | **0 of 767** |
 
 The series applies two figures, and both are met: **over 22% density and no
 routine below 10%**.

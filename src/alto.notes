@@ -21,9 +21,23 @@ F 0x9E00 9
 D 0xA280 0xA2E8 ceros_antes_de_los_sprites 104 ceros delante de los sprites de batalla (sin lector en la partida completa)
 D 0xA2E8 0xB8E8 sprites_de_batalla 176 sprites de batalla de 16x8 con mascara, 32 B cada uno en PAREJAS mascara/dibujo y en zigzag (0x887B: izquierda, derecha, baja, izquierda), dibujados en docs/imagenes/sprites-de-batalla.png (0xA2E8 + (tipo-4)*32 en 0x87B4-0x87C4 y 0x87E9-0x87FB); los leen 0x880B-0x8824, 0x887C-0x8895, 0x88B9-0x88C6, 0x88DA-0x88EE y 0x88F3-0x8903 durante la batalla
 F 0xA2E8 32
-D 0xB8E8 0xBE00 tablas_de_estado_b900 Tablas de estado del juego (0xB900 la apuntan 0x6AC2, 0x6EAC, 0x8F7A...; las lee 0x92E4 en bloque; formato pendiente)
+# Las tiras del estado de la partida. Cada una son 256 bytes y el indice es el
+# NUMERO DE UNIDAD, el mismo que indexa la lista de nombres de 0x6B46: por eso
+# la 0x16 es Sauron y la 0x17 Saruman. Las siete tiras seguidas (0xB900-0xC8FF)
+# son lo que graba y carga la opcion de salvar partida (0x9631, 0x9667).
+D 0xB8E8 0xB900 cola_antes_del_estado 24 bytes delante de las tiras de estado, sin lector conocido
+D 0xB900 0xBA00 unidades_columna La columna de cada unidad en el mapa (0x8108 la multiplica por 102). El bit 7 no es coordenada: es una de las banderas con las que 0x67B0 recuerda por que lado estaba rodeando un obstaculo
+D 0xBA00 0xBB00 unidades_fila La fila de cada unidad, con la otra bandera de rodeo en el bit 7. Las dos a cero quieren decir "no esta en el mapa": es lo que deja BORRA_EL_EJERCITO_DEL_MAPA (0x8F1A)
+D 0xBB00 0xBC00 unidades_destino_columna La columna de su destino; o, si la tira de al lado vale 0xFE o mas, el NUMERO de la unidad a la que persigue (0x6961 sigue la cadena hasta 256 saltos)
+D 0xBC00 0xBD00 unidades_destino_fila La fila de su destino. De 0xFE arriba no es una fila: dice que lo de 0xBB00 es una unidad a la que seguir
+D 0xBD00 0xBE00 unidades_tipo_y_banderas Nibble bajo: el tipo de tropa, que indexa las fichas de 0x6D47 y las tablas de dibujo. Bit 4: lleva el Anillo (lo busca 0x733E). Bit 5: ha entrado en la batalla que se esta resolviendo (lo pone 0x9004 y lo mira 0x91DB para borrar al bando perdedor)
 D 0xBE00 0xC000 ram_de_trabajo_be00 Ceros: RAM de trabajo que viene cargada (0xBE00/0xBF00 las escriben 0x8BC3, 0x914E...)
-D 0xC000 0xC600 tablas_de_estado_c100 Tablas de estado (0xC1xx las toca el menu en 0x5E8D-0x5E9E: nivel; formato pendiente)
+D 0xC000 0xC100 unidades_tabla_c000 Una tira por unidad que el menu toca en 0x5E8D-0x5E9E (el nivel) y de la que 0x926E gasta el nibble bajo cada vez que se usa la tecla R para salir de una batalla: a cero, derrota. El nibble alto se conserva
+D 0xC100 0xC200 unidades_acierto_y_golpe De aqui salen los dos numeros con los que peleara cada figura suya: el nibble BAJO da lo que acierta (a 0xE400, tras multiplicarlo en 0x8D29) y el ALTO lo que quita cada golpe (a 0xE500, por 0x8D2F)
+D 0xC200 0xC300 unidades_fuelle Lo que le queda de andar a cada unidad: 0x6752 le resta uno por paso y por debajo de 11 la unidad SE PLANTA (0x6951) hasta recuperarse; ademas es el numero por el que se multiplica la vida de sus figuras en batalla (0x8D38)
+D 0xC300 0xC400 unidades_meses Un contador por unidad al que 0x8340 le suma uno cada mes del juego, saturando en 255
+D 0xC400 0xC500 figuras_dibujo El dibujo de cada FIGURA del tablero de batalla (no de cada unidad del mapa): lo escribe 0x8D8A con el tipo de tropa por dos, e indexa la tabla de 0x94C7
+D 0xC500 0xC600 unidades_tropa Cuantas figuras pone cada unidad en un tablero de batalla, y la cuenta de las que le quedan vivas. Los 24 personajes con nombre traen CERO, y 0x8F07 lee ese cero como "ya no queda nada": por eso desaparecen del mapa al primer golpe que les tumban la figura
 D 0xC600 0xC800 ram_de_trabajo_c600 Ceros: RAM de trabajo que viene cargada (0x7F43 y 0x9239 la limpian con ld hl,0xC600 / ld de,0xC601)
 D 0xC800 0xCC00 fuente La FUENTE: 128 caracteres de 8 bytes. Los codigos 0x00-0x20 estan A CERO (33 caracteres vacios, contados byte a byte); el primero con dibujo es 0x21 y de ahi salen marcos, flechas, digitos, mayusculas y minusculas. La leen 0x7620-0x763C y el volcado a VRAM de 0x043F (dibujada en docs/imagenes/fuente.png con tools/render_graficos.py)
 F 0xC800 8
