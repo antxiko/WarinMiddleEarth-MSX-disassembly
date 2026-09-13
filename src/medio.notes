@@ -2118,8 +2118,21 @@ C 0x8DD6 ... ni del 12 arriba ...
 C 0x8DD9 ... ni en el 10
 C 0x8DDC El terreno 11 da 50
 C 0x8DE1 Y los terrenos 7, 8 y 9 dan 100
+B 0x8DE4 EL INDICE DE ESTA TABLA ESTA MAL, Y POR ESO SIEMPRE SALE LO MISMO.
+  La tabla de 0x6D47 son diez fichas de dieciseis bytes, una por tipo de tropa,
+  con lo que le cuesta cada clase de terreno; los otros dos sitios que la leen
+  -0x6728 y 0x9296- la indexan con tipo*16, con sus CUATRO `add a,a`. Aqui solo
+  hay TRES, o sea tipo*8, y encima el terreno entra con un `or` en vez de
+  sumarse, sobre un 0x47 que ya trae los tres bits bajos puestos. Resultado: de
+  la tabla solo se pueden leer diez posiciones -0x6D47, 0x6D4F, 0x6D57 ... una
+  cada ocho- y en todas hay un 3. MEDIDO ejecutando la rutina en el emulador
+  con las 160 parejas (tipo, terreno) posibles, con el juego cargado en RAM
+  (tools/omsx_barre_fuerza.tcl): devuelve 3 en las 160, asi que C sale siempre
+  24 y la vida de las figuras no depende ni del tipo de tropa ni del terreno.
+  SUPOSICION, no demostrable desde el binario: faltaba un `add a,a` y el `or`
+  queria ser un `add`.
 L 0x8DE4 FUERZA_DE_LA_TROPA  A = tipo; lee la tabla de 0x6D47 y le suma la ventaja del terreno
-C 0x8DE7 0x6D47: la tabla de tropas del bloque de textos
+C 0x8DE7 0x6D47: la tabla de tropas del bloque de textos. Solo hay TRES add a,a antes: tipo*8, no tipo*16
 C 0x8DE9 Operando en 0x8DEA, que escribe 0x902F
 C 0x8DF1 Lo de la tabla, por ocho
 C 0x8DF5 Y la ventaja que da el terreno

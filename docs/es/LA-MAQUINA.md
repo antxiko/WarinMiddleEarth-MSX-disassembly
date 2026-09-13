@@ -185,6 +185,31 @@ los demás, ninguna.
 > (0x8908 y 0x8925) con el sorteo en 0x89B4, la rueda de cuatro en 0x9163 sobre
 > la tabla de 0x94B7, y los golpes en `RESUELVE_LOS_COMBATES` (0x8E95).
 
+## Y una tabla que el juego nunca llega a leer bien
+
+Cada tipo de tropa trae su tabla de terrenos, la misma que decide lo que le
+cuesta andar por cada sitio. Al montar una batalla, el juego va a buscar en esa
+tabla lo que a **ese** tipo de tropa le supone **ese** terreno, para
+descontárselo a la vida de sus figuras: la idea, se ve, era que una tropa que se
+mueve mal por un sitio peleara peor en él.
+
+Nunca pasa. La cuenta con la que busca está mal hecha —salta de ocho en ocho
+donde debería saltar de dieciséis, y mezcla el terreno con el índice en vez de
+sumarlo—, así que de toda la tabla sólo puede caer en diez posiciones sueltas, y
+en las diez hay el mismo número. **Siempre saca un 3**, sea cual sea la tropa y
+sea cual sea el terreno.
+
+No es una sospecha de leer el código: hemos puesto al propio Z80 a ejecutar esa
+rutina con las **160 combinaciones** posibles de tropa y terreno, con el juego
+cargado en memoria, y devuelve lo mismo en las ciento sesenta. Los otros dos
+sitios del juego que leen esa misma tabla sí la recorren bien, lo que hace
+pensar que aquí faltó una línea.
+
+Así que dos cosas que uno daría por descontadas —que unas tropas aguanten más
+que otras, y que el terreno donde peleas cuente— **no influyen en nada**. Lo
+único que decide la dureza de una figura es lo cansada que llegara su unidad de
+andar.
+
 ## El nivel de dificultad es una sola cosa
 
 El menú ofrece «6. Nivel», del 1 al 15, y uno se imagina que ahí se decide
