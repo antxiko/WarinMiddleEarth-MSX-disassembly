@@ -2118,21 +2118,25 @@ C 0x8DD6 ... ni del 12 arriba ...
 C 0x8DD9 ... ni en el 10
 C 0x8DDC El terreno 11 da 50
 C 0x8DE1 Y los terrenos 7, 8 y 9 dan 100
-B 0x8DE4 EL INDICE DE ESTA TABLA ESTA MAL, Y POR ESO SIEMPRE SALE LO MISMO.
-  La tabla de 0x6D47 son diez fichas de dieciseis bytes, una por tipo de tropa,
-  con lo que le cuesta cada clase de terreno; los otros dos sitios que la leen
-  -0x6728 y 0x9296- la indexan con tipo*16, con sus CUATRO `add a,a`. Aqui solo
-  hay TRES, o sea tipo*8, y encima el terreno entra con un `or` en vez de
-  sumarse, sobre un 0x47 que ya trae los tres bits bajos puestos. Resultado: de
-  la tabla solo se pueden leer diez posiciones -0x6D47, 0x6D4F, 0x6D57 ... una
-  cada ocho- y en todas hay un 3. MEDIDO ejecutando la rutina en el emulador
-  con las 160 parejas (tipo, terreno) posibles, con el juego cargado en RAM
-  (tools/omsx_barre_fuerza.tcl): devuelve 3 en las 160, asi que C sale siempre
-  24 y la vida de las figuras no depende ni del tipo de tropa ni del terreno.
-  SUPOSICION, no demostrable desde el binario: faltaba un `add a,a` y el `or`
-  queria ser un `add`.
-L 0x8DE4 FUERZA_DE_LA_TROPA  A = tipo; lee la tabla de 0x6D47 y le suma la ventaja del terreno
-C 0x8DE7 0x6D47: la tabla de tropas del bloque de textos. Solo hay TRES add a,a antes: tipo*8, no tipo*16
+B 0x8DE4 ESTA RUTINA LEE UN BYTE CUALQUIERA DE LA PAGINA 0x6D00.
+  Deberia sacar de la tabla de 0x6D47 lo que a un tipo de tropa le cuesta el
+  terreno donde se pelea, pero **ni siquiera recibe el tipo**: 0x8D37 carga en A
+  el 0xC200 de la unidad -lo que le queda de andar- y con ESO entra aqui. Lo
+  multiplica por ocho, le suma 0x47 y le mete el terreno con un `or`, asi que la
+  direccion final recorre toda la pagina: cae dentro de la tabla, en el bufer de
+  la ficha en curso (0x6D37), en la red de caminos chica o en el codigo que
+  empieza en 0x6DE7. MEDIDO ejecutando la rutina en el emulador con las 4.096
+  parejas (0xC200, terreno) posibles, con el juego cargado
+  (tools/omsx_barre_fuerza.tcl): devuelve ONCE valores distintos -3 en 2.816 de
+  los 4.096 casos, porque la tabla esta llena de treses, y ademas 40, 57, 65,
+  66, 71, 72, 78, 88, 205 y 217-, o sea que la fuerza que se descuenta va de 8
+  a 200. El terreno solo alcanza a mover un bit, y el tipo de tropa no
+  interviene. Los otros dos lectores de la tabla si la recorren bien:
+  CARGA_LA_FICHA_DEL_TIPO (0x6728) y TECLA_R_EN_LA_BATALLA (0x9296), que ademas
+  hace justo lo que aqui se pretendia: base tipo*16 y el terreno de indice.
+  SUPOSICION, no demostrable desde el binario: que A tenia que traer el tipo.
+L 0x8DE4 FUERZA_DE_LA_TROPA  A = el 0xC200 de la unidad; lee un byte de la pagina 0x6D00 y le suma la ventaja del terreno
+C 0x8DE7 0x6D47: la tabla de tropas. Pero lo que se ha multiplicado por ocho es el 0xC200 de la unidad, no un tipo de tropa
 C 0x8DE9 Operando en 0x8DEA, que escribe 0x902F
 C 0x8DF1 Lo de la tabla, por ocho
 C 0x8DF5 Y la ventaja que da el terreno

@@ -44,44 +44,56 @@ proc byte {a} { return [debug read memory $a] }
 set ::caso 0
 set ::distintos {}
 array set ::salida {}
+array set ::hl {}
 
 proc prepara {} {
-    set tipo [expr {$::caso / 16}]
+    set ca [expr {$::caso / 16}]
     set terr [expr {$::caso % 16}]
     debug write memory 0x8DEA $terr
-    reg a $tipo
+    reg a $ca
     reg pc 0x8DE4
 }
 
 proc recoge {} {
-    set tipo [expr {$::caso / 16}]
+    set ca [expr {$::caso / 16}]
     set terr [expr {$::caso % 16}]
     set v [reg a]
-    set ::salida($tipo,$terr) $v
+    set ::salida($ca,$terr) $v
+    set ::hl($ca,$terr) [reg hl]
     if {[lsearch $::distintos $v] < 0} { lappend ::distintos $v }
-    if {$terr == 0} {
-        di "  tipo $tipo, terreno 0: HL=[format 0x%04X [reg hl]], la tabla da $v"
-    }
     incr ::caso
-    if {$::caso < 160} {
+    if {$::caso < 4096} {
         prepara
         return
     }
-    di "-------- los 160 casos, ejecutados por el Z80 --------"
-    for {set t 0} {$t < 10} {incr t} {
-        set fila ""
+    di "-------- los 4096 casos, ejecutados por el Z80 --------"
+    di "valores distintos devueltos: [lsort -integer $::distintos]"
+    # Un histograma, y aparte el de los valores que 0xC200 toma de verdad en la
+    # cinta (de 27 a 158).
+    array set cuenta {}
+    array set cuenta_real {}
+    for {set ca 0} {$ca < 256} {incr ca} {
         for {set e 0} {$e < 16} {incr e} {
-            append fila [format " %3d" $::salida($t,$e)]
+            set v $::salida($ca,$e)
+            incr cuenta($v)
+            if {$ca >= 27 && $ca <= 158} { incr cuenta_real($v) }
         }
-        di "  tipo $t ->$fila"
     }
-    di "valores distintos devueltos: $::distintos"
-    if {[llength $::distintos] == 1} {
-        set v [lindex $::distintos 0]
-        di "CONFIRMADO: siempre $v. La fuerza que sale de aqui es [expr {$v * 8}],"
-        di "la misma para los diez tipos de tropa y los dieciseis terrenos."
-    } else {
-        di "NO siempre el mismo: la lectura del listado estaba equivocada."
+    di "histograma sobre los 4096:"
+    foreach v [lsort -integer [array names cuenta]] {
+        di [format "   valor %3d -> %4d casos   (fuerza %3d)" $v $cuenta($v) [expr {($v * 8) & 0xFF}]]
+    }
+    di "y solo con los valores de 0xC200 que existen en la cinta (27..158):"
+    foreach v [lsort -integer [array names cuenta_real]] {
+        di [format "   valor %3d -> %4d casos   (fuerza %3d)" $v $cuenta_real($v) [expr {($v * 8) & 0xFF}]]
+    }
+    di "unas cuantas direcciones tocadas, para ver el reparto:"
+    foreach ca {27 50 100 117 130 158} {
+        set l ""
+        foreach e {0 3 7 12} {
+            append l [format " (t%d)%04X->%d" $e $::hl($ca,$e) $::salida($ca,$e)]
+        }
+        di "   0xC200=$ca:$l"
     }
     after realtime 1 {exit 0}
 }
@@ -114,4 +126,4 @@ after time 1 {
 }
 
 set throttle off
-after realtime 240 {di "se acabo el tiempo en el caso $::caso"; exit 3}
+after realtime 600 {di "se acabo el tiempo en el caso $::caso"; exit 3}
