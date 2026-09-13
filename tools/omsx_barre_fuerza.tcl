@@ -1,10 +1,15 @@
 # Ejecuta FUERZA_DE_LA_TROPA (0x8DE4) con TODOS los tipos y terrenos posibles.
 #
-# Esperar a que una partida pase por sus 160 combinaciones es inviable -en dos
-# horas y media de la partida de Araubi no hubo ni una batalla-, asi que se hace
-# al reves: con el juego ya cargado en la RAM, se le pone al Z80 el tipo en A y
-# el terreno en el operando de 0x8DEA, se coloca el PC en 0x8DE4 y se le deja
-# ejecutar la rutina. En 0x8DF1, A ya trae el byte que ha salido de la tabla.
+# Esperar a que una partida pase por sus 160 combinaciones es inviable: se dejo
+# correr el replay de Araubi 52.828 segundos emulados con un punto de ruptura en
+# 0x9021 y no se registro NI UNA batalla (work/fuerza/fuerza.log). Cuidado con
+# leer de mas en ese dato: el guion no detectaba el final del replay, asi que
+# parte de ese tiempo es el emulador corriendo solo, sin nadie a los mandos. Lo
+# que si vale es que por ahi no iba a salir la medida.
+#
+# Asi que se hace al reves: con el juego ya cargado en la RAM, se le pone al Z80
+# el tipo en A y el terreno en el operando de 0x8DEA, se coloca el PC en 0x8DE4
+# y se le deja ejecutar la rutina. En 0x8DF1, A ya trae el byte de la tabla.
 #
 #   8DE4 add a,a / 8DE5 add a,a / 8DE6 add a,a / 8DE7 add a,047h / 8DE9 or nn
 #   8DEB ld l,a / 8DEC adc a,06dh / 8DEE sub l / 8DEF ld h,a / 8DF0 ld a,(hl)

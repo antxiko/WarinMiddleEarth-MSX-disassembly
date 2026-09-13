@@ -6777,7 +6777,7 @@ BUSCA_LA_SALIDA:		; Recorre las siete entradas hasta dar con una que valga
 	ld (092afh),a		;92aa   ; 0x92AF es el operando de un ld que 0x92A9 va cambiando
 	ld a,(ix+000h)		;92ad
 	and 00fh		;92b0
-	ld (092b7h),a		;92b2   ; 0x92B7 es el operando del cp de 0x92B6
+	ld (092b7h),a		;92b2   ; 0x92B7 es el DESPLAZAMIENTO del ld a,(iy+d) de 0x92B5: asi se lee la ficha del tipo en la posicion del terreno, que es justo lo que 0x8DE4 no llega a hacer
 	ld a,(iy+000h)		;92b5
 	or a			;92b8   ; Bit 7: esta entrada vale
 	jp p,SE_LARGA_DE_LA_BATALLA		;92b9
